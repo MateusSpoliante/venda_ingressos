@@ -19,7 +19,7 @@ function App() {
       <div className="divisoria"></div>
 
       <form className="login-box" onSubmit={handleSubmit}>
-        <h2>LOGIN</h2>
+        <h2>Login</h2>
 
         <div className="input-group">
           {/* EMAIL */}
