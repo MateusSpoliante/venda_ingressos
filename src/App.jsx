@@ -12,11 +12,16 @@ function App() {
 
   return (
     <div className="login-container">
+      <div className="uniTicket-title">
+        <img src="/logo.png" alt="logo" />
+        <h1>Uni Ticket</h1>
+      </div>
+      <div className="divisoria"></div>
+
       <form className="login-box" onSubmit={handleSubmit}>
         <h2>LOGIN</h2>
 
         <div className="input-group">
-
           {/* EMAIL */}
           <label>Email</label>
           <input
