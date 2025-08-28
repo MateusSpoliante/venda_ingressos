@@ -1,15 +1,16 @@
 import { useState } from "react";
-import './Login.css'
+import "./Login.css";
 
-function Login() {
+function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-    const handleSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`Login realizado com sucesso!\nEmail: ${email}\nSenha: ${senha}`);
+    /* alert(`Login realizado com sucesso!\nEmail: ${email}\nSenha: ${senha}`); */
+    onLogin();
   };
-  
+
   return (
     <div className="login-container">
       <div className="uniTicket-title">
