@@ -13,7 +13,6 @@ function Login({ onLogin }) {
 
   return (
     <div className="login-container">
-      
       <div className="logoDiv">
         <img src="/logo.png" alt="logo" />
         <div className="ticket-title">
