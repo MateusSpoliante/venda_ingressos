@@ -13,10 +13,14 @@ function Login({ onLogin }) {
 
   return (
     <div className="login-container">
-      <div className="uniTicket-title">
+      
+      <div className="logoDiv">
         <img src="/logo.png" alt="logo" />
-        <h1>Uni Ticket</h1>
+        <div className="ticket-title">
+          <h1>OPEN TICKET</h1>
+        </div>
       </div>
+
       <div className="divisoria"></div>
 
       <form className="login-box" onSubmit={handleSubmit}>

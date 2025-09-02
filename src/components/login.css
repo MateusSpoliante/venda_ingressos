@@ -1,48 +1,67 @@
+/* Container principal */
 .login-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgba(10, 0, 50, 0.9);
-  padding: 40px 30px;
-  padding-top: 20px;
-  width: 350px;
-  border-radius: 20px;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(10px);
+  background: #f7f3e8;
+  padding: 28px 25px;
+  width: 420px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.uniTicket-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: bold;
-  color: #00e5ff;
-  text-align: center;
+/* Logo + título */
+.logoDiv {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  margin-bottom: 10px;
 }
 
-.uniTicket-title img {
-  width: 72px;
-  height: 72px;
+.logoDiv img {
+  margin: -20px;
+  margin-bottom: -22px;
+  width: 120px;
+  height: 120px;
 }
 
+.ticket-title h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #5789a6;
+  text-align: center;
+  -webkit-text-stroke: 2px #04324c;
+}
+
+/* Linha divisória */
 .divisoria {
   width: 100%;
-  height: 1.5px;
-  background: #00e5ff;
-  border-radius: 40px;
-  box-shadow: 0 0 10px 1.3px #00e5ff;
+  height: 1px;
+  background: #f97721;
+  margin: 15px 0;
+  box-shadow: 0px 0px 4px #ff8331;
 }
 
+/* Box do formulário */
+.login-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Subtítulo */
 .login-box h2 {
-  margin-bottom: 1.5rem;
-  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
   font-weight: bold;
-  color: #00e5ff;
-  text-align: start;
+  color: #111;
+  text-align: left;
+  width: 100%;
 }
 
+/* Inputs */
 .input-group {
   display: flex;
   flex-direction: column;
@@ -52,42 +71,42 @@
 }
 
 .input-group label {
-  font-size: 0.9rem;
-  color: #bbb;
+  font-size: 0.85rem;
+  color: #666;
 }
 
 .input-group input {
   padding: 10px;
-  border: none;
-  border-radius: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
   outline: none;
   font-size: 1rem;
-  background: #1a1a3d;
-  color: white;
-  transition: 0.3s;
+  background: #fafafa;
+  color: #000;
+  transition: 0.2s;
 }
 
 .input-group input:focus {
-  background: #2a2a5c;
-  box-shadow: 0 0 6px #00e5ff;
+  border-color: #333;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
 }
 
+/* Botão */
 .btn-login {
   margin-top: 1rem;
   width: 100%;
   padding: 12px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: bold;
-  color: #0a0032;
-  background: linear-gradient(135deg, #00e5ff, #3c4cff);
+  color: #fff;
+  background: #333;
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
+  transition: 0.3s;
 }
 
 .btn-login:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, #3c4cff, #00e5ff);
-  box-shadow: 0 5px 15px rgba(0, 229, 255, 0.5);
+  background: #111;
 }
