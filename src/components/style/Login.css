@@ -2,14 +2,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #ffffff;
-  /* branco clean */
+  background: #ffffff; /* branco clean */
   padding: 30px 25px;
   width: 420px;
   border-radius: 2.5px;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.08);
 }
-
 
 /* Logo + título */
 .logoDiv {
@@ -37,8 +35,8 @@
 
 /* Linha divisória */
 .divisoria {
-  width: 100%;
-  height: 1px;
+  width: 100%; 
+  height: 2px;
   background: #f97721;
   margin: 15px 0;
   box-shadow: 0px 0px 4px #ff8331;
@@ -123,13 +121,12 @@
   background-color: #ffae3d;
 }
 
-
 /* ===== Responsividade ===== */
 @media (max-width: 768px) {
-   body {
+  body {
     min-height: 100vh;
   }
-  
+
   .login-container {
     max-width: 400px;
   }
@@ -155,16 +152,7 @@
     padding: 8px;
   }
 
-  .btn-login {
-    font-size: 0.95rem;
-    padding: 10px;
-  }
-
-  .btn-login {
-    font-size: 0.95rem;
-    padding: 10px;
-  }
-
+  .btn-login,
   .btn-cad {
     font-size: 0.95rem;
     padding: 10px;
@@ -185,7 +173,8 @@
 
   .ticket-title h1 {
     font-size: 1.3rem;
-    -webkit-text-stroke: 1px #04324c;
+    -webkit-text-stroke: 0.8px #04324c; /* menor stroke */
+    color: #5789a6;
   }
 
   .logoDiv img {
@@ -193,11 +182,7 @@
     height: 75px;
   }
 
-  .btn-login {
-    padding: 9px;
-    font-size: 0.9rem;
-  }
-
+  .btn-login,
   .btn-cad {
     padding: 9px;
     font-size: 0.9rem;
@@ -205,7 +190,7 @@
 }
 
 @media (max-width: 360px) {
-   body {
+  body {
     min-height: 100vh;
   }
 
@@ -218,8 +203,9 @@
   }
 
   .ticket-title h1 {
-    font-size: 1.3rem;
-    -webkit-text-stroke: 1px #04324c;
+    font-size: 1.2rem;
+    -webkit-text-stroke: 0.7px #04324c;
+    color: #5789a6;
   }
 
   .logoDiv img {
@@ -227,11 +213,7 @@
     height: 75px;
   }
 
-  .btn-login {
-    padding: 9px;
-    font-size: 0.9rem;
-  }
-
+  .btn-login,
   .btn-cad {
     padding: 9px;
     font-size: 0.9rem;

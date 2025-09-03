@@ -49,7 +49,7 @@ function Login({ onLogin }) {
         <button type="submit" className="btn-login">
           Entrar
         </button>
-        <button type="submit" className="btn-cad"> 
+        <button type="button" className="btn-cad"> 
           Cadastrar
         </button>
       </form>
