@@ -36,7 +36,7 @@
 /* Linha divisória */
 .divisoria {
   width: 100%; 
-  height: 2px;
+  height: 1px;
   background: #f97721;
   margin: 15px 0;
   box-shadow: 0px 0px 4px #ff8331;
@@ -122,6 +122,7 @@
 }
 
 /* ===== Responsividade ===== */
+
 @media (max-width: 768px) {
   body {
     min-height: 100vh;
@@ -166,14 +167,14 @@
 
   .login-container {
     max-width: 320px;
-    max-height: 400px;
+    max-height: 420px;
     border-radius: 2.5px;
     justify-content: center;
   }
 
   .ticket-title h1 {
     font-size: 1.3rem;
-    -webkit-text-stroke: 0.8px #04324c; /* menor stroke */
+    -webkit-text-stroke: 0.8px #04324c;
     color: #5789a6;
   }
 
@@ -196,7 +197,7 @@
 
   .login-container {
     max-width: 250px;
-    max-height: 400px;
+    max-height: 420px;
     border-radius: 2.5px;
     justify-content: center;
     align-items: center;
