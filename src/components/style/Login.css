@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #ffffff; /* branco clean */
+  background: #ffffff;
+  /* branco clean */
   padding: 30px 25px;
   width: 420px;
   border-radius: 2.5px;
@@ -77,19 +78,17 @@
 
 .input-group input {
   padding: 10px;
-  border:none;
+  border: none;
   border-radius: 2.5px;
   outline: none;
   font-size: 1rem;
-  background: #ececec;
+  background: #efefef;
   color: #000;
   transition: 0.2s;
 }
 
 .input-group input:focus {
-  border-color: #333;
-  background: #fff;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+  background-color: #e4e4e4;
 }
 
 /* Botão */
