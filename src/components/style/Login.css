@@ -92,7 +92,8 @@
 }
 
 /* Botão */
-.btn-login {
+.btn-login,
+.btn-cad {
   margin-top: 1rem;
   width: 100%;
   padding: 12px;
@@ -100,18 +101,35 @@
   border-radius: 2.5px;
   font-size: 1rem;
   font-weight: bold;
-  color: #fff;
-  background: #054062;
   cursor: pointer;
   transition: 0.3s;
 }
 
-.btn-login:hover {
-  background: #e88800;
+.btn-login {
+  color: #fff;
+  background: #054062;
 }
+
+.btn-cad {
+  color: #ffffff;
+  background: #ff990a;
+}
+
+.btn-login:hover {
+  background: #3c83ac;
+}
+
+.btn-cad:hover {
+  background-color: #ffae3d;
+}
+
 
 /* ===== Responsividade ===== */
 @media (max-width: 768px) {
+   body {
+    min-height: 100vh;
+  }
+  
   .login-container {
     max-width: 400px;
   }
@@ -141,9 +159,23 @@
     font-size: 0.95rem;
     padding: 10px;
   }
+
+  .btn-login {
+    font-size: 0.95rem;
+    padding: 10px;
+  }
+
+  .btn-cad {
+    font-size: 0.95rem;
+    padding: 10px;
+  }
 }
 
 @media (max-width: 480px) {
+  body {
+    min-height: 100vh;
+  }
+
   .login-container {
     max-width: 320px;
     max-height: 400px;
@@ -165,9 +197,18 @@
     padding: 9px;
     font-size: 0.9rem;
   }
+
+  .btn-cad {
+    padding: 9px;
+    font-size: 0.9rem;
+  }
 }
 
 @media (max-width: 360px) {
+   body {
+    min-height: 100vh;
+  }
+
   .login-container {
     max-width: 250px;
     max-height: 400px;
@@ -187,6 +228,11 @@
   }
 
   .btn-login {
+    padding: 9px;
+    font-size: 0.9rem;
+  }
+
+  .btn-cad {
     padding: 9px;
     font-size: 0.9rem;
   }

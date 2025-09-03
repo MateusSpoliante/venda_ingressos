@@ -49,6 +49,9 @@ function Login({ onLogin }) {
         <button type="submit" className="btn-login">
           Entrar
         </button>
+        <button type="submit" className="btn-cad"> 
+          Cadastrar
+        </button>
       </form>
     </div>
   );
