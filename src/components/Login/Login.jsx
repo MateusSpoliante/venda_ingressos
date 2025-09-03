@@ -1,15 +1,6 @@
-import { useState } from "react";
-import "./style/Login.css";
+import "./Login.css";
 
-function Login({ onLogin }) {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    /* alert(`Login realizado com sucesso!\nEmail: ${email}\nSenha: ${senha}`); */
-    onLogin();
-  };
+function Login() {
 
   return (
     <div className="login-container">
@@ -22,7 +13,7 @@ function Login({ onLogin }) {
 
       <div className="divisoria"></div>
 
-      <form className="login-box" onSubmit={handleSubmit}>
+      <form className="login-box">
         <h2>Login</h2>
 
         <div className="input-group">
@@ -31,8 +22,6 @@ function Login({ onLogin }) {
           <input
             type="email"
             placeholder="Digite seu email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             required
           />
 
@@ -41,8 +30,6 @@ function Login({ onLogin }) {
           <input
             type="password"
             placeholder="Digite sua senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
             required
           />
         </div>
@@ -50,7 +37,7 @@ function Login({ onLogin }) {
           Entrar
         </button>
         <button type="button" className="btn-cad"> 
-          Cadastrar
+          Cadastre-se
         </button>
       </form>
     </div>
