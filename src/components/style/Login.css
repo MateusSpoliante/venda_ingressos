@@ -77,11 +77,11 @@
 
 .input-group input {
   padding: 10px;
-  border: 1px solid #ccc;
+  border:none;
   border-radius: 2.5px;
   outline: none;
   font-size: 1rem;
-  background: #fafafa;
+  background: #ececec;
   color: #000;
   transition: 0.2s;
 }
@@ -108,7 +108,7 @@
 }
 
 .btn-login:hover {
-  background: #ff9500;
+  background: #e88800;
 }
 
 /* ===== Responsividade ===== */
