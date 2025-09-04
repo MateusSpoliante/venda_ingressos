@@ -12,7 +12,7 @@ function LoginWrapper() {
 
 function RoutesApp() {
   return (
-    <BrowserRouter>
+    <BrowserRouter> 
       <Fragment>
         <Routes>
           <Route path="/home" element={<Home />} />

@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #ffffff; /* branco clean */
+  background: #ffffff;
+  /* branco clean */
   padding: 30px 25px;
   width: 420px;
   border-radius: 2.5px;
@@ -35,7 +36,7 @@
 
 /* Linha divisória */
 .divisoria {
-  width: 100%; 
+  width: 100%;
   height: 1px;
   background: #f97721;
   margin: 15px 0;
@@ -90,8 +91,13 @@
 }
 
 /* Botão */
+.link-cad {
+  text-decoration: none;
+  width: 100%;
+}
+
 .btn-login,
-.btn-cad {
+.btn-cad-login {
   margin-top: 1rem;
   width: 100%;
   padding: 12px;
@@ -108,17 +114,23 @@
   background: #054062;
 }
 
-.btn-cad {
+.btn-cad-login {
   color: #ffffff;
   background: #ff990a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .btn-login:hover {
   background: #3c83ac;
+  transform: scale(1.01);
 }
 
-.btn-cad:hover {
+.btn-cad-login:hover {
   background-color: #ffae3d;
+  transform: scale(1.01);
 }
 
 /* ===== Responsividade ===== */
@@ -154,7 +166,7 @@
   }
 
   .btn-login,
-  .btn-cad {
+  .btn-cad-login {
     font-size: 0.95rem;
     padding: 10px;
   }
@@ -184,7 +196,7 @@
   }
 
   .btn-login,
-  .btn-cad {
+  .btn-cad-login {
     padding: 9px;
     font-size: 0.9rem;
   }
@@ -215,7 +227,7 @@
   }
 
   .btn-login,
-  .btn-cad {
+  .btn-cad-login {
     padding: 9px;
     font-size: 0.9rem;
   }

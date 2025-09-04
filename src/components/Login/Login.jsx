@@ -1,7 +1,8 @@
+import { Link } from "react-router-dom";
 import "./Login.css";
+import { UserRoundPlus } from "lucide-react";
 
 function Login() {
-
   return (
     <div className="login-container">
       <div className="logoDiv">
@@ -19,26 +20,20 @@ function Login() {
         <div className="input-group">
           {/* EMAIL */}
           <label>Email</label>
-          <input
-            type="email"
-            placeholder="Digite seu email"
-            required
-          />
+          <input type="email" placeholder="Digite seu email" required />
 
           {/* SENHA */}
           <label>Senha</label>
-          <input
-            type="password"
-            placeholder="Digite sua senha"
-            required
-          />
+          <input type="password" placeholder="Digite sua senha" required />
         </div>
         <button type="submit" className="btn-login">
           Entrar
         </button>
-        <button type="button" className="btn-cad"> 
-          Cadastre-se
-        </button>
+        <Link to="/cadastro" className="link-cad">
+          <button type="button" className="btn-cad-login">
+            Criar Conta <UserRoundPlus size={20}/>
+          </button>
+        </Link>
       </form>
     </div>
   );
