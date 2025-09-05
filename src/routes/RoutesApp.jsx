@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
-import Login from "../components/Login/Login";
-import Cadastro from "../components/Cadastro/Cadastro";
-import Home from "../components/Home/Home";
+import Login from "../pages/Login/Login";
+import Cadastro from "../pages/Cadastro/Cadastro";
+import Home from "../pages/Home/Home";
 import { Fragment } from "react";
 
 // Componente de login que redireciona se já estiver logado
