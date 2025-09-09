@@ -1,10 +1,10 @@
+import { Outlet } from "react-router-dom";
 import "./App.css";
-import RoutesApp from "./routes/RoutesApp";
 
 function App() {
   return (
     <div>
-      <RoutesApp />
+      <Outlet/>
     </div>
   );
 }
