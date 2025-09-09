@@ -12,7 +12,7 @@ app.use(express.json());
 const pool = mysql.createPool({
   host: "localhost",
   user: "root",
-  password: "74859612", // ajuste para sua senha do MySQL
+  password: "hostbd25", // ajuste para sua senha do MySQL
   database: "venda_ingressos",
   port: 3306,
   waitForConnections: true,
