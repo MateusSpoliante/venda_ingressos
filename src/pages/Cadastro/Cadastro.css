@@ -111,3 +111,94 @@
     background: #ff6d6d;
     transform: scale(1.02);
 }
+
+/* Responsividade Cadastro */
+@media (max-width: 768px) {
+  .cad-container {
+    width: 425px;
+    padding: 25px 20px;
+  }
+
+  .cad-box h2 {
+    font-size: 1.3rem;
+  }
+
+  .input-group-cad {
+    width: 90%;
+  }
+
+  .input-group-cad input {
+    font-size: 0.95rem;
+    padding: 9px;
+  }
+
+  .btn-cad {
+    width: 40%;
+    font-size: 0.95rem;
+    padding: 10px;
+  }
+
+  .btn-voltar {
+    font-size: 0.95rem;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cad-container {
+    width: 330px;
+    padding: 20px 15px;
+  }
+
+  .cad-box h2 {
+    font-size: 1.1rem;
+  }
+
+  .input-group-cad {
+    width: 100%;
+  }
+
+  .input-group-cad input {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+
+  .btn-cad {
+    width: 40%;
+    font-size: 0.9rem;
+    padding: 9px;
+  }
+
+  .btn-voltar {
+    font-size: 0.9rem;
+    padding: 6px 9px;
+  }
+}
+
+@media (max-width: 360px) {
+  .cad-container {
+    width: 100%;
+    padding: 15px 10px;
+    border-radius: 2px;
+  }
+
+  .cad-box h2 {
+    font-size: 1rem;
+  }
+
+  .input-group-cad input {
+    font-size: 0.85rem;
+    padding: 7px;
+  }
+
+  .btn-cad {
+    width: 70%;
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+
+  .btn-voltar {
+    font-size: 0.85rem;
+    padding: 5px 8px;
+  }
+}
