@@ -16,15 +16,15 @@ function Cadastro() {
     setSucesso("");
 
     try {
-      const res = await fetch("/api/cadastro", {
+      const resposta = await fetch("http://localhost:3000/api/cadastro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),
       });
 
-      const data = await res.json();
+      const data = await resposta.json();
 
-      if (!res.ok) {
+      if (!resposta.ok) {
         setErro(data.erro || "Erro ao cadastrar");
       } else {
         setSucesso(data.mensagem);
@@ -61,8 +61,10 @@ function Cadastro() {
           />
         </div>
 
-        {erro && <p className="mensagem-erro">{erro}</p>}
-        {sucesso && <p className="mensagem-sucesso">{sucesso}</p>}
+        {erro && <div style={{ color: "red", marginTop: "8px" }}>{erro}</div>}
+        {sucesso && (
+          <div style={{ color: "green", marginTop: "8px" }}>{sucesso}</div>
+        )}
 
         <button type="submit" className="btn-cad">
           Cadastrar
