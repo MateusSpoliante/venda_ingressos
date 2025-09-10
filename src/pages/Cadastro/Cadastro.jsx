@@ -16,7 +16,7 @@ function Cadastro() {
     setSucesso("");
 
     try {
-      const resposta = await fetch("https://openticket.onrender/api/login", {
+      const resposta = await fetch("https://openticket.onrender.com/api/cadastro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),
