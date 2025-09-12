@@ -1,16 +1,17 @@
 {
   "name": "venda_ingressos_backend",
   "version": "1.0.0",
-  "main": "index.cjs",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.cjs"
+    "start": "node index.js"
   },
   "dependencies": {
+    "postgres": "^3.4.7",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
     "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.14.4"
+    "jsonwebtoken": "^9.0.2"
   }
 }
