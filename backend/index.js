@@ -11,7 +11,7 @@ if (!process.env.JWT_SECRET) {
   throw new Error("⚠️ Defina JWT_SECRET no arquivo .env");
 }
 
-const app = express();
+const app = express();  
 app.use(cors());
 app.use(express.json());
 
@@ -96,5 +96,5 @@ app.post("/api/login", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+  console.log(`🚀 Servidor rodando em   ${PORT}`);
 });
