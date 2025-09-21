@@ -1,0 +1,10 @@
+{
+  "name": "venda_ingressos",
+  "version": "1.0.0",
+  "scripts": {
+    "start:all": "concurrently \"cd frontend && npm run dev\" \"cd backend && npm start\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
