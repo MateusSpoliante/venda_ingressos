@@ -1,3 +1,11 @@
+.body-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #f5f6f7;
+}
+
 .login-container {
   display: flex;
   flex-direction: column;
@@ -133,6 +141,21 @@
   transform: scale(1.01);
 }
 
+form a {
+  display: flex;
+  text-decoration: none;
+  color: #0b82c7;
+  margin-top: 15px;
+  align-items: center;
+  gap: 4px;
+  transition: 0.3s;
+}
+
+form a:hover {
+  color: #ffae3d;
+  transform: scale(1.01);
+}
+
 /* ===== Responsividade ===== */
 
 @media (max-width: 768px) {
@@ -230,5 +253,28 @@
   .btn-cad-login {
     padding: 9px;
     font-size: 0.9rem;
+  }
+}
+
+.spinner {
+  border: 3px solid #f3f3f3;
+  /* cor da borda */
+  border-top: 3px solid #054062;
+  /* cor da borda superior */
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
   }
 }

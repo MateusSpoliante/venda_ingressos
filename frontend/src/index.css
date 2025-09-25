@@ -7,10 +7,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
+/* index.css: Apenas o ESSENCIAL GLOBAL */
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background: linear-gradient(135deg, #f3f3f3 0%, #e6e6e6 100%);
-  color: white;
+  font-family: "Inter", sans-serif;
 }

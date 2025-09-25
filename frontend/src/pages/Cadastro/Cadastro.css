@@ -1,115 +1,123 @@
+.body-cad {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #f5f6f7;
+}
+
 .cad-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #f3f8ff;
-    /* tom azulado claro em vez de branco */
-    padding: 30px 25px;
-    width: 550px;
-    border-radius: 2.5px;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  /* tom azulado claro em vez de branco */
+  padding: 30px 25px;
+  width: 550px;
+  border-radius: 2.5px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .cad-box {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Subtítulo */
 .cad-box h2 {
-    font-size: 1.6rem;
-    font-weight: bold;
-    color: #054062;
-    /* azul forte no título */
-    width: 100%;
-    text-align: center;
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #054062;
+  /* azul forte no título */
+  width: 100%;
+  text-align: center;
 }
 
 /* Inputs */
 .input-group-cad {
-    display: flex;
-    flex-direction: column;
-    width: 80%;
-    margin-bottom: 1rem;
-    gap: 5px;
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  margin-bottom: 1rem;
+  gap: 5px;
 
 }
 
 .input-group-cad label {
-    font-size: 0.85rem;
-    color: #333;
-    /* mais escuro */
+  font-size: 0.85rem;
+  color: #333;
+  /* mais escuro */
 }
 
 .input-group-cad input {
-    padding: 10px;
-    border: none;
-    border-radius: 2.5px;
-    outline: none;
-    font-size: 1rem;
-    background: #e8f0ff;
-    /* tom azul bem claro */
-    color: #000;
-    transition: 0.2s;
-    margin-top: 2px;
+  padding: 10px;
+  border: none;
+  border-radius: 2.5px;
+  outline: none;
+  font-size: 1rem;
+  background: #e8f0ff;
+  /* tom azul bem claro */
+  color: #000;
+  transition: 0.2s;
+  margin-top: 2px;
 }
 
 .input-group-cad input:focus {
-    background-color: #d4e6ff;
+  background-color: #d4e6ff;
 }
 
 /* Botão */
 .btn-cad {
-    margin-top: 1rem;
-    width: 20%;
-    padding: 12px;
-    border: none;
-    border-radius: 2.5px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-    color: #fff;
-    background: #00c624;
-    /* azul escuro */
+  margin-top: 1rem;
+  width: 20%;
+  padding: 12px;
+  border: none;
+  border-radius: 2.5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  color: #fff;
+  background: #00c624;
+  /* azul escuro */
 }
 
 .btn-cad:hover {
-    background-color: #00da54;
-    transform: scale(1.01);
+  background-color: #00da54;
+  transform: scale(1.01);
 }
 
 /* Voltar */
 .link-cad {
-    text-decoration: none;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: start;
+  text-decoration: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
 }
 
 .btn-voltar {
-    margin-top: 1.8rem;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 2.5px;
-    font-size: 1.0rem;
-    cursor: pointer;
-    transition: 0.3s;
-    color: #fff;
-    background: #e60000;
-    /* invertido: aqui o laranja */
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4px;
+  margin-top: 1.8rem;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 2.5px;
+  font-size: 1.0rem;
+  cursor: pointer;
+  transition: 0.3s;
+  color: #fff;
+  background: #e60000;
+  /* invertido: aqui o laranja */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
 }
 
 .btn-voltar:hover {
-    background: #ff6d6d;
-    transform: scale(1.02);
+  background: #ff6d6d;
+  transform: scale(1.02);
 }
 
 /* Responsividade Cadastro */
