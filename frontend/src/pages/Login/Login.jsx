@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
-import { ArrowLeft, UserCheck, UserRoundPlus } from "lucide-react";
+import { UserCheck, UserRoundPlus } from "lucide-react";
 
 function Login() {
   const navigate = useNavigate();
@@ -37,13 +37,15 @@ function Login() {
       localStorage.setItem("nome", dados.nome);
 
       setSucesso(
-        <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+        <span
+          style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
+        >
           <UserCheck /> Login realizado com sucesso!
         </span>
       );
 
       setTimeout(() => {
-        navigate("/");
+        navigate("/home"); // vai direto pra Home protegida
       }, 1500);
     } catch (err) {
       console.error(err);
@@ -54,7 +56,7 @@ function Login() {
   }
 
   return (
-    <body className="body-login">
+    <div className="body-login">
       <div className="login-container">
         <div className="logoDiv">
           <img src="/logo.png" alt="logo" />
@@ -88,7 +90,9 @@ function Login() {
           </div>
 
           {erro && <div style={{ color: "red", marginTop: "8px" }}>{erro}</div>}
-          {sucesso && <div style={{ color: "green", marginTop: "8px" }}>{sucesso}</div>}
+          {sucesso && (
+            <div style={{ color: "green", marginTop: "8px" }}>{sucesso}</div>
+          )}
 
           <button type="submit" className="btn-login" disabled={loading}>
             {loading ? <span className="spinner"></span> : "Entrar"}
@@ -102,14 +106,9 @@ function Login() {
           >
             Criar Conta <UserRoundPlus size={20} />
           </button>
-
-          <a href="/">
-            <ArrowLeft size={20} />
-            Navegar sem Logar
-          </a>
         </form>
       </div>
-    </body>
+    </div>
   );
 }
 

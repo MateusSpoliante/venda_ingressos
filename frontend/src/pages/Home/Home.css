@@ -256,3 +256,170 @@
     transform: rotate(360deg);
   }
 }
+
+
+/* ===== Responsividade Home ===== */
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 20px;
+  }
+
+  .nav {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 20px;
+  }
+
+  .search-bar {
+    width: 250px;
+  }
+
+  .banner {
+    margin: 15px 20px;
+    padding: 30px;
+    height: 300px;
+  }
+
+  .banner-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .buy-btn {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 15px;
+  }
+
+  .logoDiv {
+    margin-left: 0;
+    margin-top: 0;
+    gap: 10px;
+  }
+
+  .logoDiv img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .logoDiv h1 {
+    font-size: 1.2rem;
+    -webkit-text-stroke: 1px #04324c;
+  }
+
+  .search-bar {
+    width: 200px;
+  }
+
+  .header-actions {
+    width: 100%;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .nav {
+    justify-content: space-around;
+  }
+
+  .banner {
+    margin: 10px 15px;
+    padding: 20px;
+    height: 250px;
+  }
+
+  .banner-content {
+    padding: 15px 20px;
+  }
+
+  .banner-content h1 {
+    font-size: 1.3rem;
+  }
+
+  .buy-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .logoDiv img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .logoDiv h1 {
+    font-size: 1rem;
+    -webkit-text-stroke: 0.8px #04324c;
+  }
+
+  .search-bar {
+    width: 150px;
+  }
+
+  .header-actions button {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+
+  .nav {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 10px;
+  }
+
+  .banner {
+    height: 200px;
+    padding: 15px;
+    margin: 10px;
+  }
+
+  .banner-content h1 {
+    font-size: 1.1rem;
+  }
+
+  .buy-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .floating-buttons {
+    bottom: 15px;
+    right: 15px;
+    gap: 10px;
+  }
+
+  .floating-buttons button {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .banner {
+    height: 180px;
+    padding: 10px;
+  }
+
+  .banner-content h1 {
+    font-size: 1rem;
+  }
+
+  .buy-btn {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+
+  .floating-buttons button {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+}

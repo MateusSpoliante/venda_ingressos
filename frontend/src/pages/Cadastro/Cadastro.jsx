@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 function Cadastro() {
   const navigate = useNavigate();
   const [nome, setNome] = useState("");
+  const [cpfCnpj, setCpfCnpj] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
@@ -20,7 +21,7 @@ function Cadastro() {
       const resposta = await fetch("http://localhost:3000/api/cadastro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({nome, email, senha }),
+        body: JSON.stringify({ nome, cpfCnpj, email, senha }),
       });
 
       const data = await resposta.json();
@@ -53,6 +54,16 @@ function Cadastro() {
               required
             />
 
+            <label>CPF/CNPJ</label>
+            <input
+              type="text"
+              placeholder="Digite seu CPF ou CNPJ"
+              value={cpfCnpj}
+              onChange={(e) => setCpfCnpj(e.target.value)}
+              maxLength={14}
+              required
+            />
+
             <label>Email</label>
             <input
               type="email"
@@ -73,9 +84,7 @@ function Cadastro() {
           </div>
 
           {erro && <div style={{ color: "red", marginTop: "8px" }}>{erro}</div>}
-          {sucesso && (
-            <div style={{ color: "green", marginTop: "8px" }}>{sucesso}</div>
-          )}
+          {sucesso && <div style={{ color: "green", marginTop: "8px" }}>{sucesso}</div>}
 
           <button type="submit" className="btn-cad">
             Cadastrar

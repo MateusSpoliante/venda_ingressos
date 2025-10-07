@@ -11,7 +11,6 @@
   flex-direction: column;
   align-items: center;
   background: #ffffff;
-  /* tom azulado claro em vez de branco */
   padding: 30px 25px;
   width: 550px;
   border-radius: 2.5px;
@@ -30,7 +29,6 @@
   font-size: 1.6rem;
   font-weight: bold;
   color: #054062;
-  /* azul forte no título */
   width: 100%;
   text-align: center;
 }
@@ -42,13 +40,14 @@
   width: 80%;
   margin-bottom: 1rem;
   gap: 5px;
-
 }
 
 .input-group-cad label {
   font-size: 0.85rem;
   color: #333;
-  /* mais escuro */
+  margin-top: 10px;
+  display: block;
+  font-weight: 500;
 }
 
 .input-group-cad input {
@@ -58,7 +57,6 @@
   outline: none;
   font-size: 1rem;
   background: #e8f0ff;
-  /* tom azul bem claro */
   color: #000;
   transition: 0.2s;
   margin-top: 2px;
@@ -81,7 +79,6 @@
   transition: 0.3s;
   color: #fff;
   background: #00c624;
-  /* azul escuro */
 }
 
 .btn-cad:hover {
@@ -90,25 +87,16 @@
 }
 
 /* Voltar */
-.link-cad {
-  text-decoration: none;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-}
-
 .btn-voltar {
   margin-top: 1.8rem;
   padding: 6px 12px;
   border: none;
   border-radius: 2.5px;
-  font-size: 1.0rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: 0.3s;
   color: #fff;
   background: #e60000;
-  /* invertido: aqui o laranja */
   display: flex;
   flex-direction: row;
   align-items: center;

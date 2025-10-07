@@ -1,7 +1,6 @@
 import "./Home.css";
 import {
   Search,
-  MapPin,
   User,
   UserPlus,
   Drama,
@@ -16,6 +15,7 @@ import {
   MessageCircle,
   CalendarCheck2,
   Loader2,
+  LogOut,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -29,11 +29,19 @@ function Home() {
     setTimeout(() => {
       navigate(path);
       setLoading(null);
-    }, 1500); // 1.5s de delay
+    }, 1500);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("nome");
+    navigate("/login");
+  };
+
+  const nome = localStorage.getItem("nome");
+
   return (
-    <body className="body-home">
+    <div className="body-home">
       <div className="container">
         {/* HEADER */}
         <header className="header">
@@ -50,37 +58,46 @@ function Home() {
             </button>
           </div>
           <div className="header-actions">
-            <button className="location">
-              <MapPin size={16} /> Perto de você
-            </button>
+            {nome ? (
+              <>
+                <span className="user-info">
+                  <User size={16} /> Olá, {nome}
+                </span>
+                <button className="logout" onClick={handleLogout}>
+                  <LogOut size={16} /> Sair
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className="login"
+                  onClick={() => handleNavigate("/login", "login")}
+                  disabled={loading === "login"}
+                >
+                  {loading === "login" ? (
+                    <Loader2 size={16} className="spin" />
+                  ) : (
+                    <>
+                      <User size={16} /> Acessar conta
+                    </>
+                  )}
+                </button>
 
-            <button
-              className="login"
-              onClick={() => handleNavigate("/login", "login")}
-              disabled={loading === "login"}
-            >
-              {loading === "login" ? (
-                <Loader2 size={16} className="spin" />
-              ) : (
-                <>
-                  <User size={16} /> Acessar conta
-                </>
-              )}
-            </button>
-
-            <button
-              className="register"
-              onClick={() => handleNavigate("/cadastro", "cadastro")}
-              disabled={loading === "cadastro"}
-            >
-              {loading === "cadastro" ? (
-                <Loader2 size={16} className="spin" />
-              ) : (
-                <>
-                  <UserPlus size={16} /> Cadastre-se
-                </>
-              )}
-            </button>
+                <button
+                  className="register"
+                  onClick={() => handleNavigate("/cadastro", "cadastro")}
+                  disabled={loading === "cadastro"}
+                >
+                  {loading === "cadastro" ? (
+                    <Loader2 size={16} className="spin" />
+                  ) : (
+                    <>
+                      <UserPlus size={16} /> Cadastre-se
+                    </>
+                  )}
+                </button>
+              </>
+            )}
           </div>
         </header>
 
@@ -133,7 +150,7 @@ function Home() {
           </button>
         </div>
       </div>
-    </body>
+    </div>
   );
 }
 

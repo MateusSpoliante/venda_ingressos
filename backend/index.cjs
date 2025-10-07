@@ -9,18 +9,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// conexão com banco (Supabase)
+// Conexão com banco (Supabase)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
 
-// rota de cadastro
+// Rota de cadastro
 app.post("/api/cadastro", async (req, res) => {
-  const { nome, email, senha } = req.body;
+  const { nome, cpfCnpj, email, senha } = req.body;
 
-  // validação básica
-  if (!nome || !email || !senha) {
+  if (!nome || !cpfCnpj || !email || !senha) {
     return res.status(400).json({ erro: "Preencha todos os campos" });
   }
   if (senha.length < 6) {
@@ -28,18 +27,30 @@ app.post("/api/cadastro", async (req, res) => {
   }
 
   try {
-    const { rows } = await pool.query(
+    // Verifica se email já existe
+    const { rows: emailExistente } = await pool.query(
       "SELECT id FROM usuarios WHERE email = $1",
       [email]
     );
-    if (rows.length > 0) {
+    if (emailExistente.length > 0) {
       return res.status(400).json({ erro: "Email já cadastrado!" });
     }
 
+    // Verifica se CPF/CNPJ já existe
+    const { rows: cpfExistente } = await pool.query(
+      "SELECT id FROM usuarios WHERE cpf_cnpj = $1",
+      [cpfCnpj]
+    );
+    if (cpfExistente.length > 0) {
+      return res.status(400).json({ erro: "CPF/CNPJ já cadastrado!" });
+    }
+
     const hash = await bcrypt.hash(senha, 10);
+
+    // Insere usuário com CPF/CNPJ
     await pool.query(
-      "INSERT INTO usuarios (nome, email, senha) VALUES ($1, $2, $3)",
-      [nome, email, hash]
+      "INSERT INTO usuarios (nome, cpf_cnpj, email, senha) VALUES ($1, $2, $3, $4)",
+      [nome, cpfCnpj, email, hash]
     );
 
     res.json({ mensagem: "Usuário cadastrado com sucesso" });
@@ -49,7 +60,7 @@ app.post("/api/cadastro", async (req, res) => {
   }
 });
 
-// rota de login (retornando nome também)
+// Rota de login
 app.post("/api/login", async (req, res) => {
   const { email, senha } = req.body;
 
@@ -76,6 +87,7 @@ app.post("/api/login", async (req, res) => {
       mensagem: "Login realizado com sucesso",
       token,
       nome: usuario.nome,
+      cpfCnpj: usuario.cpf_cnpj, // opcional, se quiser enviar também
     });
   } catch (err) {
     console.error(err);
@@ -83,7 +95,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// iniciando servidor
+// Iniciando servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
