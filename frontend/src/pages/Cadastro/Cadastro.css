@@ -108,6 +108,27 @@
   transform: scale(1.02);
 }
 
+.cpf_cnpj_group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+.radioGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.radioGroup label {
+  font-size: 0.9rem;
+  color: #0e6eaa;
+  font-weight: 500;
+  margin-top: 2px;  
+}
 /* Responsividade Cadastro */
 @media (max-width: 768px) {
   .cad-container {

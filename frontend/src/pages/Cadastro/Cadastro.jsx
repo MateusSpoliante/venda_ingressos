@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 function Cadastro() {
   const navigate = useNavigate();
   const [nome, setNome] = useState("");
+  const [tipo, setTipo] = useState("cpf");
   const [cpfCnpj, setCpfCnpj] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -17,11 +18,21 @@ function Cadastro() {
     setErro("");
     setSucesso("");
 
+    const valorLimpo = cpfCnpj.replace(/\D/g, "");
+    if (tipo === "cpf" && valorLimpo.length !== 11) {
+      setErro("CPF deve ter 11 dígitos");
+      return;
+    }
+    if (tipo === "cnpj" && valorLimpo.length !== 14) {
+      setErro("CNPJ deve ter 14 dígitos");
+      return;
+    }
+
     try {
       const resposta = await fetch("http://localhost:3000/api/cadastro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome, cpfCnpj, email, senha }),
+        body: JSON.stringify({ nome, cpfCnpj: valorLimpo, email, senha }),
       });
 
       const data = await resposta.json();
@@ -32,8 +43,7 @@ function Cadastro() {
         setSucesso(data.mensagem);
         setTimeout(() => navigate("/login"), 1500);
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
       setErro("Erro ao conectar com o servidor");
     }
   };
@@ -54,13 +64,42 @@ function Cadastro() {
               required
             />
 
-            <label>CPF/CNPJ</label>
+            <div className="cpf_cnpj_group">
+              <label style={{ marginRight: "8px" }}>CPF/CNPJ:</label>
+              <div className="radioGroup">
+                <input
+                  type="radio"
+                  name="tipoUser"
+                  id="cpf"
+                  checked={tipo === "cpf"}
+                  onChange={() => {
+                    setTipo("cpf");
+                    setCpfCnpj("");
+                  }}
+                />
+                <label htmlFor="cpf">CPF</label>
+
+                <input
+                  type="radio"
+                  name="tipoUser"
+                  id="cnpj"
+                  checked={tipo === "cnpj"}
+                  onChange={() => {
+                    setTipo("cnpj");
+                    setCpfCnpj("");
+                  }}
+                />
+                <label htmlFor="cnpj">CNPJ</label>
+              </div>
+            </div>
+
             <input
               type="text"
-              placeholder="Digite seu CPF ou CNPJ"
+              placeholder={
+                tipo === "cpf" ? "Digite seu CPF (11 dígitos)" : "Digite seu CNPJ (14 dígitos)"
+              }
               value={cpfCnpj}
               onChange={(e) => setCpfCnpj(e.target.value)}
-              maxLength={14}
               required
             />
 
@@ -84,7 +123,9 @@ function Cadastro() {
           </div>
 
           {erro && <div style={{ color: "red", marginTop: "8px" }}>{erro}</div>}
-          {sucesso && <div style={{ color: "green", marginTop: "8px" }}>{sucesso}</div>}
+          {sucesso && (
+            <div style={{ color: "green", marginTop: "8px" }}>{sucesso}</div>
+          )}
 
           <button type="submit" className="btn-cad">
             Cadastrar

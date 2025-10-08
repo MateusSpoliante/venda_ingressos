@@ -2,7 +2,6 @@ import "./Home.css";
 import {
   Search,
   User,
-  UserPlus,
   Drama,
   Music,
   Smile,
@@ -14,31 +13,34 @@ import {
   Church,
   MessageCircle,
   CalendarCheck2,
-  Loader2,
   LogOut,
+  Loader2,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(null); // "login" | "cadastro" | null
-
-  const handleNavigate = (path, type) => {
-    setLoading(type);
-    setTimeout(() => {
-      navigate(path);
-      setLoading(null);
-    }, 1500);
-  };
+  const [loggingOut, setLoggingOut] = useState(false); // estado de loading
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("nome");
-    navigate("/login");
+    setLoggingOut(true); // ativa a rodinha
+    setTimeout(() => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("nome");
+      navigate("/login");
+    }, 1500); // delay de 1,5s
   };
 
   const nome = localStorage.getItem("nome");
+
+  // estilo base para alinhar ícone e texto
+  const iconStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
+  };
 
   return (
     <div className="body-home">
@@ -51,48 +53,31 @@ function Home() {
               <h1>OPEN TICKET</h1>
             </div>
           </a>
+
           <div className="search-bar">
             <input type="text" placeholder="Buscar evento" />
-            <button className="search-btn">
+            <button className="search-btn" style={iconStyle}>
               <Search size={18} />
             </button>
           </div>
+
           <div className="header-actions">
-            {nome ? (
+            {nome && (
               <>
-                <span className="user-info">
+                <span className="user-info" style={iconStyle}>
                   <User size={16} /> Olá, {nome}
                 </span>
-                <button className="logout" onClick={handleLogout}>
-                  <LogOut size={16} /> Sair
-                </button>
-              </>
-            ) : (
-              <>
                 <button
-                  className="login"
-                  onClick={() => handleNavigate("/login", "login")}
-                  disabled={loading === "login"}
+                  className="logout"
+                  onClick={handleLogout}
+                  style={iconStyle}
+                  disabled={loggingOut} // desabilita enquanto está saindo
                 >
-                  {loading === "login" ? (
+                  {loggingOut ? (
                     <Loader2 size={16} className="spin" />
                   ) : (
                     <>
-                      <User size={16} /> Acessar conta
-                    </>
-                  )}
-                </button>
-
-                <button
-                  className="register"
-                  onClick={() => handleNavigate("/cadastro", "cadastro")}
-                  disabled={loading === "cadastro"}
-                >
-                  {loading === "cadastro" ? (
-                    <Loader2 size={16} className="spin" />
-                  ) : (
-                    <>
-                      <UserPlus size={16} /> Cadastre-se
+                      <LogOut size={16} /> Sair
                     </>
                   )}
                 </button>
@@ -103,34 +88,34 @@ function Home() {
 
         {/* NAV */}
         <nav className="nav">
-          <button className="active">
+          <button className="active" style={iconStyle}>
             <CalendarCheck2 size={16} /> Todos Eventos
           </button>
-          <button>
+          <button style={iconStyle}>
             <Drama size={16} /> Teatro
           </button>
-          <button>
+          <button style={iconStyle}>
             <Music size={16} /> Musical
           </button>
-          <button>
+          <button style={iconStyle}>
             <Smile size={16} /> Stand up
           </button>
-          <button>
+          <button style={iconStyle}>
             <Star size={16} /> Infantil
           </button>
-          <button>
+          <button style={iconStyle}>
             <Activity size={16} /> Dança
           </button>
-          <button>
+          <button style={iconStyle}>
             <Guitar size={16} /> Shows
           </button>
-          <button>
+          <button style={iconStyle}>
             <TentTree size={16} /> Circo
           </button>
-          <button>
+          <button style={iconStyle}>
             <Mic size={16} /> Palestras
           </button>
-          <button>
+          <button style={iconStyle}>
             <Church size={16} /> Religioso
           </button>
         </nav>
@@ -139,13 +124,15 @@ function Home() {
         <section className="banner">
           <div className="banner-content">
             <h1>Ciclo de Estudos | UniCV</h1>
-            <button className="buy-btn">Comprar Ingressos</button>
+            <button className="buy-btn" style={iconStyle}>
+              Comprar Ingressos
+            </button>
           </div>
         </section>
 
         {/* FLOATING BUTTONS */}
         <div className="floating-buttons">
-          <button className="whatsapp">
+          <button className="whatsapp" style={iconStyle}>
             <MessageCircle size={22} />
           </button>
         </div>

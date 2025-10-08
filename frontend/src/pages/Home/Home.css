@@ -98,6 +98,13 @@
   color: #f97721;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 30%;
+}
+
 .header-actions button {
   margin-left: 15px;
   padding: 8px 15px;
@@ -113,16 +120,6 @@
 
 .header-actions button:hover {
   background: #efefef;
-}
-
-.header-actions .register {
-  background: #f97721;
-  color: #fff;
-  border-radius: 4px;
-}
-
-.header-actions .register:hover {
-  background: #ff990a;
 }
 
 /* NAV */
