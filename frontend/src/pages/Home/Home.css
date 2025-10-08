@@ -157,7 +157,7 @@
 .banner {
   position: relative;
   height: 400px;
-  background: url("banner2.png") center/cover no-repeat;
+  background: url("public/banner2.png") center/cover no-repeat;
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
