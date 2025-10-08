@@ -59,7 +59,7 @@ function Login() {
     <div className="body-login">
       <div className="login-container">
         <div className="logoDiv">
-          <img src="/logo.png" alt="logo" />
+          <img src="/logo.webp" alt="logo" />
           <div className="ticket-title">
             <h1>OPEN TICKET</h1>
           </div>
