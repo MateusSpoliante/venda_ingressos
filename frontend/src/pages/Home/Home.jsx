@@ -49,7 +49,7 @@ function Home() {
         <header className="header">
           <a href="/">
             <div className="logoDiv">
-              <img src="logo.png" alt="logo" className="logo" />
+              <img src="logo.webp" alt="logo" className="logo" />
               <h1>OPEN TICKET</h1>
             </div>
           </a>
