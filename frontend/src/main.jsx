@@ -6,6 +6,8 @@ import Login from "./pages/Login/Login.jsx";
 import Cadastro from "./pages/Cadastro/Cadastro.jsx";
 import Home from "./pages/Home/Home.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
+import { CartProvider } from "./context/CartContext/CartContext.jsx";
+import Cart from "./pages/Cart/Cart.jsx";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +25,14 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+        path: "carrinho",
+        element: (
+          <PrivateRoute>
+            <Cart />
+          </PrivateRoute>
+        )
+      },
       { path: "*", element: <Login /> },
     ],
   },
@@ -30,6 +40,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
+    <CartProvider>
     <RouterProvider router={router} />
+    </CartProvider>
   </StrictMode>
 );

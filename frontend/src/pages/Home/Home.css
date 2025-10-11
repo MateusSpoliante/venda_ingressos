@@ -103,6 +103,7 @@
   align-items: center;
   justify-content: flex-end;
   width: 30%;
+  gap: 20px;
 }
 
 .header-actions button {
@@ -420,3 +421,33 @@
     font-size: 1rem;
   }
 }
+
+/* Ícone do carrinho no header */
+.cart-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #054062;
+  text-decoration: none;
+  margin-left: 15px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cart-header:hover {
+  color: #f97721;
+}
+
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: #00b91e;
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+

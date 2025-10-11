@@ -1,0 +1,115 @@
+.carrinho-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #f4f6f8;
+  border-radius: 8px;
+}
+
+.carrinho-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #04324c;
+}
+
+.carrinho-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.carrinho-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.carrinho-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.carrinho-info {
+  flex: 1;
+}
+
+.carrinho-info h3 {
+  margin: 0 0 5px 0;
+  font-size: 1rem;
+  color: #054062;
+}
+
+.carrinho-info p {
+  margin: 0 0 10px 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.carrinho-controles {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.carrinho-controles button {
+  width: 25px;
+  height: 25px;
+  border: none;
+  border-radius: 4px;
+  background: #f97721;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.carrinho-controles span {
+  min-width: 20px;
+  text-align: center;
+  display: inline-block;
+}
+
+.remover-btn {
+  border: none;
+  background: #f44336;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.carrinho-total {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.carrinho-total h3 {
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  color: #04324c;
+}
+
+.carrinho-acoes button {
+  padding: 10px 15px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.limpar-btn {
+  background: #f44336;
+  color: #fff;
+}
+
+.comprar-btn {
+  background: #00b91e;
+  color: #fff;
+}

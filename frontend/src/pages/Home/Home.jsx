@@ -18,10 +18,14 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ShoppingCart } from "lucide-react";
+import { useCart } from "../../context/CartContext/CartContext";
 
 function Home() {
   const navigate = useNavigate();
   const [loggingOut, setLoggingOut] = useState(false); // estado de loading
+
+  const { cartItems } = useCart();
 
   const handleLogout = () => {
     setLoggingOut(true); // ativa a rodinha
@@ -64,6 +68,12 @@ function Home() {
           <div className="header-actions">
             {nome && (
               <>
+               <a href="/carrinho" className="cart-header" style={iconStyle}>
+                  <ShoppingCart size={20} />
+                  {cartItems.length > 0 && (
+                    <span className="cart-count">{cartItems.length}</span>
+                  )}
+                </a>
                 <span className="user-info" style={iconStyle}>
                   <User size={16} /> Olá, {nome}
                 </span>
