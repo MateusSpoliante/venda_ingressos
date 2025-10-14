@@ -130,6 +130,7 @@
   padding: 15px 40px;
   background: #ffffff;
   border-bottom: 1px solid #eee;
+  justify-content: center;
 }
 
 .nav button {
@@ -154,40 +155,93 @@
   color: #fff;
 }
 
-/* BANNER */
-.banner {
-  position: relative;
-  height: 400px;
-  background: url("/banner2.webp") center/cover no-repeat;
-  display: flex;
-  align-items: flex-end;  
-  justify-content: flex-start;
-  padding: 40px;
-  border-radius: 4px;
-  margin: 20px 40px;
+.eventos-section {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.eventos-section h2 {
+  font-size: 1.8rem;
+  color: #222;
+  margin-bottom: 5px;
+}
+
+.eventos-section p {
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.eventos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.evento-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  transition: transform 0.2s ease;
+  cursor: pointer;
 }
 
-.banner::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(4, 50, 76, 0.45);
+.evento-card:hover {
+  transform: translateY(-3px);
 }
 
-.banner-content {
+.evento-imagem {
   position: relative;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 20px 30px;
-  border-radius: 4px;
-  color: #054062;
-  z-index: 1;
 }
 
-.banner-content h1 {
-  font-size: 2rem;
-  margin-bottom: 15px;
-  color: #04324c;
+.evento-imagem img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.categoria-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #111;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+}
+
+.evento-info {
+  padding: 15px;
+  text-align: left;
+}
+
+.evento-info h3 {
+  font-size: 1rem;
+  color: #222;
+  margin-bottom: 5px;
+}
+
+.evento-info p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.evento-info span {
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.evento-local {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 6px;
 }
 
 .buy-btn {
@@ -256,7 +310,7 @@
 }
 
 
-/* ===== Responsividade Home ===== */
+/* ===== Responsividade Home - Sem banner ===== */
 @media (max-width: 1024px) {
   .container {
     padding: 0 20px;
@@ -266,25 +320,20 @@
     flex-wrap: wrap;
     gap: 10px;
     padding: 10px 20px;
+    justify-content: center;
   }
 
   .search-bar {
     width: 250px;
   }
 
-  .banner {
-    margin: 15px 20px;
-    padding: 30px;
-    height: 300px;
-  }
-
-  .banner-content h1 {
-    font-size: 1.5rem;
-  }
-
   .buy-btn {
     padding: 8px 14px;
     font-size: 0.9rem;
+  }
+
+  .eventos-grid {
+    gap: 20px;
   }
 }
 
@@ -318,7 +367,6 @@
   .header-actions {
     width: 100%;
     margin-top: 10px;
-    display: flex;
     justify-content: space-between;
   }
 
@@ -326,23 +374,14 @@
     justify-content: space-around;
   }
 
-  .banner {
-    margin: 10px 15px;
-    padding: 20px;
-    height: 250px;
-  }
-
-  .banner-content {
-    padding: 15px 20px;
-  }
-
-  .banner-content h1 {
-    font-size: 1.3rem;
-  }
-
   .buy-btn {
     padding: 8px 12px;
     font-size: 0.85rem;
+  }
+
+  .eventos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
   }
 }
 
@@ -369,22 +408,17 @@
   .nav {
     flex-direction: column;
     gap: 8px;
-    padding: 10px 10px;
-  }
-
-  .banner {
-    height: 200px;
-    padding: 15px;
-    margin: 10px;
-  }
-
-  .banner-content h1 {
-    font-size: 1.1rem;
+    padding: 10px;
   }
 
   .buy-btn {
     padding: 6px 10px;
     font-size: 0.8rem;
+  }
+
+  .eventos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
   }
 
   .floating-buttons {
@@ -401,18 +435,33 @@
 }
 
 @media (max-width: 360px) {
-  .banner {
-    height: 180px;
-    padding: 10px;
+  .logoDiv img {
+    width: 45px;
+    height: 45px;
   }
 
-  .banner-content h1 {
-    font-size: 1rem;
+  .logoDiv h1 {
+    font-size: 0.95rem;
+    -webkit-text-stroke: 0.7px #04324c;
+  }
+
+  .search-bar {
+    width: 130px;
+  }
+
+  .header-actions button {
+    padding: 5px 8px;
+    font-size: 0.75rem;
   }
 
   .buy-btn {
     padding: 5px 8px;
     font-size: 0.75rem;
+  }
+
+  .eventos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
   }
 
   .floating-buttons button {
@@ -421,33 +470,3 @@
     font-size: 1rem;
   }
 }
-
-/* Ícone do carrinho no header */
-.cart-header {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #054062;
-  text-decoration: none;
-  margin-left: 15px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.cart-header:hover {
-  color: #f97721;
-}
-
-.cart-count {
-  position: absolute;
-  top: -6px;
-  right: -10px;
-  background: #00b91e;
-  color: #fff;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 12px;
-  font-weight: bold;
-}
-

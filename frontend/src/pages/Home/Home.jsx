@@ -15,36 +15,74 @@ import {
   CalendarCheck2,
   LogOut,
   Loader2,
+  ShoppingCart,
+  MapPin,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart } from "lucide-react";
 import { useCart } from "../../context/CartContext/CartContext";
 
 function Home() {
   const navigate = useNavigate();
-  const [loggingOut, setLoggingOut] = useState(false); // estado de loading
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [eventos, setEventos] = useState([]);
+  const [loadingEventos, setLoadingEventos] = useState(true);
+  const [categoriaAtiva, setCategoriaAtiva] = useState("Todos");
 
   const { cartItems } = useCart();
-
-  const handleLogout = () => {
-    setLoggingOut(true); // ativa a rodinha
-    setTimeout(() => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("nome");
-      navigate("/login");
-    }, 1500); // delay de 1,5s
-  };
-
   const nome = localStorage.getItem("nome");
 
-  // estilo base para alinhar ícone e texto
   const iconStyle = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     gap: "6px",
   };
+
+  const handleLogout = () => {
+    setLoggingOut(true);
+    setTimeout(() => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("nome");
+      navigate("/login");
+    }, 1500);
+  };
+
+  // Busca eventos da API
+  useEffect(() => {
+    const fetchEventos = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/eventos");
+        const data = await response.json();
+        setEventos(data);
+      } catch (error) {
+        console.error("Erro ao buscar eventos:", error);
+      } finally {
+        setLoadingEventos(false);
+      }
+    };
+    fetchEventos();
+  }, []);
+
+  // Função para filtrar eventos
+  const eventosFiltrados =
+    categoriaAtiva === "Todos"
+      ? eventos
+      : eventos.filter((e) => e.categoria === categoriaAtiva);
+
+  // Lista de categorias
+  const categorias = [
+    { nome: "Todos", icon: <CalendarCheck2 size={16} /> },
+    { nome: "Teatro", icon: <Drama size={16} /> },
+    { nome: "Musical", icon: <Music size={16} /> },
+    { nome: "Stand up", icon: <Smile size={16} /> },
+    { nome: "Infantil", icon: <Star size={16} /> },
+    { nome: "Dança", icon: <Activity size={16} /> },
+    { nome: "Shows", icon: <Guitar size={16} /> },
+    { nome: "Circo", icon: <TentTree size={16} /> },
+    { nome: "Palestras", icon: <Mic size={16} /> },
+    { nome: "Religioso", icon: <Church size={16} /> },
+  ];
 
   return (
     <div className="body-home">
@@ -68,7 +106,7 @@ function Home() {
           <div className="header-actions">
             {nome && (
               <>
-               <a href="/carrinho" className="cart-header" style={iconStyle}>
+                <a href="/carrinho" className="cart-header" style={iconStyle}>
                   <ShoppingCart size={20} />
                   {cartItems.length > 0 && (
                     <span className="cart-count">{cartItems.length}</span>
@@ -81,7 +119,7 @@ function Home() {
                   className="logout"
                   onClick={handleLogout}
                   style={iconStyle}
-                  disabled={loggingOut} // desabilita enquanto está saindo
+                  disabled={loggingOut}
                 >
                   {loggingOut ? (
                     <Loader2 size={16} className="spin" />
@@ -96,48 +134,63 @@ function Home() {
           </div>
         </header>
 
-        {/* NAV */}
+        {/* NAV - categorias */}
         <nav className="nav">
-          <button className="active" style={iconStyle}>
-            <CalendarCheck2 size={16} /> Todos Eventos
-          </button>
-          <button style={iconStyle}>
-            <Drama size={16} /> Teatro
-          </button>
-          <button style={iconStyle}>
-            <Music size={16} /> Musical
-          </button>
-          <button style={iconStyle}>
-            <Smile size={16} /> Stand up
-          </button>
-          <button style={iconStyle}>
-            <Star size={16} /> Infantil
-          </button>
-          <button style={iconStyle}>
-            <Activity size={16} /> Dança
-          </button>
-          <button style={iconStyle}>
-            <Guitar size={16} /> Shows
-          </button>
-          <button style={iconStyle}>
-            <TentTree size={16} /> Circo
-          </button>
-          <button style={iconStyle}>
-            <Mic size={16} /> Palestras
-          </button>
-          <button style={iconStyle}>
-            <Church size={16} /> Religioso
-          </button>
+          {categorias.map((cat) => (
+            <button
+              key={cat.nome}
+              className={categoriaAtiva === cat.nome ? "active" : ""}
+              style={iconStyle}
+              onClick={() => setCategoriaAtiva(cat.nome)}
+            >
+              {cat.icon} {cat.nome}
+            </button>
+          ))}
         </nav>
 
-        {/* BANNER */}
-        <section className="banner">
-          <div className="banner-content">
-            <h1>Ciclo de Estudos | UniCV</h1>
-            <button className="buy-btn" style={iconStyle}>
-              Comprar Ingressos
-            </button>
-          </div>
+        {/* LISTA DE EVENTOS */}
+        <section className="eventos-section">
+          <h2>Para os próximos dias</h2>
+          <p>Uma curadoria de eventos que acontecerão nos próximos dias.</p>
+
+          {loadingEventos ? (
+            <p>Carregando eventos...</p>
+          ) : eventosFiltrados.length === 0 ? (
+            <p>Nenhum evento encontrado nesta categoria.</p>
+          ) : (
+            <div className="eventos-grid">
+              {eventosFiltrados.map((evento) => (
+                <div
+                  key={evento.id}
+                  className="evento-card"
+                  onClick={() => navigate(`/evento/${evento.id}`)}
+                >
+                  <div className="evento-imagem">
+                    <img src="/banner2.webp" alt={evento.titulo} />
+                    <span className="categoria-tag">{evento.categoria}</span>
+                  </div>
+                  <div className="evento-info">
+                    <h3>{evento.titulo}</h3>
+                    <p>{evento.descricao}</p>
+                    <span>
+                      {new Date(evento.data_evento).toLocaleDateString(
+                        "pt-BR",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }
+                      )}
+                    </span>
+                    <div className="evento-local">
+                      <MapPin size={14} /> {evento.local}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* FLOATING BUTTONS */}

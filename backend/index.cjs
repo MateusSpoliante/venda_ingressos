@@ -95,6 +95,44 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+
+// Rota para criar evento
+app.post("/api/eventos", async (req, res) => {
+  const { titulo, descricao, data_evento, local, categoria } = req.body;
+
+  if (!titulo || !descricao || !data_evento || !local || !categoria) {
+    return res.status(400).json({ erro: "Preencha todos os campos" });
+  }
+
+  try {
+    await pool.query(
+      "INSERT INTO eventos (titulo, descricao, data_evento, local, categoria) VALUES ($1, $2, $3, $4, $5)",
+      [titulo, descricao, data_evento, local, categoria]
+    );
+
+    res.json({ mensagem: "Evento criado com sucesso" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: "Erro ao criar evento" });
+  }
+});
+
+
+
+// Rota para listar eventos
+app.get("/api/eventos", async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      "SELECT id, titulo, descricao, data_evento, local, categoria FROM eventos ORDER BY data_evento ASC"
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: "Erro ao buscar eventos" });
+  }
+});
+
+
 // Iniciando servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

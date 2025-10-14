@@ -8,6 +8,7 @@ import Home from "./pages/Home/Home.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import { CartProvider } from "./context/CartContext/CartContext.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
+import Evento from "./pages/eventos/evento.jsx";
 
 const router = createBrowserRouter([
   {
@@ -31,7 +32,15 @@ const router = createBrowserRouter([
           <PrivateRoute>
             <Cart />
           </PrivateRoute>
-        )
+        ),
+      },
+      {
+        path: "evento/:id",
+        element: (
+          <PrivateRoute>
+            <Evento />
+          </PrivateRoute>
+        ),
       },
       { path: "*", element: <Login /> },
     ],
@@ -41,7 +50,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <CartProvider>
-    <RouterProvider router={router} />
+      <RouterProvider router={router} />
     </CartProvider>
   </StrictMode>
 );
