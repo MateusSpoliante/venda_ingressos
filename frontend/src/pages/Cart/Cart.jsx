@@ -1,83 +1,72 @@
-import { ArrowLeft } from "lucide-react";
-import { useCart } from "../../context/CartContext/CartContext";
-import { useNavigate } from "react-router-dom";
 import "./Cart.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Carrinho() {
+  const ingressos = []; // ← carrinho começa vazio
+
+  const subtotal = ingressos.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
+  const desconto = subtotal * 0.1;
+  const total = subtotal - desconto;
   const navigate = useNavigate();
-  const {
-    cartItems,
-    addToCart,
-    decreaseQuantity,
-    removeFromCart,
-    clearCart,
-    total,
-  } = useCart();
+  function handleGoHome(){
+    navigate("/home");
+  }
 
   return (
     <div className="carrinho-container">
-      <button
-        className="voltar-btn"
-        onClick={() => navigate("/home")}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "5px",
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          fontSize: "1rem",
-          color: "#054062",
-          marginBottom: "15px"
-        }}
-      >
-        <ArrowLeft size={20} /> Voltar
-      </button>
+      <h2 className="titulo">
+        <span className="icone-titulo">🎟️</span> Seus Ingressos
+      </h2>
 
-      <h2>🛒 Meu Carrinho</h2>
-
-      {cartItems.length === 0 ? (
-        <p>Seu carrinho está vazio</p>
-      ) : (
-        <>
-          <ul className="carrinho-lista">
-            {cartItems.map((item) => (
-              <li key={item.id} className="carrinho-item">
-                <img
-                  src={item.imagem}
-                  alt={item.nome}
-                  className="carrinho-img"
-                />
-                <div className="carrinho-info">
-                  <h3>{item.nome}</h3>
-                  <p>Preço: R$ {item.preco.toFixed(2)}</p>
-                  <div className="carrinho-controles">
-                    <button onClick={() => decreaseQuantity(item.id)}>-</button>
-                    <span>{item.quantidade}</span>
-                    <button onClick={() => addToCart(item)}>+</button>
-                  </div>
+      <div className="lista-itens">
+        {ingressos.length === 0 ? (
+          <p className="carrinho-vazio">Seu carrinho está vazio.</p>
+        ) : (
+          ingressos.map((item) => (
+            <div className="item" key={item.id}>
+              <div className="item-info">
+                <div className="icone" style={{ backgroundColor: item.cor }}>
+                  {item.icone}
                 </div>
-                <button
-                  className="remover-btn"
-                  onClick={() => removeFromCart(item.id)}
-                >
-                  Remover
-                </button>
-              </li>
-            ))}
-          </ul>
-
-          <div className="carrinho-total">
-            <h3>Total: R$ {total.toFixed(2)}</h3>
-            <div className="carrinho-acoes">
-              <button className="limpar-btn" onClick={clearCart}>
-                🗑️ Limpar Carrinho
-              </button>
-              <button className="comprar-btn">💳 Finalizar Compra</button>
+                <div className="detalhes">
+                  <h3>{item.nome}</h3>
+                  <p>{item.categoria}</p>
+                  <strong>R$ {item.preco.toFixed(2).replace(".", ",")}</strong>
+                </div>
+              </div>
+              <div className="item-acoes">
+                <div className="quantidade">
+                  <button>-</button>
+                  <span>{item.quantidade}</span>
+                  <button>+</button>
+                </div>
+                <button className="remover">Remover</button>
+              </div>
             </div>
-          </div>
-        </>
-      )}
+          ))
+        )}
+      </div>
+
+      <div className="resumo">
+        <h3>Resumo da compra</h3>
+        <div className="linha">
+          <span>Subtotal:</span>
+          <span>R$ {subtotal.toFixed(2).replace(".", ",")}</span>
+        </div>
+        <div className="linha">
+          <span>Desconto (10%):</span>
+          <span className="desconto">- R$ {desconto.toFixed(2).replace(".", ",")}</span>
+        </div>
+        <div className="linha total">
+          <span>Total:</span>
+          <span>R$ {total.toFixed(2).replace(".", ",")}</span>
+        </div>
+      </div>
+
+      <div className="botoes">
+        <button className="finalizar">Finalizar Compra</button>
+        <button onClick={handleGoHome} className="limpar">Continuar Comprando</button>
+      </div>
     </div>
   );
 }

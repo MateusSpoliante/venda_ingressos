@@ -1,115 +1,202 @@
 .carrinho-container {
-  max-width: 900px;
-  margin: 30px auto;
+  max-width: 600px;
+  margin: 40px auto;
   padding: 20px;
-  background: #f4f6f8;
-  border-radius: 8px;
+  background-color: #fdfdfd;
+  font-family: "Inter", sans-serif;
 }
 
-.carrinho-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #04324c;
-}
-
-.carrinho-lista {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.carrinho-item {
+/* Título */
+.titulo {
+  font-size: 1.8rem;
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 10px;
+  gap: 8px;
+  font-weight: 700;
+  color: #0b1c3f;
+  border-bottom: 3px solid #fbc02d;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.icone-titulo {
+  font-size: 1.6rem;
+}
+
+/* Carrinho vazio */
+.carrinho-vazio {
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+  margin: 30px 0;
+}
+
+/* Lista de itens */
+.lista-itens {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background: #fff;
-  border-radius: 6px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  flex-wrap: wrap;
 }
 
-.carrinho-img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 5px;
-}
-
-.carrinho-info {
+.item-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   flex: 1;
 }
 
-.carrinho-info h3 {
-  margin: 0 0 5px 0;
-  font-size: 1rem;
-  color: #054062;
-}
-
-.carrinho-info p {
-  margin: 0 0 10px 0;
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.carrinho-controles {
+.icone {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 2rem;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
 }
 
-.carrinho-controles button {
-  width: 25px;
-  height: 25px;
+.detalhes h3 {
+  font-size: 1.1rem;
+  color: #0b1c3f;
+  margin: 0;
+}
+
+.detalhes p {
+  color: #777;
+  margin: 4px 0;
+}
+
+.detalhes strong {
+  color: #0b1c3f;
+}
+
+/* Ações do item */
+.item-acoes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.quantidade {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.quantidade button {
+  background: none;
   border: none;
-  border-radius: 4px;
-  background: #f97721;
-  color: #fff;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.carrinho-controles span {
-  min-width: 20px;
-  text-align: center;
-  display: inline-block;
-}
-
-.remover-btn {
-  border: none;
-  background: #f44336;
-  color: #fff;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.carrinho-total {
-  margin-top: 20px;
-  text-align: right;
-}
-
-.carrinho-total h3 {
-  margin-bottom: 15px;
   font-size: 1.2rem;
-  color: #04324c;
-}
-
-.carrinho-acoes button {
-  padding: 10px 15px;
-  margin-left: 10px;
-  border: none;
-  border-radius: 5px;
+  padding: 6px 10px;
   cursor: pointer;
-  font-weight: bold;
+  color: #0b1c3f;
 }
 
-.limpar-btn {
-  background: #f44336;
-  color: #fff;
+.quantidade span {
+  padding: 0 8px;
 }
 
-.comprar-btn {
-  background: #00b91e;
-  color: #fff;
+.remover {
+  background: none;
+  border: none;
+  color: #0b1c3f;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Resumo */
+.resumo {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 24px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.resumo h3 {
+  margin-bottom: 12px;
+  color: #0b1c3f;
+}
+
+.linha {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+  color: #0b1c3f;
+}
+
+.desconto {
+  color: #d32f2f;
+}
+
+.total span:last-child {
+  font-weight: 700;
+}
+
+/* Botões */
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.finalizar {
+  flex: 1;
+  background: #fbc02d;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #0b1c3f;
+}
+
+.limpar {
+  flex: 1;
+  background: #fff;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #0b1c3f;
+}
+
+/* ====== Responsividade ====== */
+@media (max-width: 768px) {
+  .item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .item-acoes {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .botoes {
+    flex-direction: column;
+  }
+
+  .finalizar,
+  .limpar {
+    width: 100%;
+  }
 }
