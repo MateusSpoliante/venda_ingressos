@@ -1,14 +1,19 @@
 import "./Cart.css";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../../context/CartContext/CartContext";
 
 export default function Carrinho() {
-  const ingressos = []; // ← carrinho começa vazio
+  const { cartItems } = useCart(); // ← pega do contexto
+  const navigate = useNavigate();
 
-  const subtotal = ingressos.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + item.preco * item.quantidade,
+    0
+  );
   const desconto = subtotal * 0.1;
   const total = subtotal - desconto;
-  const navigate = useNavigate();
-  function handleGoHome(){
+
+  function handleGoHome() {
     navigate("/home");
   }
 
@@ -19,28 +24,22 @@ export default function Carrinho() {
       </h2>
 
       <div className="lista-itens">
-        {ingressos.length === 0 ? (
+        {cartItems.length === 0 ? (
           <p className="carrinho-vazio">Seu carrinho está vazio.</p>
         ) : (
-          ingressos.map((item) => (
+          cartItems.map((item) => (
             <div className="item" key={item.id}>
               <div className="item-info">
                 <div className="icone" style={{ backgroundColor: item.cor }}>
-                  {item.icone}
+                  🎫
                 </div>
                 <div className="detalhes">
-                  <h3>{item.nome}</h3>
-                  <p>{item.categoria}</p>
-                  <strong>R$ {item.preco.toFixed(2).replace(".", ",")}</strong>
+                  <h3>{item.titulo}</h3>
+                  <p>Qtd: {item.quantidade}</p>
+                  <strong>
+                    R$ {item.preco.toFixed(2).replace(".", ",")}
+                  </strong>
                 </div>
-              </div>
-              <div className="item-acoes">
-                <div className="quantidade">
-                  <button>-</button>
-                  <span>{item.quantidade}</span>
-                  <button>+</button>
-                </div>
-                <button className="remover">Remover</button>
               </div>
             </div>
           ))
@@ -55,7 +54,9 @@ export default function Carrinho() {
         </div>
         <div className="linha">
           <span>Desconto (10%):</span>
-          <span className="desconto">- R$ {desconto.toFixed(2).replace(".", ",")}</span>
+          <span className="desconto">
+            - R$ {desconto.toFixed(2).replace(".", ",")}
+          </span>
         </div>
         <div className="linha total">
           <span>Total:</span>
@@ -65,7 +66,9 @@ export default function Carrinho() {
 
       <div className="botoes">
         <button className="finalizar">Finalizar Compra</button>
-        <button onClick={handleGoHome} className="limpar">Continuar Comprando</button>
+        <button onClick={handleGoHome} className="limpar">
+          Continuar Comprando
+        </button>
       </div>
     </div>
   );

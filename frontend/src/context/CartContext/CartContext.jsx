@@ -1,16 +1,24 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    // 🔹 Ao iniciar, tenta carregar o carrinho salvo no localStorage
+    const saved = localStorage.getItem("cartItems");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // 🔹 Sempre que o carrinho muda, salva no localStorage
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
 
   // Adiciona um item ao carrinho
   function addToCart(evento) {
     const itemExiste = cartItems.find(item => item.id === evento.id);
 
     if (itemExiste) {
-      // Se o evento já está no carrinho, aumenta a quantidade
       setCartItems(cartItems.map(item =>
         item.id === evento.id
           ? { ...item, quantidade: item.quantidade + 1 }
@@ -28,16 +36,20 @@ export function CartProvider({ children }) {
 
   // Diminui a quantidade (ou remove se chegar a 0)
   function decreaseQuantity(id) {
-    setCartItems(cartItems.map(item =>
-      item.id === id
-        ? { ...item, quantidade: item.quantidade - 1 }
-        : item
-    ).filter(item => item.quantidade > 0));
+    setCartItems(cartItems
+      .map(item =>
+        item.id === id
+          ? { ...item, quantidade: item.quantidade - 1 }
+          : item
+      )
+      .filter(item => item.quantidade > 0)
+    );
   }
 
   // Esvazia o carrinho
   function clearCart() {
     setCartItems([]);
+    localStorage.removeItem("cartItems");
   }
 
   // Total do carrinho

@@ -36,6 +36,16 @@ function Evento() {
     });
   };
 
+  const handleBuyToCart = () => {
+    addToCart({
+      id: evento.id,
+      titulo: evento.titulo,
+      preco: 120,
+      quantidade: 1,
+    });
+    navigate("/carrinho");
+  };
+
   if (loading) return <p>Carregando evento...</p>;
   if (!evento) return <p>Evento não encontrado.</p>;
 
@@ -97,6 +107,9 @@ function Evento() {
             <button className="btn-comprar-2" onClick={handleAddToCart}>
               <Plus size={16} style={{ marginRight: "5px" }} />
               Adicionar ao carrinho
+            </button>
+            <button className="btn-comprar-2" onClick={handleBuyToCart}>
+              Comprar
             </button>
           </div>
         </div>
