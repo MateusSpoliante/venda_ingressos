@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext/CartContext";
 
 export default function Carrinho() {
-  const { cartItems } = useCart(); // ← pega do contexto
+  const { cartItems, removeFromCart } = useCart(); // ← adicionamos removeFromCart
   const navigate = useNavigate();
 
   const subtotal = cartItems.reduce(
@@ -41,6 +41,14 @@ export default function Carrinho() {
                   </strong>
                 </div>
               </div>
+
+              {/* Botão de Remover */}
+              <button
+                className="remover"
+                onClick={() => removeFromCart(item.id)}
+              >
+                Remover
+              </button>
             </div>
           ))
         )}

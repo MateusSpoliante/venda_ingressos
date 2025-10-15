@@ -30,9 +30,14 @@ export function CartProvider({ children }) {
   }
 
   // Remove um item completamente
-  function removeFromCart(id) {
-    setCartItems(cartItems.filter(item => item.id !== id));
-  }
+function removeFromCart(id) {
+  setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  localStorage.setItem(
+    "cart",
+    JSON.stringify(cartItems.filter((item) => item.id !== id))
+  );
+}
+
 
   // Diminui a quantidade (ou remove se chegar a 0)
   function decreaseQuantity(id) {

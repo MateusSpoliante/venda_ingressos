@@ -216,3 +216,20 @@
     max-width: 100%;
   }
 }
+
+.remover {
+  background: #ff4b4b;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.remover:hover {
+  background: #e04141;
+  transform: scale(1.03);
+}
