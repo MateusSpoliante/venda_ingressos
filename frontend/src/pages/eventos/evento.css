@@ -82,7 +82,7 @@
 }
 
 .btn-comprar-2 {
-  margin-top: 20px;
+  margin-top: 40px; /* antes era 20px — aumenta pra descer mais */
   background-color: #00a859;
   color: #fff;
   border: none;
@@ -93,6 +93,7 @@
   cursor: pointer;
   transition: background 0.3s;
 }
+
 
 .btn-comprar-2:hover {
   background-color: #008746;

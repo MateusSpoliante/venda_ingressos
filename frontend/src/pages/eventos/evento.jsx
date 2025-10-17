@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { MapPin, Plus, ShoppingCart, ArrowLeft } from "lucide-react";
+import { MapPin, Plus, ShoppingCart, ArrowLeft, Check } from "lucide-react";
 import { useCart } from "../../context/CartContext/CartContext";
 import "./Evento.css";
 
@@ -27,37 +27,32 @@ function Evento() {
     fetchEvento();
   }, [id]);
 
-  const handleAddToCart = () => {
-    addToCart({
-      id: evento.id,
-      titulo: evento.titulo,
-      preco: 120, // ajustar se tiver preço no backend
-      quantidade: 1,
-    });
-  };
-
-  const handleBuyToCart = () => {
-    addToCart({
-      id: evento.id,
-      titulo: evento.titulo,
-      preco: 120,
-      quantidade: 1,
-    });
-    navigate("/carrinho");
-  };
-
   if (loading)
-  return (
-    <div className="loading-container">
-      <div className="spinnerEvent"></div>
-    </div>
-  );
+    return (
+      <div className="loading-container">
+        <div className="spinnerEvent"></div>
+      </div>
+    );
+
   if (!evento) return <p>Evento não encontrado.</p>;
+
+  // Verifica se já está no carrinho
+  const isInCart = cartItems.some((item) => item.id === evento.id);
+
+  const handleAddToCart = () => {
+    if (!isInCart) {
+      addToCart({
+        id: evento.id,
+        titulo: evento.titulo,
+        preco: 120,
+        quantidade: 1,
+      });
+    }
+  };
 
   return (
     <div className="evento-page-2">
       <div className="container-2">
-        {/* HEADER simplificado */}
         <header className="header-2">
           <button
             className="back-btn-2"
@@ -75,7 +70,6 @@ function Evento() {
           </a>
         </header>
 
-        {/* CONTEÚDO DO EVENTO */}
         <div className="evento-container-2">
           <img
             src="/banner2.webp"
@@ -109,12 +103,22 @@ function Evento() {
               <strong>Preço:</strong> R$ 120,00
             </p>
 
-            <button className="btn-comprar-2" onClick={handleAddToCart}>
-              <Plus size={16} style={{ marginRight: "5px" }} />
-              Adicionar ao carrinho
-            </button>
-            <button className="btn-comprar-2" onClick={handleBuyToCart}>
-              Comprar
+            <button
+              className={`btn-comprar-2 ${isInCart ? "added" : ""}`}
+              onClick={handleAddToCart}
+              disabled={isInCart}
+            >
+              {isInCart ? (
+                <>
+                  <Check size={16} style={{ marginRight: "5px" }} />
+                  Adicionado
+                </>
+              ) : (
+                <>
+                  <Plus size={16} style={{ marginRight: "5px" }} />
+                  Adicionar ao carrinho
+                </>
+              )}
             </button>
           </div>
         </div>
