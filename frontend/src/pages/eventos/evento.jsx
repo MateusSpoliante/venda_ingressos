@@ -46,7 +46,12 @@ function Evento() {
     navigate("/carrinho");
   };
 
-  if (loading) return <p>Carregando evento...</p>;
+  if (loading)
+  return (
+    <div className="loading-container">
+      <div className="spinner"></div>
+    </div>
+  );
   if (!evento) return <p>Evento não encontrado.</p>;
 
   return (

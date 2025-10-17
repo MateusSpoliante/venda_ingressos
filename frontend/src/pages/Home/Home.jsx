@@ -28,6 +28,7 @@ function Home() {
   const [eventos, setEventos] = useState([]);
   const [loadingEventos, setLoadingEventos] = useState(true);
   const [categoriaAtiva, setCategoriaAtiva] = useState("Todos");
+  const [busca, setBusca] = useState("");
 
   const { cartItems } = useCart();
   const nome = localStorage.getItem("nome");
@@ -65,10 +66,11 @@ function Home() {
   }, []);
 
   // Função para filtrar eventos
-  const eventosFiltrados =
-    categoriaAtiva === "Todos"
-      ? eventos
-      : eventos.filter((e) => e.categoria === categoriaAtiva);
+  const eventosFiltrados = eventos
+    .filter((e) =>
+      categoriaAtiva === "Todos" ? true : e.categoria === categoriaAtiva
+    )
+    .filter((e) => e.titulo.toLowerCase().includes(busca.toLowerCase()));
 
   // Lista de categorias
   const categorias = [
@@ -89,7 +91,7 @@ function Home() {
       <div className="container">
         {/* HEADER */}
         <header className="header">
-          <a href="/">
+          <a href="/home">
             <div className="logoDiv">
               <img src="logo.webp" alt="logo" className="logo" />
               <h1>OPEN TICKET</h1>
@@ -97,7 +99,12 @@ function Home() {
           </a>
 
           <div className="search-bar">
-            <input type="text" placeholder="Buscar evento" />
+            <input
+              type="text"
+              placeholder="Buscar evento"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+            />
             <button className="search-btn" style={iconStyle}>
               <Search size={18} />
             </button>
