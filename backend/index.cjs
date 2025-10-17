@@ -135,35 +135,64 @@ app.get("/api/eventos", async (req, res) => {
 // Criar pedido
 // Criar pedido (POST) ou buscar pedidos (GET)
 app.route("/api/pedidos")
-  // Criar pedido
   .post(async (req, res) => {
     const { usuarioId, itens } = req.body;
+
     if (!usuarioId || !itens || itens.length === 0) {
       return res.status(400).json({ erro: "Dados incompletos" });
     }
 
     try {
+      // 1️⃣ Pega o CPF do usuário
+      const { rows: usuarioRows } = await pool.query(
+        "SELECT cpf_cnpj FROM usuarios WHERE id = $1",
+        [usuarioId]
+      );
+      if (!usuarioRows[0]) return res.status(404).json({ erro: "Usuário não encontrado" });
+      const cpf = usuarioRows[0].cpf_cnpj;
+
+      // 2️⃣ Verifica se o usuário já comprou algum ingresso do evento
+      for (const item of itens) {
+        const { rows: existente } = await pool.query(
+          `SELECT pi.pedido_id
+           FROM pedido_itens pi
+           JOIN pedidos p ON pi.pedido_id = p.id
+           JOIN tickets t ON pi.ticket_id = t.id
+           JOIN usuarios u ON p.usuarioid = u.id
+           WHERE u.cpf_cnpj = $1 AND t.eventoid = $2`,
+          [cpf, item.eventoid] // precisa vir do frontend
+        );
+        if (existente.length > 0) {
+          return res.status(400).json({ erro: `Você já comprou ingresso para o evento "${item.titulo}".` });
+        }
+      }
+
+      // 3️⃣ Calcula valor total do pedido
       const total = itens.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
 
+      // 4️⃣ Cria pedido
       const { rows } = await pool.query(
-        "INSERT INTO pedidos (usuario_id, data_pedido, total) VALUES ($1, NOW(), $2) RETURNING id, data_pedido, total",
-        [usuarioId, total]
+        "INSERT INTO pedidos (usuarioid, data_pedido, valor_total, status_pagamento) VALUES ($1, NOW(), $2, $3) RETURNING id, data_pedido, valor_total",
+        [usuarioId, total, "pendente"] // status inicial
       );
       const pedidoId = rows[0].id;
 
+      // 5️⃣ Cria itens do pedido
       for (const item of itens) {
         await pool.query(
-          "INSERT INTO pedido_itens (pedido_id, evento_id, quantidade, preco_unitario) VALUES ($1, $2, $3, $4)",
-          [pedidoId, item.id, item.quantidade, item.preco]
+          "INSERT INTO pedido_itens (pedido_id, ticket_id, quantidade, preco_unitario) VALUES ($1, $2, $3, $4)",
+          [pedidoId, item.ticket_id, item.quantidade, item.preco]
         );
       }
 
       res.json({ mensagem: "Pedido realizado com sucesso", pedido: rows[0] });
+
     } catch (err) {
       console.error(err);
       res.status(500).json({ erro: "Erro ao criar pedido" });
     }
   })
+
   // Buscar pedidos do usuário
   .get(async (req, res) => {
     const { usuarioId } = req.query;
