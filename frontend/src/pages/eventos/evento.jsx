@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { MapPin, Plus, ShoppingCart, ArrowLeft } from "lucide-react";
 import { useCart } from "../../context/CartContext/CartContext";
-import "./evento.css";
+import "./Evento.css";
 
 function Evento() {
   const { id } = useParams();
@@ -49,7 +49,7 @@ function Evento() {
   if (loading)
   return (
     <div className="loading-container">
-      <div className="spinner"></div>
+      <div className="spinnerEvent"></div>
     </div>
   );
   if (!evento) return <p>Evento não encontrado.</p>;

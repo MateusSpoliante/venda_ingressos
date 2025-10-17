@@ -132,6 +132,68 @@ app.get("/api/eventos", async (req, res) => {
   }
 });
 
+// Criar pedido
+// Criar pedido (POST) ou buscar pedidos (GET)
+app.route("/api/pedidos")
+  // Criar pedido
+  .post(async (req, res) => {
+    const { usuarioId, itens } = req.body;
+    if (!usuarioId || !itens || itens.length === 0) {
+      return res.status(400).json({ erro: "Dados incompletos" });
+    }
+
+    try {
+      const total = itens.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
+
+      const { rows } = await pool.query(
+        "INSERT INTO pedidos (usuario_id, data_pedido, total) VALUES ($1, NOW(), $2) RETURNING id, data_pedido, total",
+        [usuarioId, total]
+      );
+      const pedidoId = rows[0].id;
+
+      for (const item of itens) {
+        await pool.query(
+          "INSERT INTO pedido_itens (pedido_id, evento_id, quantidade, preco_unitario) VALUES ($1, $2, $3, $4)",
+          [pedidoId, item.id, item.quantidade, item.preco]
+        );
+      }
+
+      res.json({ mensagem: "Pedido realizado com sucesso", pedido: rows[0] });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ erro: "Erro ao criar pedido" });
+    }
+  })
+  // Buscar pedidos do usuário
+  .get(async (req, res) => {
+    const { usuarioId } = req.query;
+    if (!usuarioId) return res.status(400).json({ erro: "usuarioId faltando" });
+
+    try {
+      const { rows: pedidos } = await pool.query(
+        "SELECT * FROM pedidos WHERE usuario_id = $1 ORDER BY data_pedido DESC",
+        [usuarioId]
+      );
+
+      const pedidosComItens = [];
+      for (const pedido of pedidos) {
+        const { rows: itens } = await pool.query(
+          `SELECT pi.id, pi.quantidade, pi.preco_unitario, e.titulo
+           FROM pedido_itens pi
+           JOIN eventos e ON pi.evento_id = e.id
+           WHERE pi.pedido_id = $1`,
+          [pedido.id]
+        );
+        pedidosComItens.push({ ...pedido, itens });
+      }
+
+      res.json(pedidosComItens);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ erro: "Erro ao buscar pedidos" });
+    }
+  });
+
 
 // Iniciando servidor
 const PORT = process.env.PORT || 3000;

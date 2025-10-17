@@ -65,7 +65,7 @@ function Home() {
     fetchEventos();
   }, []);
 
-  // Função para filtrar eventos
+  // Função para filtrar eventos por categoria e busca
   const eventosFiltrados = eventos
     .filter((e) =>
       categoriaAtiva === "Todos" ? true : e.categoria === categoriaAtiva
@@ -85,6 +85,50 @@ function Home() {
     { nome: "Palestras", icon: <Mic size={16} /> },
     { nome: "Religioso", icon: <Church size={16} /> },
   ];
+
+  // Títulos e subtítulos por categoria
+  const categoriasTextos = {
+    Todos: {
+      titulo: "Todos os Eventos",
+      subtitulo: "Listagem de ingressos de diversas categorias",
+    },
+    Teatro: {
+      titulo: "Teatros",
+      subtitulo: "Peças incríveis para você assistir",
+    },
+    Musical: {
+      titulo: "Musicais",
+      subtitulo: "Shows e apresentações musicais",
+    },
+    "Stand up": {
+      titulo: "Stand-up Comedy",
+      subtitulo: "Ria com os melhores comediantes",
+    },
+    Infantil: {
+      titulo: "Infantil",
+      subtitulo: "Eventos para a criançada",
+    },
+    Dança: {
+      titulo: "Dança",
+      subtitulo: "Espetáculos de dança e balé",
+    },
+    Shows: {
+      titulo: "Shows",
+      subtitulo: "Grandes apresentações ao vivo",
+    },
+    Circo: {
+      titulo: "Circo",
+      subtitulo: "Diversão e entretenimento para toda a família",
+    },
+    Palestras: {
+      titulo: "Palestras",
+      subtitulo: "Aprenda com especialistas",
+    },
+    Religioso: {
+      titulo: "Eventos Religiosos",
+      subtitulo: "Celebrações e encontros espirituais",
+    },
+  };
 
   return (
     <div className="body-home">
@@ -157,8 +201,8 @@ function Home() {
 
         {/* LISTA DE EVENTOS */}
         <section className="eventos-section">
-          <h2>Para os próximos dias</h2>
-          <p>Uma curadoria de eventos que acontecerão nos próximos dias.</p>
+          <h2>{categoriasTextos[categoriaAtiva]?.titulo || "Eventos"}</h2>
+          <p>{categoriasTextos[categoriaAtiva]?.subtitulo || ""}</p>
 
           {loadingEventos ? (
             <p>Carregando eventos...</p>
@@ -202,9 +246,16 @@ function Home() {
 
         {/* FLOATING BUTTONS */}
         <div className="floating-buttons">
-          <button className="whatsapp" style={iconStyle}>
-            <MessageCircle size={22} />
-          </button>
+          <a
+            href="https://wa.me/5544984315023?text=Olá,%20vim%20do%20site%20da%20OpenTicket,%20gostaria%20de%20mais%20informações!"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: "none" }}
+          >
+            <button className="whatsapp" style={iconStyle}>
+              <MessageCircle size={22} />
+            </button>
+          </a>
         </div>
       </div>
     </div>
