@@ -8,7 +8,7 @@ import Home from "./pages/Home/Home.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import { CartProvider } from "./context/CartContext/CartContext.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
-import Evento from "./pages/eventos/Evento.jsx";
+import Evento from "./pages/Evento/Evento.jsx";
 
 const router = createBrowserRouter([
   {
