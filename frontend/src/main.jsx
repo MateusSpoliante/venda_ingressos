@@ -6,9 +6,10 @@ import Login from "./pages/Login/Login.jsx";
 import Cadastro from "./pages/Cadastro/Cadastro.jsx";
 import Home from "./pages/Home/Home.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
-import { CartProvider } from "./context/CartContext/CartContext.jsx";
+import { CartProvider } from "../src/context/CartContext/CartContext.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
 import Evento from "./pages/Evento/Evento.jsx";
+import Pagamento from "./pagamento/Pagamento.jsx";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Evento />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "pagamento",
+        element: (
+          <PrivateRoute>
+            <Pagamento />
           </PrivateRoute>
         ),
       },

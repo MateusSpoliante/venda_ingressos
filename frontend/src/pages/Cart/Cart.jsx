@@ -21,6 +21,9 @@ export default function Carrinho() {
   function handleGoHome() {
     navigate("/home");
   }
+  function handleComprar() {
+    navigate("/pagamento");
+  }
 
   return (
     <div className="carrinho-container">
@@ -76,7 +79,7 @@ export default function Carrinho() {
       </div>
 
       <div className="botoes">
-        <button className="finalizar">Finalizar Compra</button>
+        <button className="finalizar" onClick={handleComprar}>Finalizar Compra</button>
         <button onClick={handleGoHome} className="limpar">
           Continuar Comprando
         </button>
