@@ -79,7 +79,7 @@ export default function Carrinho() {
       </div>
 
       <div className="botoes">
-        <button className="finalizar" onClick={handleComprar}>Finalizar Compra</button>
+        <button className="finalizar" onClick={handleComprar} disabled={itensUnicos.length === 0}>Finalizar Compra</button>
         <button onClick={handleGoHome} className="limpar">
           Continuar Comprando
         </button>

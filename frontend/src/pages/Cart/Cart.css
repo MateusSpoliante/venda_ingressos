@@ -233,3 +233,9 @@
   background: #e04141;
   transform: scale(1.03);
 }
+
+.finalizar:disabled {
+  background-color: #ccc;  /* cinza */
+  cursor: not-allowed;     /* cursor de não permitido */
+  opacity: 0.7;            /* visual de desativado */
+}
