@@ -231,30 +231,29 @@
     font-size: 0.95rem;
   }
 
+
   .eventos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    /* cards flexíveis */
-    gap: 25px;
-    /* espaçamento equilibrado */
-    padding: 0 16px;
-    /* padding lateral */
-    justify-items: center;
-    /* centraliza os cards no grid */
+    grid-template-columns: repeat(4, 1fr);
+    /* 4 por linha */
+    gap: 30px;
+    justify-content: center;
+    padding: 0 20px;
   }
 
-  /* Ajuste do card */
   .evento-card {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    min-height: 300px;
+    max-width: 300px;
+    height: 350px;
+    /* altura fixa */
     background: #fff;
     border-radius: 14px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     transition: transform 0.2s ease, box-shadow 0.2s;
     cursor: pointer;
-    display: flex;
-    flex-direction: column;
   }
 
 
@@ -391,8 +390,10 @@
     }
 
     .eventos-grid {
-      gap: 24px;
-      justify-items: center;
+
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 0 12px;
       /* centraliza os cards */
     }
   }
