@@ -15,6 +15,8 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
+// ==================== USUÁRIOS ====================
+
 // Rota de cadastro
 app.post("/api/cadastro", async (req, res) => {
   const { nome, cpfCnpj, email, senha } = req.body;
@@ -27,7 +29,6 @@ app.post("/api/cadastro", async (req, res) => {
   }
 
   try {
-    // Verifica se email já existe
     const { rows: emailExistente } = await pool.query(
       "SELECT id FROM usuarios WHERE email = $1",
       [email]
@@ -36,7 +37,6 @@ app.post("/api/cadastro", async (req, res) => {
       return res.status(400).json({ erro: "Email já cadastrado!" });
     }
 
-    // Verifica se CPF/CNPJ já existe
     const { rows: cpfExistente } = await pool.query(
       "SELECT id FROM usuarios WHERE cpf_cnpj = $1",
       [cpfCnpj]
@@ -47,7 +47,6 @@ app.post("/api/cadastro", async (req, res) => {
 
     const hash = await bcrypt.hash(senha, 10);
 
-    // Insere usuário com CPF/CNPJ
     await pool.query(
       "INSERT INTO usuarios (nome, cpf_cnpj, email, senha) VALUES ($1, $2, $3, $4)",
       [nome, cpfCnpj, email, hash]
@@ -87,7 +86,7 @@ app.post("/api/login", async (req, res) => {
       mensagem: "Login realizado com sucesso",
       token,
       nome: usuario.nome,
-      cpfCnpj: usuario.cpf_cnpj, // opcional, se quiser enviar também
+      cpfCnpj: usuario.cpf_cnpj,
     });
   } catch (err) {
     console.error(err);
@@ -95,8 +94,9 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+// ==================== EVENTOS ====================
 
-// Rota para criar evento
+// Criar evento
 app.post("/api/eventos", async (req, res) => {
   const { titulo, descricao, data_evento, local, categoria } = req.body;
 
@@ -117,9 +117,7 @@ app.post("/api/eventos", async (req, res) => {
   }
 });
 
-
-
-// Rota para listar eventos
+// Listar eventos
 app.get("/api/eventos", async (req, res) => {
   try {
     const { rows } = await pool.query(
@@ -132,8 +130,47 @@ app.get("/api/eventos", async (req, res) => {
   }
 });
 
-// Criar pedido
-// Criar pedido (POST) ou buscar pedidos (GET)
+// ==================== INGRESSOS ====================
+
+// Cadastrar ingressos do evento
+app.post("/api/ingressos", async (req, res) => {
+  const { evento_id, tipo_ingresso, preco, quantidade } = req.body;
+
+  if (!evento_id || !tipo_ingresso || !preco || !quantidade) {
+    return res.status(400).json({ erro: "Preencha todos os campos" });
+  }
+
+  try {
+    await pool.query(
+      "INSERT INTO ingressos (evento_id, tipo_ingresso, preco, quantidade) VALUES ($1, $2, $3, $4)",
+      [evento_id, tipo_ingresso, preco, quantidade]
+    );
+
+    res.json({ mensagem: "Ingresso cadastrado com sucesso" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: "Erro ao cadastrar ingresso" });
+  }
+});
+
+// Listar ingressos por evento
+app.get("/api/ingressos/:eventoId", async (req, res) => {
+  const { eventoId } = req.params;
+
+  try {
+    const { rows } = await pool.query(
+      "SELECT id, tipo_ingresso, preco, quantidade FROM ingressos WHERE evento_id = $1",
+      [eventoId]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: "Erro ao buscar ingressos" });
+  }
+});
+
+// ==================== PEDIDOS ====================
+
 app.route("/api/pedidos")
   .post(async (req, res) => {
     const { usuarioId, itens } = req.body;
@@ -143,7 +180,6 @@ app.route("/api/pedidos")
     }
 
     try {
-      // 1️⃣ Pega o CPF do usuário
       const { rows: usuarioRows } = await pool.query(
         "SELECT cpf_cnpj FROM usuarios WHERE id = $1",
         [usuarioId]
@@ -151,37 +187,35 @@ app.route("/api/pedidos")
       if (!usuarioRows[0]) return res.status(404).json({ erro: "Usuário não encontrado" });
       const cpf = usuarioRows[0].cpf_cnpj;
 
-      // 2️⃣ Verifica se o usuário já comprou algum ingresso do evento
+      // Verifica se já comprou ingresso do mesmo evento
       for (const item of itens) {
         const { rows: existente } = await pool.query(
           `SELECT pi.pedido_id
            FROM pedido_itens pi
            JOIN pedidos p ON pi.pedido_id = p.id
-           JOIN tickets t ON pi.ticket_id = t.id
-           JOIN usuarios u ON p.usuarioid = u.id
-           WHERE u.cpf_cnpj = $1 AND t.eventoid = $2`,
-          [cpf, item.eventoid] // precisa vir do frontend
+           JOIN ingressos i ON pi.ingresso_id = i.id
+           JOIN usuarios u ON p.usuario_id = u.id
+           WHERE u.cpf_cnpj = $1 AND i.evento_id = $2`,
+          [cpf, item.evento_id]
         );
         if (existente.length > 0) {
-          return res.status(400).json({ erro: `Você já comprou ingresso para o evento "${item.titulo}".` });
+          return res.status(400).json({ erro: `Você já comprou ingresso para o evento.` });
         }
       }
 
-      // 3️⃣ Calcula valor total do pedido
       const total = itens.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
 
-      // 4️⃣ Cria pedido
       const { rows } = await pool.query(
-        "INSERT INTO pedidos (usuarioid, data_pedido, valor_total, status_pagamento) VALUES ($1, NOW(), $2, $3) RETURNING id, data_pedido, valor_total",
-        [usuarioId, total, "pendente"] // status inicial
+        "INSERT INTO pedidos (usuario_id, data_pedido, valor_total, status_pagamento) VALUES ($1, NOW(), $2, $3) RETURNING id, data_pedido, valor_total",
+        [usuarioId, total, "pendente"]
       );
       const pedidoId = rows[0].id;
 
-      // 5️⃣ Cria itens do pedido
+      // Insere os itens do pedido
       for (const item of itens) {
         await pool.query(
-          "INSERT INTO pedido_itens (pedido_id, ticket_id, quantidade, preco_unitario) VALUES ($1, $2, $3, $4)",
-          [pedidoId, item.ticket_id, item.quantidade, item.preco]
+          "INSERT INTO pedido_itens (pedido_id, ingresso_id, quantidade, preco_unitario) VALUES ($1, $2, $3, $4)",
+          [pedidoId, item.ingresso_id, item.quantidade, item.preco]
         );
       }
 
@@ -207,9 +241,10 @@ app.route("/api/pedidos")
       const pedidosComItens = [];
       for (const pedido of pedidos) {
         const { rows: itens } = await pool.query(
-          `SELECT pi.id, pi.quantidade, pi.preco_unitario, e.titulo
+          `SELECT pi.id, pi.quantidade, pi.preco_unitario, i.tipo_ingresso, e.titulo
            FROM pedido_itens pi
-           JOIN eventos e ON pi.evento_id = e.id
+           JOIN ingressos i ON pi.ingresso_id = i.id
+           JOIN eventos e ON i.evento_id = e.id
            WHERE pi.pedido_id = $1`,
           [pedido.id]
         );
@@ -223,8 +258,8 @@ app.route("/api/pedidos")
     }
   });
 
+// ==================== SERVIDOR ====================
 
-// Iniciando servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);

@@ -1,8 +1,8 @@
 import "./Pagamento.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useCart } from "../context/CartContext/CartContext";
-import { CreditCard, QrCode, FileText } from "lucide-react"; // ícones bonitos
+import { useCart } from "../../context/CartContext/CartContext";
+import { QrCode } from "lucide-react"; // ícones bonitos
 
 export default function Pagamento() {
   const navigate = useNavigate();
@@ -21,9 +21,7 @@ export default function Pagamento() {
 
   return (
     <div className="pagamento-container">
-      <h2 className="titulo">
-        💳 Escolha a forma de pagamento
-      </h2>
+      <h2 className="titulo">💳 Escolha a forma de pagamento</h2>
 
       <div className="resumo">
         <p>Total da compra:</p>
@@ -32,15 +30,6 @@ export default function Pagamento() {
 
       <div className="opcoes">
         <div
-          className={`opcao ${metodo === "cartao" ? "selecionado" : ""}`}
-          onClick={() => setMetodo("cartao")}
-        >
-          <CreditCard size={40} />
-          <h3>Cartão de Crédito</h3>
-          <p>Pague em até 12x com cartão de crédito</p>
-        </div>
-
-        <div
           className={`opcao ${metodo === "pix" ? "selecionado" : ""}`}
           onClick={() => setMetodo("pix")}
         >
@@ -48,17 +37,7 @@ export default function Pagamento() {
           <h3>Pix</h3>
           <p>Pagamento instantâneo e sem taxas</p>
         </div>
-
-        <div
-          className={`opcao ${metodo === "boleto" ? "selecionado" : ""}`}
-          onClick={() => setMetodo("boleto")}
-        >
-          <FileText size={40} />
-          <h3>Boleto Bancário</h3>
-          <p>Imprima e pague no banco ou lotérica</p>
-        </div>
       </div>
-
       <div className="acoes">
         <button
           className={`continuar ${metodo ? "ativo" : ""}`}
