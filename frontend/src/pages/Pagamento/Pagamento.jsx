@@ -2,22 +2,28 @@ import "./Pagamento.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useCart } from "../../context/CartContext/CartContext";
-import { QrCode } from "lucide-react"; // ícones bonitos
+import { QrCode } from "lucide-react";
+import QRCode from "react-qr-code"; // npm install react-qr-code
 
 export default function Pagamento() {
   const navigate = useNavigate();
   const { total } = useCart();
   const [metodo, setMetodo] = useState(null);
+  const [mostrarQR, setMostrarQR] = useState(false);
 
   const handleContinuar = () => {
-    if (metodo) {
-      navigate(`/checkout?metodo=${metodo}`);
+    if (metodo === "pix") {
+      setMostrarQR(true);
     }
   };
 
   function handleVoltar() {
     navigate("/carrinho");
   }
+
+  const fecharPopup = () => {
+    setMostrarQR(false);
+  };
 
   return (
     <div className="pagamento-container">
@@ -38,6 +44,7 @@ export default function Pagamento() {
           <p>Pagamento instantâneo e sem taxas</p>
         </div>
       </div>
+
       <div className="acoes">
         <button
           className={`continuar ${metodo ? "ativo" : ""}`}
@@ -51,6 +58,22 @@ export default function Pagamento() {
           Voltar ao carrinho
         </button>
       </div>
+
+      {mostrarQR && (
+        <div className="popup-overlay" onClick={fecharPopup}>
+          <div className="popup" onClick={(e) => e.stopPropagation()}>
+            <h3>Escaneie o QR Code para pagar</h3>
+            <QRCode
+              value={`Pagamento de R$ ${total.toFixed(2)}`}
+              size={180}
+            />
+            <p>Após o pagamento, seu pedido será confirmado automaticamente.</p>
+            <button onClick={fecharPopup} className="fechar">
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
