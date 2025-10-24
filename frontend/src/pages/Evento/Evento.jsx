@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { MapPin, Plus, ShoppingCart, ArrowLeft, Check } from "lucide-react";
+import { MapPin, ShoppingCart, ArrowLeft, Check, Plus } from "lucide-react";
 import { useCart } from "../../context/CartContext/CartContext";
 import "./Evento.css";
 
@@ -8,23 +8,31 @@ function Evento() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [evento, setEvento] = useState(null);
+  const [ingressos, setIngressos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedIngresso, setSelectedIngresso] = useState(null);
   const { addToCart, cartItems } = useCart();
 
   useEffect(() => {
-    const fetchEvento = async () => {
+    const fetchDados = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/eventos`);
-        const data = await res.json();
-        const ev = data.find((e) => e.id === parseInt(id));
+        const resEvento = await fetch(`http://localhost:3000/api/eventos`);
+        const dataEvento = await resEvento.json();
+        const ev = dataEvento.find((e) => e.id === parseInt(id));
         setEvento(ev);
+
+        const resIngressos = await fetch(
+          `http://localhost:3000/api/ingressos/${id}`
+        );
+        const dataIngressos = await resIngressos.json();
+        setIngressos(Array.isArray(dataIngressos) ? dataIngressos : []);
       } catch (err) {
-        console.error(err);
+        console.error("Erro ao buscar dados:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchEvento();
+    fetchDados();
   }, [id]);
 
   if (loading)
@@ -36,15 +44,18 @@ function Evento() {
 
   if (!evento) return <p>Evento não encontrado.</p>;
 
-  // Verifica se já está no carrinho
-  const isInCart = cartItems.some((item) => item.id === evento.id);
-
   const handleAddToCart = () => {
-    if (!isInCart) {
+    if (!selectedIngresso) return;
+    const jaExiste = cartItems.some(
+      (item) => item.ingresso_id === selectedIngresso.id
+    );
+    if (!jaExiste) {
       addToCart({
-        id: evento.id,
+        ingresso_id: selectedIngresso.id,
+        evento_id: evento.id,
         titulo: evento.titulo,
-        preco: 120,
+        tipo_ingresso: selectedIngresso.tipo_ingresso,
+        preco: Number(selectedIngresso.preco),
         quantidade: 1,
       });
     }
@@ -80,7 +91,6 @@ function Evento() {
           <div className="evento-detalhes-2">
             <h1>{evento.titulo}</h1>
             <p>{evento.descricao}</p>
-
             <p>
               <strong>Data:</strong>{" "}
               {new Date(evento.data_evento).toLocaleDateString("pt-BR", {
@@ -99,16 +109,63 @@ function Evento() {
               <MapPin size={16} /> {evento.local}
             </p>
 
-            <p>
-              <strong>Preço:</strong> R$ 120,00
-            </p>
+            <h3 style={{ marginTop: "20px" }}>Ingressos disponíveis</h3>
+            {ingressos.length === 0 ? (
+              <p>Nenhum ingresso disponível.</p>
+            ) : (
+              <div className="ingressos-radio-group">
+                {ingressos.map((ing) => {
+                  const jaNoCarrinho = cartItems.some(
+                    (item) => item.ingresso_id === ing.id
+                  );
+                  return (
+                    <label
+                      key={ing.id}
+                      className={`ingresso-radio ${
+                        jaNoCarrinho ? "disabled" : ""
+                      } ${selectedIngresso?.id === ing.id ? "selected" : ""}`}
+                    >
+                      <input
+                        type="radio"
+                        name="ingresso"
+                        value={ing.id}
+                        disabled={jaNoCarrinho}
+                        onChange={() => setSelectedIngresso(ing)}
+                        checked={selectedIngresso?.id === ing.id}
+                      />
+                      <span>
+                        {ing.tipo_ingresso} - R${" "}
+                        {Number(ing.preco).toFixed(2).replace(".", ",")}
+                        {jaNoCarrinho && " (Já no carrinho)"}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
 
             <button
-              className={`btn-comprar-2 ${isInCart ? "added" : ""}`}
+              className={`btn-comprar-2 ${
+                selectedIngresso &&
+                cartItems.some(
+                  (item) => item.ingresso_id === selectedIngresso.id
+                )
+                  ? "added"
+                  : ""
+              }`}
               onClick={handleAddToCart}
-              disabled={isInCart}
+              disabled={
+                !selectedIngresso ||
+                (selectedIngresso &&
+                  cartItems.some(
+                    (item) => item.ingresso_id === selectedIngresso.id
+                  ))
+              }
             >
-              {isInCart ? (
+              {selectedIngresso &&
+              cartItems.some(
+                (item) => item.ingresso_id === selectedIngresso.id
+              ) ? (
                 <>
                   <Check size={16} style={{ marginRight: "5px" }} />
                   Adicionado

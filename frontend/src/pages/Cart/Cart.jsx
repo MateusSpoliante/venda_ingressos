@@ -6,13 +6,13 @@ export default function Carrinho() {
   const { cartItems, removeFromCart } = useCart();
   const navigate = useNavigate();
 
-  // Agrupar itens pelo mesmo id para não somar quantidade
+  // Agrupar itens pelo ingresso_id
   const itensUnicos = Array.from(
-    new Map(cartItems.map(item => [item.id, item])).values()
+    new Map(cartItems.map(item => [item.ingresso_id, item])).values()
   );
 
   const subtotal = itensUnicos.reduce(
-    (acc, item) => acc + item.preco, // <- não multiplica pela quantidade
+    (acc, item) => acc + Number(item.preco) * (item.quantidade || 1),
     0
   );
   const desconto = subtotal * 0.1;
@@ -36,7 +36,7 @@ export default function Carrinho() {
           <p className="carrinho-vazio">Seu carrinho está vazio.</p>
         ) : (
           itensUnicos.map((item) => (
-            <div className="item" key={item.id}>
+            <div className="item" key={item.ingresso_id}>
               <div className="item-info">
                 <div className="icone" style={{ backgroundColor: item.cor }}>
                   🎫
@@ -44,14 +44,15 @@ export default function Carrinho() {
                 <div className="detalhes">
                   <h3>{item.titulo}</h3>
                   <strong>
-                    R$ {item.preco.toFixed(2).replace(".", ",")}
+                    R$ {Number(item.preco).toFixed(2).replace(".", ",")}
                   </strong>
+                  {item.quantidade > 1 && <span> x{item.quantidade}</span>}
                 </div>
               </div>
 
               <button
                 className="remover"
-                onClick={() => removeFromCart(item.id)}
+                onClick={() => removeFromCart(item.ingresso_id)}
               >
                 Remover
               </button>
@@ -62,16 +63,6 @@ export default function Carrinho() {
 
       <div className="resumo">
         <h3>Resumo da compra</h3>
-        <div className="linha">
-          <span>Subtotal:</span>
-          <span>R$ {subtotal.toFixed(2).replace(".", ",")}</span>
-        </div>
-        <div className="linha">
-          <span>Desconto (10%):</span>
-          <span className="desconto">
-            - R$ {desconto.toFixed(2).replace(".", ",")}
-          </span>
-        </div>
         <div className="linha total">
           <span>Total:</span>
           <span>R$ {total.toFixed(2).replace(".", ",")}</span>
@@ -79,7 +70,13 @@ export default function Carrinho() {
       </div>
 
       <div className="botoes">
-        <button className="finalizar" onClick={handleComprar} disabled={itensUnicos.length === 0}>Finalizar Compra</button>
+        <button
+          className="finalizar"
+          onClick={handleComprar}
+          disabled={itensUnicos.length === 0}
+        >
+          Finalizar Compra
+        </button>
         <button onClick={handleGoHome} className="limpar">
           Continuar Comprando
         </button>
