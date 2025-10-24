@@ -233,21 +233,20 @@
 
   .eventos-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    /* força 4 cards por linha */
-    gap: 30px;
-    justify-content: center;
-    /* centraliza os cards */
-    padding: 0 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    /* cards flexíveis */
+    gap: 25px;
+    /* espaçamento equilibrado */
+    padding: 0 16px;
+    /* padding lateral */
+    justify-items: center;
+    /* centraliza os cards no grid */
   }
 
+  /* Ajuste do card */
   .evento-card {
     width: 100%;
-    /* agora ocupa toda a coluna */
-    max-width: 300px;
-    /* limite de largura do card */
     min-height: 300px;
-    /* altura fixa */
     background: #fff;
     border-radius: 14px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -425,13 +424,11 @@
     .eventos-grid {
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
-      justify-items: center;
-      /* centraliza os cards */
-      padding: 0 10px;
+      padding: 0 12px;
     }
 
     .evento-card {
-      max-width: 260px;
+      max-width: 380px;
     }
   }
 
