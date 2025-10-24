@@ -9,7 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Conexão com banco (Supabase)
+// ==================== CONEXÃO BANCO (SUPABASE) ====================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
@@ -17,33 +17,29 @@ const pool = new Pool({
 
 // ==================== USUÁRIOS ====================
 
-// Rota de cadastro
+// Cadastro
 app.post("/api/cadastro", async (req, res) => {
   const { nome, cpfCnpj, email, senha } = req.body;
 
-  if (!nome || !cpfCnpj || !email || !senha) {
+  if (!nome || !cpfCnpj || !email || !senha)
     return res.status(400).json({ erro: "Preencha todos os campos" });
-  }
-  if (senha.length < 6) {
+  if (senha.length < 6)
     return res.status(400).json({ erro: "A senha deve ter pelo menos 6 caracteres" });
-  }
 
   try {
-    const { rows: emailExistente } = await pool.query(
+    const emailExistente = await pool.query(
       "SELECT id FROM usuarios WHERE email = $1",
       [email]
     );
-    if (emailExistente.length > 0) {
+    if (emailExistente.rowCount > 0)
       return res.status(400).json({ erro: "Email já cadastrado!" });
-    }
 
-    const { rows: cpfExistente } = await pool.query(
+    const cpfExistente = await pool.query(
       "SELECT id FROM usuarios WHERE cpf_cnpj = $1",
       [cpfCnpj]
     );
-    if (cpfExistente.length > 0) {
+    if (cpfExistente.rowCount > 0)
       return res.status(400).json({ erro: "CPF/CNPJ já cadastrado!" });
-    }
 
     const hash = await bcrypt.hash(senha, 10);
 
@@ -54,18 +50,16 @@ app.post("/api/cadastro", async (req, res) => {
 
     res.json({ mensagem: "Usuário cadastrado com sucesso" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ erro: "Erro ao cadastrar usuário" });
+    console.error("Erro ao cadastrar:", err);
+    res.status(500).json({ erro: "Erro interno ao cadastrar usuário" });
   }
 });
 
-// Rota de login
+// Login
 app.post("/api/login", async (req, res) => {
   const { email, senha } = req.body;
-
-  if (!email || !senha) {
+  if (!email || !senha)
     return res.status(400).json({ erro: "Preencha email e senha" });
-  }
 
   try {
     const { rows } = await pool.query(
@@ -77,11 +71,13 @@ app.post("/api/login", async (req, res) => {
       return res.status(401).json({ erro: "Usuário não encontrado" });
 
     const senhaValida = await bcrypt.compare(senha, usuario.senha);
-    if (!senhaValida) return res.status(401).json({ erro: "Senha inválida" });
+    if (!senhaValida)
+      return res.status(401).json({ erro: "Senha inválida" });
 
     const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
+
     res.json({
       mensagem: "Login realizado com sucesso",
       token,
@@ -89,8 +85,8 @@ app.post("/api/login", async (req, res) => {
       cpfCnpj: usuario.cpf_cnpj,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ erro: "Erro no servidor" });
+    console.error("Erro no login:", err);
+    res.status(500).json({ erro: "Erro interno no servidor" });
   }
 });
 
@@ -99,20 +95,17 @@ app.post("/api/login", async (req, res) => {
 // Criar evento
 app.post("/api/eventos", async (req, res) => {
   const { titulo, descricao, data_evento, local, categoria } = req.body;
-
-  if (!titulo || !descricao || !data_evento || !local || !categoria) {
+  if (!titulo || !descricao || !data_evento || !local || !categoria)
     return res.status(400).json({ erro: "Preencha todos os campos" });
-  }
 
   try {
     await pool.query(
       "INSERT INTO eventos (titulo, descricao, data_evento, local, categoria) VALUES ($1, $2, $3, $4, $5)",
       [titulo, descricao, data_evento, local, categoria]
     );
-
     res.json({ mensagem: "Evento criado com sucesso" });
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao criar evento:", err);
     res.status(500).json({ erro: "Erro ao criar evento" });
   }
 });
@@ -125,142 +118,96 @@ app.get("/api/eventos", async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao buscar eventos:", err);
     res.status(500).json({ erro: "Erro ao buscar eventos" });
   }
 });
 
 // ==================== INGRESSOS ====================
 
-// Cadastrar ingressos do evento
+// Criar ingresso
 app.post("/api/ingressos", async (req, res) => {
   const { evento_id, tipo_ingresso, preco, quantidade } = req.body;
-
-  if (!evento_id || !tipo_ingresso || !preco || !quantidade) {
+  if (!evento_id || !tipo_ingresso || !preco || !quantidade)
     return res.status(400).json({ erro: "Preencha todos os campos" });
-  }
 
   try {
     await pool.query(
       "INSERT INTO ingressos (evento_id, tipo_ingresso, preco, quantidade) VALUES ($1, $2, $3, $4)",
       [evento_id, tipo_ingresso, preco, quantidade]
     );
-
     res.json({ mensagem: "Ingresso cadastrado com sucesso" });
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao cadastrar ingresso:", err);
     res.status(500).json({ erro: "Erro ao cadastrar ingresso" });
   }
 });
 
-// Listar ingressos por evento
+// Buscar ingressos por evento
 app.get("/api/ingressos/:eventoId", async (req, res) => {
   const { eventoId } = req.params;
-
   try {
     const { rows } = await pool.query(
       "SELECT id, tipo_ingresso, preco, quantidade FROM ingressos WHERE evento_id = $1",
       [eventoId]
     );
-    res.json(rows);
+    res.json(rows || []);
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao buscar ingressos:", err);
     res.status(500).json({ erro: "Erro ao buscar ingressos" });
   }
 });
 
 // ==================== PEDIDOS ====================
 
-app.route("/api/pedidos")
-  .post(async (req, res) => {
-    const { usuarioId, itens } = req.body;
+app.post("/api/pedidos", async (req, res) => {
+  const { usuarioId, itens } = req.body;
+  if (!usuarioId || !itens?.length)
+    return res.status(400).json({ erro: "Dados incompletos" });
 
-    if (!usuarioId || !itens || itens.length === 0) {
-      return res.status(400).json({ erro: "Dados incompletos" });
+  try {
+    const usuarioRes = await pool.query(
+      "SELECT cpf_cnpj FROM usuarios WHERE id = $1",
+      [usuarioId]
+    );
+    const usuario = usuarioRes.rows[0];
+    if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado" });
+
+    // Evita duplicidade de compra por evento
+    for (const item of itens) {
+      const existente = await pool.query(
+        `SELECT 1 FROM pedido_itens pi
+         JOIN pedidos p ON p.id = pi.pedido_id
+         JOIN ingressos i ON i.id = pi.ingresso_id
+         JOIN usuarios u ON u.id = p.usuario_id
+         WHERE u.cpf_cnpj = $1 AND i.evento_id = $2`,
+        [usuario.cpf_cnpj, item.evento_id]
+      );
+      if (existente.rowCount > 0)
+        return res.status(400).json({ erro: "Você já comprou ingresso para este evento." });
     }
 
-    try {
-      const { rows: usuarioRows } = await pool.query(
-        "SELECT cpf_cnpj FROM usuarios WHERE id = $1",
-        [usuarioId]
+    const total = itens.reduce((acc, i) => acc + i.preco * i.quantidade, 0);
+    const novoPedido = await pool.query(
+      "INSERT INTO pedidos (usuario_id, data_pedido, valor_total, status_pagamento) VALUES ($1, NOW(), $2, $3) RETURNING id, data_pedido, valor_total",
+      [usuarioId, total, "pendente"]
+    );
+
+    const pedidoId = novoPedido.rows[0].id;
+    for (const item of itens) {
+      await pool.query(
+        "INSERT INTO pedido_itens (pedido_id, ingresso_id, quantidade, preco_unitario) VALUES ($1, $2, $3, $4)",
+        [pedidoId, item.ingresso_id, item.quantidade, item.preco]
       );
-      if (!usuarioRows[0]) return res.status(404).json({ erro: "Usuário não encontrado" });
-      const cpf = usuarioRows[0].cpf_cnpj;
-
-      // Verifica se já comprou ingresso do mesmo evento
-      for (const item of itens) {
-        const { rows: existente } = await pool.query(
-          `SELECT pi.pedido_id
-           FROM pedido_itens pi
-           JOIN pedidos p ON pi.pedido_id = p.id
-           JOIN ingressos i ON pi.ingresso_id = i.id
-           JOIN usuarios u ON p.usuario_id = u.id
-           WHERE u.cpf_cnpj = $1 AND i.evento_id = $2`,
-          [cpf, item.evento_id]
-        );
-        if (existente.length > 0) {
-          return res.status(400).json({ erro: `Você já comprou ingresso para o evento.` });
-        }
-      }
-
-      const total = itens.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
-
-      const { rows } = await pool.query(
-        "INSERT INTO pedidos (usuario_id, data_pedido, valor_total, status_pagamento) VALUES ($1, NOW(), $2, $3) RETURNING id, data_pedido, valor_total",
-        [usuarioId, total, "pendente"]
-      );
-      const pedidoId = rows[0].id;
-
-      // Insere os itens do pedido
-      for (const item of itens) {
-        await pool.query(
-          "INSERT INTO pedido_itens (pedido_id, ingresso_id, quantidade, preco_unitario) VALUES ($1, $2, $3, $4)",
-          [pedidoId, item.ingresso_id, item.quantidade, item.preco]
-        );
-      }
-
-      res.json({ mensagem: "Pedido realizado com sucesso", pedido: rows[0] });
-
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ erro: "Erro ao criar pedido" });
     }
-  })
 
-  // Buscar pedidos do usuário
-  .get(async (req, res) => {
-    const { usuarioId } = req.query;
-    if (!usuarioId) return res.status(400).json({ erro: "usuarioId faltando" });
-
-    try {
-      const { rows: pedidos } = await pool.query(
-        "SELECT * FROM pedidos WHERE usuario_id = $1 ORDER BY data_pedido DESC",
-        [usuarioId]
-      );
-
-      const pedidosComItens = [];
-      for (const pedido of pedidos) {
-        const { rows: itens } = await pool.query(
-          `SELECT pi.id, pi.quantidade, pi.preco_unitario, i.tipo_ingresso, e.titulo
-           FROM pedido_itens pi
-           JOIN ingressos i ON pi.ingresso_id = i.id
-           JOIN eventos e ON i.evento_id = e.id
-           WHERE pi.pedido_id = $1`,
-          [pedido.id]
-        );
-        pedidosComItens.push({ ...pedido, itens });
-      }
-
-      res.json(pedidosComItens);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ erro: "Erro ao buscar pedidos" });
-    }
-  });
+    res.json({ mensagem: "Pedido realizado com sucesso", pedido: novoPedido.rows[0] });
+  } catch (err) {
+    console.error("Erro ao criar pedido:", err);
+    res.status(500).json({ erro: "Erro interno ao criar pedido" });
+  }
+});
 
 // ==================== SERVIDOR ====================
-
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
