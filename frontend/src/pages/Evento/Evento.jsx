@@ -16,13 +16,13 @@ function Evento() {
   useEffect(() => {
     const fetchDados = async () => {
       try {
-        const resEvento = await fetch(`http://localhost:3000/api/eventos`);
+        const resEvento = await fetch(`${import.meta.env.VITE_API_URL}/api/eventos`);
         const dataEvento = await resEvento.json();
         const ev = dataEvento.find((e) => e.id === parseInt(id));
         setEvento(ev);
 
         const resIngressos = await fetch(
-          `http://localhost:3000/api/ingressos/${id}`
+          `${import.meta.env.VITE_API_URL}/api/ingressos/${id}`
         );
         const dataIngressos = await resIngressos.json();
         setIngressos(Array.isArray(dataIngressos) ? dataIngressos : []);

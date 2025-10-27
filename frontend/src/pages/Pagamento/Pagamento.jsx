@@ -3,23 +3,37 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useCart } from "../../context/CartContext/CartContext";
 import { QrCode } from "lucide-react";
-import QRCode from "react-qr-code"; // npm install react-qr-code
+import QRCode from "react-qr-code";
 
 export default function Pagamento() {
   const navigate = useNavigate();
   const { total } = useCart();
   const [metodo, setMetodo] = useState(null);
   const [mostrarQR, setMostrarQR] = useState(false);
+  const [qrValue, setQrValue] = useState("");
 
-  const handleContinuar = () => {
+  const handleContinuar = async () => {
     if (metodo === "pix") {
-      setMostrarQR(true);
+      try {
+        // pega QR do backend remoto
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/pix`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ valor: total }),
+        });
+        const data = await res.json();
+        setQrValue(data.qrCode); // backend retorna a string do QR
+        setMostrarQR(true);
+      } catch (err) {
+        console.error("Erro ao gerar QR:", err);
+        alert("Erro ao gerar QR Code, tente novamente.");
+      }
     }
   };
 
-  function handleVoltar() {
+  const handleVoltar = () => {
     navigate("/carrinho");
-  }
+  };
 
   const fecharPopup = () => {
     setMostrarQR(false);
@@ -63,10 +77,7 @@ export default function Pagamento() {
         <div className="popup-overlay" onClick={fecharPopup}>
           <div className="popup" onClick={(e) => e.stopPropagation()}>
             <h3>Escaneie o QR Code para pagar</h3>
-            <QRCode
-              value={`Pagamento de R$ ${total.toFixed(2)}`}
-              size={180}
-            />
+            <QRCode value={qrValue} size={180} />
             <p>Após o pagamento, seu pedido será confirmado automaticamente.</p>
             <button onClick={fecharPopup} className="fechar">
               Fechar

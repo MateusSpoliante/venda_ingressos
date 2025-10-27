@@ -29,11 +29,15 @@ function Cadastro() {
     }
 
     try {
-      const resposta = await fetch("http://localhost:3000/api/cadastro", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome, cpfCnpj: valorLimpo, email, senha }),
-      });
+      const resposta = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/cadastro`, // Vite
+        // `${process.env.REACT_APP_API_URL}/api/cadastro`, // CRA
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nome, cpfCnpj: valorLimpo, email, senha }),
+        }
+      );
 
       const data = await resposta.json();
 
@@ -96,7 +100,9 @@ function Cadastro() {
             <input
               type="text"
               placeholder={
-                tipo === "cpf" ? "Digite seu CPF (11 dígitos)" : "Digite seu CNPJ (14 dígitos)"
+                tipo === "cpf"
+                  ? "Digite seu CPF (11 dígitos)"
+                  : "Digite seu CNPJ (14 dígitos)"
               }
               value={cpfCnpj}
               onChange={(e) => setCpfCnpj(e.target.value)}

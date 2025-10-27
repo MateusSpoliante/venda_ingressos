@@ -53,7 +53,12 @@ function Home() {
   useEffect(() => {
     const fetchEventos = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/eventos");
+        // Substitua esta linha dentro do useEffect
+        // const response = await fetch("http://localhost:3000/api/eventos");
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/eventos`
+        );
+
         const data = await response.json();
         setEventos(data);
       } catch (error) {
