@@ -9,7 +9,7 @@ import PrivateRoute from "./components/PrivateRoute.jsx";
 import { CartProvider } from "../src/context/CartContext/CartContext.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
 import Evento from "./pages/Evento/Evento.jsx";
-import Pagamento from "./pages/pagamento/Pagamento.jsx";
+import Pagamento from "./pages/Pagamento/Pagamento.jsx";
 
 const router = createBrowserRouter([
   {
