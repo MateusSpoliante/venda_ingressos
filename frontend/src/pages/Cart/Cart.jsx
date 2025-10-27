@@ -15,8 +15,7 @@ export default function Carrinho() {
     (acc, item) => acc + Number(item.preco) * (item.quantidade || 1),
     0
   );
-  const desconto = subtotal * 0.1;
-  const total = subtotal - desconto;
+  const total = subtotal;
 
   function handleGoHome() {
     navigate("/home");

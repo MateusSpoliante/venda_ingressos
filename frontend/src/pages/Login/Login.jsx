@@ -18,11 +18,15 @@ function Login() {
     setLoading(true);
 
     try {
-      const resposta = await fetch("http://localhost:3000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, senha }),
-      });
+      const resposta = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/login`, // Vite
+        // `${process.env.REACT_APP_API_URL}/api/login`, // CRA
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, senha }),
+        }
+      );
 
       const dados = await resposta.json();
 
@@ -37,9 +41,7 @@ function Login() {
       localStorage.setItem("nome", dados.nome);
 
       setSucesso(
-        <span
-          style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
-        >
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
           <UserCheck /> Login realizado com sucesso!
         </span>
       );
