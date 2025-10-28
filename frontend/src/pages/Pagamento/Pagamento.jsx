@@ -2,7 +2,7 @@ import "./Pagamento.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useCart } from "../../context/CartContext/CartContext";
-import { QrCode } from "lucide-react";
+import { QrCode, CheckCircle2 } from "lucide-react";
 import QRCode from "react-qr-code";
 
 export default function Pagamento() {
@@ -11,23 +11,26 @@ export default function Pagamento() {
   const [metodo, setMetodo] = useState(null);
   const [mostrarQR, setMostrarQR] = useState(false);
   const [qrValue, setQrValue] = useState("");
+  const [pagamentoConcluido, setPagamentoConcluido] = useState(false);
 
   const handleContinuar = async () => {
-    if (metodo === "pix") {
-      try {
-        // pega QR do backend remoto
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/pix`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ valor: total }),
-        });
-        const data = await res.json();
-        setQrValue(data.qrCode); // backend retorna a string do QR
-        setMostrarQR(true);
-      } catch (err) {
-        console.error("Erro ao gerar QR:", err);
-        alert("Erro ao gerar QR Code, tente novamente.");
-      }
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/pix`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ valor: total }),
+      });
+      const data = await res.json();
+      setQrValue(data.qrCode || "https://fakepixcode.com"); // QR fake pra teste
+      setMostrarQR(true);
+
+      // Simulação: após 10 segundos o pagamento é confirmado
+      setTimeout(() => {
+        setPagamentoConcluido(true);
+      }, 10000);
+    } catch (err) {
+      console.error("Erro ao gerar QR:", err);
+      alert("Erro ao gerar QR Code PIX");
     }
   };
 
@@ -37,6 +40,7 @@ export default function Pagamento() {
 
   const fecharPopup = () => {
     setMostrarQR(false);
+    setPagamentoConcluido(false);
   };
 
   return (
@@ -76,12 +80,25 @@ export default function Pagamento() {
       {mostrarQR && (
         <div className="popup-overlay" onClick={fecharPopup}>
           <div className="popup" onClick={(e) => e.stopPropagation()}>
-            <h3>Escaneie o QR Code para pagar</h3>
-            <QRCode value={qrValue} size={180} />
-            <p>Após o pagamento, seu pedido será confirmado automaticamente.</p>
-            <button onClick={fecharPopup} className="fechar">
-              Fechar
-            </button>
+            {!pagamentoConcluido ? (
+              <>
+                <h3>Escaneie o QR Code para pagar</h3>
+                <QRCode value={qrValue} size={180} />
+                <p>Após o pagamento, seu pedido será confirmado automaticamente.</p>
+                <button onClick={fecharPopup} className="fechar">
+                  Fechar
+                </button>
+              </>
+            ) : (
+              <div className="sucesso-container">
+                <CheckCircle2 className="icone-sucesso" size={90} />
+                <h3>Pagamento confirmado!</h3>
+                <p>Seu pedido foi registrado com sucesso. 🎉</p>
+                <button onClick={fecharPopup} className="fechar">
+                  Fechar
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -166,3 +166,102 @@
     padding: 20px;
   }
 }
+
+
+/* === Animação e estilo melhorado do popup === */
+.popup {
+  background: #fff;
+  padding: 35px 25px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  animation: popupFadeIn 0.3s ease forwards;
+  max-width: 320px;
+  width: 90%;
+  position: relative;
+}
+
+@keyframes popupFadeIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.popup h3 {
+  font-size: 1.3rem;
+  color: #111;
+}
+
+.popup p {
+  font-size: 0.95rem;
+  color: #555;
+  margin-top: 10px;
+}
+
+.popup .fechar {
+  margin-top: 18px;
+  background: linear-gradient(90deg, #008cff, #0057a3);
+  color: #fff;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.popup .fechar:hover {
+  background: linear-gradient(90deg, #0074d9, #00437f);
+  transform: translateY(-2px);
+}
+
+/* === Estilo e animação da tela de sucesso === */
+.sucesso-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.icone-sucesso {
+  color: #2ecc71;
+  margin-bottom: 10px;
+  animation: popIn 0.4s ease forwards;
+}
+
+.sucesso-container h3 {
+  font-size: 1.4rem;
+  color: #222;
+}
+
+.sucesso-container p {
+  color: #555;
+  font-size: 1rem;
+  margin-top: 8px;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

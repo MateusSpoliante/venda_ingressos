@@ -15,44 +15,14 @@ export default function Carrinho() {
     (acc, item) => acc + Number(item.preco) * (item.quantidade || 1),
     0
   );
-  const total = subtotal;
+  const desconto = subtotal * 0.1;
+  const total = subtotal - desconto;
 
   function handleGoHome() {
     navigate("/home");
   }
-
-  async function handleComprar() {
-    if (itensUnicos.length === 0) return;
-
-    try {
-      // Exemplo de envio pro backend (Render/Railway)
-      const token = localStorage.getItem("token"); // se necessário autenticação
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/compra`, // Vite
-        // `${process.env.REACT_APP_API_URL}/api/compra`, // CRA
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : undefined,
-          },
-          body: JSON.stringify({ itens: cartItems }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.erro || "Erro ao finalizar compra");
-        return;
-      }
-
-      // Redireciona pro pagamento ou página de sucesso
-      navigate("/pagamento");
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao conectar com o servidor");
-    }
+  function handleComprar() {
+    navigate("/pagamento");
   }
 
   return (

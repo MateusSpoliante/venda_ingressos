@@ -4,7 +4,12 @@ const cors = require("cors");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const mercadopago = require("mercadopago");
 
+// ==================== CONFIG MERCADO PAGO (SDK v1) ====================
+mercadopago.configurations.setAccessToken(process.env.MERCADO_PAGO_ACCESS_TOKEN);
+
+// ==================== CONFIG EXPRESS ====================
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -16,11 +21,9 @@ const pool = new Pool({
 });
 
 // ==================== USUÁRIOS ====================
-
 // Cadastro
 app.post("/api/cadastro", async (req, res) => {
   const { nome, cpfCnpj, email, senha } = req.body;
-
   if (!nome || !cpfCnpj || !email || !senha)
     return res.status(400).json({ erro: "Preencha todos os campos" });
   if (senha.length < 6)
@@ -74,9 +77,7 @@ app.post("/api/login", async (req, res) => {
     if (!senhaValida)
       return res.status(401).json({ erro: "Senha inválida" });
 
-    const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
     res.json({
       mensagem: "Login realizado com sucesso",
@@ -91,8 +92,6 @@ app.post("/api/login", async (req, res) => {
 });
 
 // ==================== EVENTOS ====================
-
-// Criar evento
 app.post("/api/eventos", async (req, res) => {
   const { titulo, descricao, data_evento, local, categoria } = req.body;
   if (!titulo || !descricao || !data_evento || !local || !categoria)
@@ -110,7 +109,6 @@ app.post("/api/eventos", async (req, res) => {
   }
 });
 
-// Listar eventos
 app.get("/api/eventos", async (req, res) => {
   try {
     const { rows } = await pool.query(
@@ -124,8 +122,6 @@ app.get("/api/eventos", async (req, res) => {
 });
 
 // ==================== INGRESSOS ====================
-
-// Criar ingresso
 app.post("/api/ingressos", async (req, res) => {
   const { evento_id, tipo_ingresso, preco, quantidade } = req.body;
   if (!evento_id || !tipo_ingresso || !preco || !quantidade)
@@ -143,7 +139,6 @@ app.post("/api/ingressos", async (req, res) => {
   }
 });
 
-// Buscar ingressos por evento
 app.get("/api/ingressos/:eventoId", async (req, res) => {
   const { eventoId } = req.params;
   try {
@@ -159,7 +154,6 @@ app.get("/api/ingressos/:eventoId", async (req, res) => {
 });
 
 // ==================== PEDIDOS ====================
-
 app.post("/api/pedidos", async (req, res) => {
   const { usuarioId, itens } = req.body;
   if (!usuarioId || !itens?.length)
@@ -173,7 +167,6 @@ app.post("/api/pedidos", async (req, res) => {
     const usuario = usuarioRes.rows[0];
     if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado" });
 
-    // Evita duplicidade de compra por evento
     for (const item of itens) {
       const existente = await pool.query(
         `SELECT 1 FROM pedido_itens pi
@@ -205,6 +198,33 @@ app.post("/api/pedidos", async (req, res) => {
   } catch (err) {
     console.error("Erro ao criar pedido:", err);
     res.status(500).json({ erro: "Erro interno ao criar pedido" });
+  }
+});
+
+// ==================== PIX ====================
+app.post("/api/pix", async (req, res) => {
+  const { pedidoId, valor } = req.body;
+  if (!pedidoId || !valor)
+    return res.status(400).json({ erro: "Pedido ou valor inválido" });
+
+  try {
+    const paymentData = {
+      transaction_amount: Number(valor),
+      description: `Pedido #${pedidoId}`,
+      payment_method_id: "pix",
+      payer: { email: "cliente@email.com" },
+    };
+
+    // Cria pagamento PIX usando SDK v1
+    const payment = await mercadopago.payment.create(paymentData);
+
+    const qrCode = payment.response.point_of_interaction.transaction_data.qr_code;
+    const qrCodeBase64 = payment.response.point_of_interaction.transaction_data.qr_code_base64;
+
+    res.json({ qrCode, qrCodeBase64 });
+  } catch (err) {
+    console.error("Erro ao gerar PIX:", err);
+    res.status(500).json({ erro: "Erro ao gerar PIX" });
   }
 });
 
