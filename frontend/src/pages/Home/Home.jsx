@@ -11,12 +11,12 @@ import {
   TentTree,
   Mic,
   Church,
-  MessageCircle,
   CalendarCheck2,
   LogOut,
   Loader2,
   ShoppingCart,
   MapPin,
+  MessageCircleMore,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -218,7 +218,7 @@ function Home() {
             style={{ textDecoration: "none" }}
           >
             <button className="whatsapp" style={iconStyle}>
-              <MessageCircle size={22} />
+              <MessageCircleMore size={22} />
             </button>
           </a>
         </div>

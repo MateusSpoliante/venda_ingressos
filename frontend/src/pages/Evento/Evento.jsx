@@ -16,7 +16,9 @@ function Evento() {
   useEffect(() => {
     const fetchDados = async () => {
       try {
-        const resEvento = await fetch(`${import.meta.env.VITE_API_URL}/api/eventos`);
+        const resEvento = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/eventos`
+        );
         const dataEvento = await resEvento.json();
         const ev = dataEvento.find((e) => e.id === parseInt(id));
         setEvento(ev);
@@ -105,7 +107,7 @@ function Evento() {
                 minute: "2-digit",
               })}
             </p>
-            <p>
+            <p style={{ display: "flex", alignItems: "center", gap: "0px" }}>
               <MapPin size={16} /> {evento.local}
             </p>
 
