@@ -1,6 +1,7 @@
 import "./Cart.css";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext/CartContext";
+import { ShoppingCart } from "lucide-react";
 
 export default function Carrinho() {
   const { cartItems, removeFromCart } = useCart();
@@ -15,8 +16,8 @@ export default function Carrinho() {
     (acc, item) => acc + Number(item.preco) * (item.quantidade || 1),
     0
   );
-  const desconto = subtotal * 0.1;
-  const total = subtotal - desconto;
+  //const desconto = subtotal * 0.1;
+  const total = subtotal;
 
   function handleGoHome() {
     navigate("/home");
@@ -28,7 +29,7 @@ export default function Carrinho() {
   return (
     <div className="carrinho-container">
       <h2 className="titulo">
-        <span className="icone-titulo">🎟️</span> Seus Ingressos
+        <span className="icone-titulo"><ShoppingCart/></span> Carrinho
       </h2>
 
       <div className="lista-itens">

@@ -49,20 +49,16 @@ function Home() {
     }, 1500);
   };
 
-  // Busca eventos da API
   useEffect(() => {
     const fetchEventos = async () => {
       try {
-        // Substitua esta linha dentro do useEffect
-        // const response = await fetch("http://localhost:3000/api/eventos");
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/eventos`
-        );
-
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/eventos`);
         const data = await response.json();
-        setEventos(data);
+        // Garantir que seja sempre array
+        setEventos(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Erro ao buscar eventos:", error);
+        setEventos([]);
       } finally {
         setLoadingEventos(false);
       }
@@ -70,14 +66,13 @@ function Home() {
     fetchEventos();
   }, []);
 
-  // Função para filtrar eventos por categoria e busca
-  const eventosFiltrados = eventos
+  // Proteger filter caso eventos não seja array
+  const eventosFiltrados = (eventos || [])
     .filter((e) =>
       categoriaAtiva === "Todos" ? true : e.categoria === categoriaAtiva
     )
     .filter((e) => e.titulo.toLowerCase().includes(busca.toLowerCase()));
 
-  // Lista de categorias
   const categorias = [
     { nome: "Todos", icon: <CalendarCheck2 size={16} /> },
     { nome: "Teatro", icon: <Drama size={16} /> },
@@ -91,54 +86,32 @@ function Home() {
     { nome: "Religioso", icon: <Church size={16} /> },
   ];
 
-  // Títulos e subtítulos por categoria
   const categoriasTextos = {
-    Todos: {
-      titulo: "Todos os Eventos",
-      subtitulo: "Listagem de ingressos de diversas categorias",
-    },
-    Teatro: {
-      titulo: "Teatros",
-      subtitulo: "Peças incríveis para você assistir",
-    },
-    Musical: {
-      titulo: "Musicais",
-      subtitulo: "Shows e apresentações musicais",
-    },
-    "Stand up": {
-      titulo: "Stand-up Comedy",
-      subtitulo: "Ria com os melhores comediantes",
-    },
-    Infantil: {
-      titulo: "Infantil",
-      subtitulo: "Eventos para a criançada",
-    },
-    Dança: {
-      titulo: "Dança",
-      subtitulo: "Espetáculos de dança e balé",
-    },
-    Shows: {
-      titulo: "Shows",
-      subtitulo: "Grandes apresentações ao vivo",
-    },
-    Circo: {
-      titulo: "Circo",
-      subtitulo: "Diversão e entretenimento para toda a família",
-    },
-    Palestras: {
-      titulo: "Palestras",
-      subtitulo: "Aprenda com especialistas",
-    },
-    Religioso: {
-      titulo: "Eventos Religiosos",
-      subtitulo: "Celebrações e encontros espirituais",
-    },
+    Todos: { titulo: "Todos os Eventos", subtitulo: "Listagem de ingressos de diversas categorias" },
+    Teatro: { titulo: "Teatros", subtitulo: "Peças incríveis para você assistir" },
+    Musical: { titulo: "Musicais", subtitulo: "Shows e apresentações musicais" },
+    "Stand up": { titulo: "Stand-up Comedy", subtitulo: "Ria com os melhores comediantes" },
+    Infantil: { titulo: "Infantil", subtitulo: "Eventos para a criançada" },
+    Dança: { titulo: "Dança", subtitulo: "Espetáculos de dança e balé" },
+    Shows: { titulo: "Shows", subtitulo: "Grandes apresentações ao vivo" },
+    Circo: { titulo: "Circo", subtitulo: "Diversão e entretenimento para toda a família" },
+    Palestras: { titulo: "Palestras", subtitulo: "Aprenda com especialistas" },
+    Religioso: { titulo: "Eventos Religiosos", subtitulo: "Celebrações e encontros espirituais" },
+  };
+
+  const formatarData = (dataString) => {
+    const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+    const data = new Date(dataString);
+    const dia = data.getDate();
+    const mes = meses[data.getMonth()];
+    const horas = data.getHours().toString().padStart(2, "0");
+    const minutos = data.getMinutes().toString().padStart(2, "0");
+    return `${dia} de ${mes} às ${horas}:${minutos}`;
   };
 
   return (
     <div className="body-home">
       <div className="container">
-        {/* HEADER */}
         <header className="header">
           <a href="/home">
             <div className="logoDiv">
@@ -190,7 +163,6 @@ function Home() {
           </div>
         </header>
 
-        {/* NAV - categorias */}
         <nav className="nav">
           {categorias.map((cat) => (
             <button
@@ -204,7 +176,6 @@ function Home() {
           ))}
         </nav>
 
-        {/* LISTA DE EVENTOS */}
         <section className="eventos-section">
           <h2>{categoriasTextos[categoriaAtiva]?.titulo || "Eventos"}</h2>
           <p>{categoriasTextos[categoriaAtiva]?.subtitulo || ""}</p>
@@ -227,18 +198,8 @@ function Home() {
                   </div>
                   <div className="evento-info">
                     <h3>{evento.titulo}</h3>
-                    <p>{evento.descricao}</p>
-                    <span>
-                      {new Date(evento.data_evento).toLocaleDateString(
-                        "pt-BR",
-                        {
-                          day: "2-digit",
-                          month: "short",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }
-                      )}
-                    </span>
+                    {/* <span className="evento-desc">{evento.descricao}</span> */}
+                    <span className="evento-data">{formatarData(evento.data_evento)}</span>
                     <div className="evento-local">
                       <MapPin size={14} /> {evento.local}
                     </div>
@@ -249,7 +210,6 @@ function Home() {
           )}
         </section>
 
-        {/* FLOATING BUTTONS */}
         <div className="floating-buttons">
           <a
             href="https://wa.me/5544984315023?text=Olá,%20vim%20do%20site%20da%20OpenTicket,%20gostaria%20de%20mais%20informações!"

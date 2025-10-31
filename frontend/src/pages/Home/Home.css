@@ -168,6 +168,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -230,7 +231,7 @@
 /* GRID FLUIDO E CENTRALIZADO */
 .eventos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: 30px;
   justify-content: center;
   align-items: start;
@@ -248,7 +249,7 @@
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s;
   cursor: pointer;
-  min-height: 340px;
+  min-height: 300px;
 }
 
 .evento-card:hover {
@@ -288,8 +289,7 @@
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1;
+  gap: 8px; /* já define o espaçamento entre titulo, data e local */
 }
 
 .evento-info h3 {
@@ -298,19 +298,30 @@
   color: var(--cor-texto);
 }
 
-.evento-info p {
-  font-size: 0.9rem;
-  color: var(--cor-subtexto);
-  line-height: 1.4;
+
+.evento-data {
+  font-size: 1rem;
+  color: #888;
+  margin-top: 0; /* sem margem extra */
 }
 
+
+/* .evento-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #585555;
+}
+*/
 .evento-local {
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 0.85rem;
   color: #555;
-  margin-top: auto;
+  margin-top: auto; /* empurra o local para o final do card */
 }
 
 /* ========== BOTÕES FLUTUANTES ========== */
@@ -346,64 +357,30 @@
   color: #fff;
 }
 
-/* ================= RESPONSIVIDADE ================= */
+/* ================= AJUSTES PROFISSIONAIS DE RESPONSIVIDADE ================= */
 
-/* Monitores médios */
-@media (max-width: 1280px) {
-  .search-bar {
-    max-width: 340px;
-  }
-  .eventos-grid {
-    gap: 26px;
-  }
-}
-
-/* Tablets grandes */
-@media (max-width: 1024px) {
-  .header {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-  }
-
-  .search-bar {
-    order: 3;
-    max-width: 400px;
-    width: 90%;
-  }
-
-  .header-actions {
-    order: 2;
-    justify-content: center;
-    width: 100%;
-    gap: 16px;
-  }
-
-  .nav {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px 0;
-  }
-
-  .eventos-grid {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    padding: 0 12px;
-  }
-}
-
-/* Tablets médios */
+/* Tablets médios (até 768px) */
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .logoDiv img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .logoDiv h1 {
+    font-size: 1.2rem;
   }
 
   .search-bar {
-    width: 90%;
-    max-width: 320px;
+    width: 100%;
+    max-width: 360px;
+    margin-top: 8px;
   }
 
   .header-actions {
@@ -412,88 +389,119 @@
   }
 
   .nav {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .eventos-grid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 18px;
-    padding: 0 12px;
-  }
-}
-
-/* Celulares */
-@media (max-width: 480px) {
-  .header {
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .search-bar {
-    width: 95%;
-    max-width: 260px;
-  }
-
-  .header-actions {
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
+    padding: 12px;
+  }
+
+  .eventos-section {
+    margin-top: 30px;
+  }
+
+  .eventos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 22px;
+    padding: 0 16px;
+  }
+
+  .evento-card {
+    min-height: 300px;
+  }
+}
+
+/* Celulares (até 480px) */
+@media (max-width: 480px) {
+  .header {
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .logoDiv img {
+    width: 54px;
+    height: 54px;
+  }
+
+  .logoDiv h1 {
+    font-size: 1.1rem;
+  }
+
+  .search-bar {
+    width: 100%;
+    max-width: 300px;
   }
 
   .nav {
-    flex-direction: wrap;
-    align-items: center;
-    gap: 6px;
+    gap: 8px;
+    padding: 10px;
   }
 
   .nav button {
     font-size: 0.9rem;
-    padding: 6px 10px;
+    padding: 6px 12px;
   }
 
   .eventos-grid {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px;
-    justify-items: center;
-    padding: 0 8px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 18px;
+    padding: 0 12px;
+  }
+
+  .evento-card {
+    border-radius: 12px;
+    min-height: 280px;
+  }
+
+  .evento-info {
+    padding: 12px;
+    gap: 6px;
+  }
+
+  .floating-buttons {
+    bottom: 20px;
+    right: 20px;
+    gap: 10px;
   }
 
   .floating-buttons button {
-    width: 46px;
-    height: 46px;
+    width: 48px;
+    height: 48px;
   }
 }
 
-/* Telas muito pequenas */
+/* Telas muito pequenas (até 360px) */
 @media (max-width: 360px) {
+  .logoDiv img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .logoDiv h1 {
+    font-size: 1rem;
+  }
+
   .search-bar {
-    width: 90%;
-    max-width: 180px;
+    width: 95%;
+    max-width: 240px;
   }
 
   .nav button {
     font-size: 0.85rem;
-    padding: 5px 8px;
+    padding: 5px 10px;
   }
 
   .eventos-grid {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 14px;
-    justify-items: center;
-    padding: 0 6px;
+    padding: 0 10px;
   }
 
   .evento-card {
-    max-width: 170px;
     min-height: 260px;
   }
 
   .floating-buttons button {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
   }
 }
-
