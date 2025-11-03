@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import Login from "./pages/Login/Login.jsx";
 import Cadastro from "./pages/Cadastro/Cadastro.jsx";
 import Home from "./pages/Home/Home.jsx";
+import HomeOrg from "./pages/HomeOrg/HomeOrg.jsx"; // import adicionado
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import { CartProvider } from "../src/context/CartContext/CartContext.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
@@ -24,6 +25,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Home />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "homeorg",
+        element: (
+          <PrivateRoute>
+            <HomeOrg />
           </PrivateRoute>
         ),
       },

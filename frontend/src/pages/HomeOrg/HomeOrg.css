@@ -1,0 +1,507 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+:root {
+  --cor-principal: #054062;
+  --cor-secundaria: #f97721;
+  --cor-cinza: #efefef;
+  --cor-texto: #222;
+  --cor-subtexto: #666;
+}
+
+.body-home {
+  background: #f4f6f8;
+  min-height: 100vh;
+}
+
+/* ========== CONTAINER GLOBAL ========== */
+.container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ========== HEADER ========== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  width: 100%;
+  background: #fff;
+  border-bottom: 2px solid var(--cor-secundaria);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.logoDiv {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-bottom: 0px;
+}
+
+.logoDiv img {
+  width: 70px;
+  height: 70px;
+}
+
+.logoDiv h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #5789a6;
+  text-align: center;
+  -webkit-text-stroke: 2px #04324c;
+}
+
+.header a {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+}
+
+.header a:hover {
+  transform: scale(1.01);
+}
+
+/* ========== SEARCH BAR ========== */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: var(--cor-cinza);
+  border-radius: 6px;
+  padding: 6px 12px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.search-bar input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  outline: none;
+  font-size: 0.95rem;
+  color: var(--cor-texto);
+}
+
+.search-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--cor-principal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.search-btn:hover {
+  color: var(--cor-secundaria);
+}
+
+/* ========== HEADER ACTIONS ========== */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+}
+
+.cart-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: var(--cor-principal);
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: var(--cor-secundaria);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--cor-principal);
+  font-weight: 500;
+}
+
+.logout {
+  border: none;
+  background: transparent;
+  color: var(--cor-principal);
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 4px;
+  transition: 0.3s;
+}
+
+.logout:hover {
+  background: var(--cor-cinza);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========== NAVBAR DE CATEGORIAS ========== */
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  padding: 16px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.nav button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--cor-principal);
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: 500;
+}
+
+.nav button:hover {
+  background: var(--cor-cinza);
+  color: var(--cor-secundaria);
+}
+
+.nav .active {
+  background: var(--cor-principal);
+  color: #fff;
+}
+
+/* ========== LISTA DE EVENTOS ========== */
+.eventos-section {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.eventos-section h2 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--cor-texto);
+}
+
+.eventos-section p {
+  color: var(--cor-subtexto);
+  margin-bottom: 25px;
+  font-size: 0.95rem;
+}
+
+/* GRID FLUIDO E CENTRALIZADO */
+.eventos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 30px;
+  justify-content: center;
+  align-items: start;
+  padding: 0 20px;
+}
+
+/* CARD FLEXÍVEL */
+.evento-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s;
+  cursor: pointer;
+  min-height: 300px;
+}
+
+.evento-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* IMAGEM COM PROPORÇÃO FIXA */
+.evento-imagem {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #ddd;
+}
+
+.evento-imagem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.categoria-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #111;
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+/* INFO */
+.evento-info {
+  padding: 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* já define o espaçamento entre titulo, data e local */
+}
+
+.evento-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cor-texto);
+}
+
+
+.evento-data {
+  font-size: 1rem;
+  color: #888;
+  margin-top: 0; /* sem margem extra */
+}
+
+
+/* .evento-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #585555;
+}
+*/
+.evento-local {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: auto; /* empurra o local para o final do card */
+}
+
+/* ========== BOTÕES FLUTUANTES ========== */
+.floating-buttons {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 999;
+}
+
+.floating-buttons button {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+}
+
+.floating-buttons button:hover {
+  transform: scale(1.08);
+}
+
+.whatsapp {
+  background: #25d366;
+  color: #fff;
+}
+
+/* ================= AJUSTES PROFISSIONAIS DE RESPONSIVIDADE ================= */
+
+/* Tablets médios (até 768px) */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .logoDiv img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .logoDiv h1 {
+    font-size: 1.2rem;
+  }
+
+  .search-bar {
+    width: 100%;
+    max-width: 360px;
+    margin-top: 8px;
+  }
+
+  .header-actions {
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .eventos-section {
+    margin-top: 30px;
+  }
+
+  .eventos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 22px;
+    padding: 0 16px;
+  }
+
+  .evento-card {
+    min-height: 300px;
+  }
+}
+
+/* Celulares (até 480px) */
+@media (max-width: 480px) {
+  .header {
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .logoDiv img {
+    width: 54px;
+    height: 54px;
+  }
+
+  .logoDiv h1 {
+    font-size: 1.1rem;
+  }
+
+  .search-bar {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .nav {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .nav button {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+
+  .eventos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 18px;
+    padding: 0 12px;
+  }
+
+  .evento-card {
+    border-radius: 12px;
+    min-height: 280px;
+  }
+
+  .evento-info {
+    padding: 12px;
+    gap: 6px;
+  }
+
+  .floating-buttons {
+    bottom: 20px;
+    right: 20px;
+    gap: 10px;
+  }
+
+  .floating-buttons button {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* Telas muito pequenas (até 360px) */
+@media (max-width: 360px) {
+  .logoDiv img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .logoDiv h1 {
+    font-size: 1rem;
+  }
+
+  .search-bar {
+    width: 95%;
+    max-width: 240px;
+  }
+
+  .nav button {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+  }
+
+  .eventos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    padding: 0 10px;
+  }
+
+  .evento-card {    
+    min-height: 260px;
+  }
+
+  .floating-buttons button {
+    width: 42px;
+    height: 42px;
+  }
+}

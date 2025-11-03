@@ -18,15 +18,11 @@ function Login() {
     setLoading(true);
 
     try {
-      const resposta = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/login`, // Vite
-        // `${process.env.REACT_APP_API_URL}/api/login`, // CRA
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, senha }),
-        }
-      );
+      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, senha }),
+      });
 
       const dados = await resposta.json();
 
@@ -36,9 +32,10 @@ function Login() {
         return;
       }
 
-      // salva token e nome no localStorage
+      // salva token e dados básicos
       localStorage.setItem("token", dados.token);
       localStorage.setItem("nome", dados.nome);
+      localStorage.setItem("organizador", dados.organizador);
 
       setSucesso(
         <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
@@ -46,8 +43,13 @@ function Login() {
         </span>
       );
 
+      // redireciona conforme tipo de usuário
       setTimeout(() => {
-        navigate("/home"); // vai direto pra Home protegida
+        if (dados.organizador === "S") {
+          navigate("/homeorg");
+        } else {
+          navigate("/home");
+        }
       }, 1500);
     } catch (err) {
       console.error(err);
