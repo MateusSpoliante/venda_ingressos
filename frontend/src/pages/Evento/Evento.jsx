@@ -85,7 +85,7 @@ function Evento() {
 
         <div className="evento-container-2">
           <img
-            src="/banner2.webp"
+            src={evento.imagem || "/banner2.webp"} // fallback caso não tenha imagem
             alt={evento.titulo}
             className="evento-imagem-2"
           />

@@ -5,23 +5,55 @@ const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mercadopago = require("mercadopago");
+const multer = require("multer");
+const sharp = require("sharp");
+const { createClient } = require("@supabase/supabase-js");
 
-// ==================== CONFIG MERCADO PAGO (SDK v1) ====================
+// ==================== CONFIG MERCADO PAGO ====================
 mercadopago.configurations.setAccessToken(process.env.MERCADO_PAGO_ACCESS_TOKEN);
+
+// ==================== CONFIG SUPABASE ====================
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 // ==================== CONFIG EXPRESS ====================
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ==================== CONEXÃO BANCO (SUPABASE) ====================
+// ==================== UPLOAD (memória) ====================
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// ==================== CONEXÃO BANCO ====================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
 
+// Listener global de erros do pool
+pool.on("error", (err) => {
+  console.error("Erro no pool do banco:", err);
+});
+
+// ==================== FUNÇÃO AUXILIAR PARA UPLOAD DE IMAGEM ====================
+async function uploadImagem(fileBuffer) {
+  const webpBuffer = await sharp(fileBuffer).webp({ quality: 80 }).toBuffer();
+  const nomeArquivo = `${Date.now()}.webp`;
+
+  const { error } = await supabase.storage
+    .from("eventos")
+    .upload(`imagens/${nomeArquivo}`, webpBuffer, { contentType: "image/webp", upsert: false });
+
+  if (error) throw error;
+
+  const { data: publicUrlData } = supabase.storage
+    .from("eventos")
+    .getPublicUrl(`imagens/${nomeArquivo}`);
+
+  return publicUrlData.publicUrl;
+}
+
 // ==================== USUÁRIOS ====================
-// Cadastro
 app.post("/api/cadastro", async (req, res) => {
   const { nome, cpfCnpj, email, senha } = req.body;
   if (!nome || !cpfCnpj || !email || !senha)
@@ -30,22 +62,13 @@ app.post("/api/cadastro", async (req, res) => {
     return res.status(400).json({ erro: "A senha deve ter pelo menos 6 caracteres" });
 
   try {
-    const emailExistente = await pool.query(
-      "SELECT id FROM usuarios WHERE email = $1",
-      [email]
-    );
-    if (emailExistente.rowCount > 0)
-      return res.status(400).json({ erro: "Email já cadastrado!" });
+    const emailExistente = await pool.query("SELECT id FROM usuarios WHERE email = $1", [email]);
+    if (emailExistente.rowCount > 0) return res.status(400).json({ erro: "Email já cadastrado!" });
 
-    const cpfExistente = await pool.query(
-      "SELECT id FROM usuarios WHERE cpf_cnpj = $1",
-      [cpfCnpj]
-    );
-    if (cpfExistente.rowCount > 0)
-      return res.status(400).json({ erro: "CPF/CNPJ já cadastrado!" });
+    const cpfExistente = await pool.query("SELECT id FROM usuarios WHERE cpf_cnpj = $1", [cpfCnpj]);
+    if (cpfExistente.rowCount > 0) return res.status(400).json({ erro: "CPF/CNPJ já cadastrado!" });
 
     const hash = await bcrypt.hash(senha, 10);
-
     await pool.query(
       "INSERT INTO usuarios (nome, cpf_cnpj, email, senha) VALUES ($1, $2, $3, $4)",
       [nome, cpfCnpj, email, hash]
@@ -58,24 +81,17 @@ app.post("/api/cadastro", async (req, res) => {
   }
 });
 
-// Login
 app.post("/api/login", async (req, res) => {
   const { email, senha } = req.body;
-  if (!email || !senha)
-    return res.status(400).json({ erro: "Preencha email e senha" });
+  if (!email || !senha) return res.status(400).json({ erro: "Preencha email e senha" });
 
   try {
-    const { rows } = await pool.query(
-      "SELECT * FROM usuarios WHERE email = $1",
-      [email]
-    );
+    const { rows } = await pool.query("SELECT * FROM usuarios WHERE email = $1", [email]);
     const usuario = rows[0];
-    if (!usuario)
-      return res.status(401).json({ erro: "Usuário não encontrado" });
+    if (!usuario) return res.status(401).json({ erro: "Usuário não encontrado" });
 
     const senhaValida = await bcrypt.compare(senha, usuario.senha);
-    if (!senhaValida)
-      return res.status(401).json({ erro: "Senha inválida" });
+    if (!senhaValida) return res.status(401).json({ erro: "Senha inválida" });
 
     const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
@@ -92,16 +108,20 @@ app.post("/api/login", async (req, res) => {
 });
 
 // ==================== EVENTOS ====================
-app.post("/api/eventos", async (req, res) => {
+app.post("/api/eventos", upload.single("imagem"), async (req, res) => {
   const { titulo, descricao, data_evento, local, categoria } = req.body;
   if (!titulo || !descricao || !data_evento || !local || !categoria)
     return res.status(400).json({ erro: "Preencha todos os campos" });
 
   try {
+    let imagemUrl = null;
+    if (req.file) imagemUrl = await uploadImagem(req.file.buffer);
+
     await pool.query(
-      "INSERT INTO eventos (titulo, descricao, data_evento, local, categoria) VALUES ($1, $2, $3, $4, $5)",
-      [titulo, descricao, data_evento, local, categoria]
+      "INSERT INTO eventos (titulo, descricao, data_evento, local, categoria, imagem) VALUES ($1, $2, $3, $4, $5, $6)",
+      [titulo, descricao, data_evento, local, categoria, imagemUrl]
     );
+
     res.json({ mensagem: "Evento criado com sucesso" });
   } catch (err) {
     console.error("Erro ao criar evento:", err);
@@ -112,12 +132,40 @@ app.post("/api/eventos", async (req, res) => {
 app.get("/api/eventos", async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT id, titulo, descricao, data_evento, local, categoria FROM eventos ORDER BY data_evento ASC"
+      "SELECT id, titulo, descricao, data_evento, local, categoria, imagem FROM eventos ORDER BY data_evento ASC"
     );
     res.json(rows);
   } catch (err) {
     console.error("Erro ao buscar eventos:", err);
     res.status(500).json({ erro: "Erro ao buscar eventos" });
+  }
+});
+
+app.put("/api/eventos/:id", upload.single("imagem"), async (req, res) => {
+  const { id } = req.params;
+  const { titulo, descricao, data_evento, local, categoria } = req.body;
+  if (!titulo || !descricao || !data_evento || !local || !categoria)
+    return res.status(400).json({ erro: "Preencha todos os campos" });
+
+  try {
+    const { rows } = await pool.query("SELECT imagem FROM eventos WHERE id = $1", [id]);
+    const eventoAtual = rows[0];
+    if (!eventoAtual) return res.status(404).json({ erro: "Evento não encontrado" });
+
+    let imagemUrl = eventoAtual.imagem;
+    if (req.file) imagemUrl = await uploadImagem(req.file.buffer);
+
+    await pool.query(
+      `UPDATE eventos
+       SET titulo = $1, descricao = $2, data_evento = $3, local = $4, categoria = $5, imagem = $6
+       WHERE id = $7`,
+      [titulo, descricao, data_evento, local, categoria, imagemUrl, id]
+    );
+
+    res.json({ mensagem: "Evento atualizado com sucesso" });
+  } catch (err) {
+    console.error("Erro ao atualizar evento:", err);
+    res.status(500).json({ erro: "Erro ao atualizar evento" });
   }
 });
 
@@ -153,54 +201,6 @@ app.get("/api/ingressos/:eventoId", async (req, res) => {
   }
 });
 
-// ==================== PEDIDOS ====================
-app.post("/api/pedidos", async (req, res) => {
-  const { usuarioId, itens } = req.body;
-  if (!usuarioId || !itens?.length)
-    return res.status(400).json({ erro: "Dados incompletos" });
-
-  try {
-    const usuarioRes = await pool.query(
-      "SELECT cpf_cnpj FROM usuarios WHERE id = $1",
-      [usuarioId]
-    );
-    const usuario = usuarioRes.rows[0];
-    if (!usuario) return res.status(404).json({ erro: "Usuário não encontrado" });
-
-    for (const item of itens) {
-      const existente = await pool.query(
-        `SELECT 1 FROM pedido_itens pi
-         JOIN pedidos p ON p.id = pi.pedido_id
-         JOIN ingressos i ON i.id = pi.ingresso_id
-         JOIN usuarios u ON u.id = p.usuario_id
-         WHERE u.cpf_cnpj = $1 AND i.evento_id = $2`,
-        [usuario.cpf_cnpj, item.evento_id]
-      );
-      if (existente.rowCount > 0)
-        return res.status(400).json({ erro: "Você já comprou ingresso para este evento." });
-    }
-
-    const total = itens.reduce((acc, i) => acc + i.preco * i.quantidade, 0);
-    const novoPedido = await pool.query(
-      "INSERT INTO pedidos (usuario_id, data_pedido, valor_total, status_pagamento) VALUES ($1, NOW(), $2, $3) RETURNING id, data_pedido, valor_total",
-      [usuarioId, total, "pendente"]
-    );
-
-    const pedidoId = novoPedido.rows[0].id;
-    for (const item of itens) {
-      await pool.query(
-        "INSERT INTO pedido_itens (pedido_id, ingresso_id, quantidade, preco_unitario) VALUES ($1, $2, $3, $4)",
-        [pedidoId, item.ingresso_id, item.quantidade, item.preco]
-      );
-    }
-
-    res.json({ mensagem: "Pedido realizado com sucesso", pedido: novoPedido.rows[0] });
-  } catch (err) {
-    console.error("Erro ao criar pedido:", err);
-    res.status(500).json({ erro: "Erro interno ao criar pedido" });
-  }
-});
-
 // ==================== PIX ====================
 app.post("/api/pix", async (req, res) => {
   const { pedidoId, valor } = req.body;
@@ -215,9 +215,7 @@ app.post("/api/pix", async (req, res) => {
       payer: { email: "cliente@email.com" },
     };
 
-    // Cria pagamento PIX usando SDK v1
     const payment = await mercadopago.payment.create(paymentData);
-
     const qrCode = payment.response.point_of_interaction.transaction_data.qr_code;
     const qrCodeBase64 = payment.response.point_of_interaction.transaction_data.qr_code_base64;
 

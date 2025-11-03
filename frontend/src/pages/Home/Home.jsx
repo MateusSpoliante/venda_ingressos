@@ -52,7 +52,9 @@ function Home() {
   useEffect(() => {
     const fetchEventos = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/eventos`);
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/eventos`
+        );
         const data = await response.json();
         // Garantir que seja sempre array
         setEventos(Array.isArray(data) ? data : []);
@@ -87,20 +89,51 @@ function Home() {
   ];
 
   const categoriasTextos = {
-    Todos: { titulo: "Todos os Eventos", subtitulo: "Listagem de ingressos de diversas categorias" },
-    Teatro: { titulo: "Teatros", subtitulo: "Peças incríveis para você assistir" },
-    Musical: { titulo: "Musicais", subtitulo: "Shows e apresentações musicais" },
-    "Stand up": { titulo: "Stand-up Comedy", subtitulo: "Ria com os melhores comediantes" },
+    Todos: {
+      titulo: "Todos os Eventos",
+      subtitulo: "Listagem de ingressos de diversas categorias",
+    },
+    Teatro: {
+      titulo: "Teatros",
+      subtitulo: "Peças incríveis para você assistir",
+    },
+    Musical: {
+      titulo: "Musicais",
+      subtitulo: "Shows e apresentações musicais",
+    },
+    "Stand up": {
+      titulo: "Stand-up Comedy",
+      subtitulo: "Ria com os melhores comediantes",
+    },
     Infantil: { titulo: "Infantil", subtitulo: "Eventos para a criançada" },
     Dança: { titulo: "Dança", subtitulo: "Espetáculos de dança e balé" },
     Shows: { titulo: "Shows", subtitulo: "Grandes apresentações ao vivo" },
-    Circo: { titulo: "Circo", subtitulo: "Diversão e entretenimento para toda a família" },
+    Circo: {
+      titulo: "Circo",
+      subtitulo: "Diversão e entretenimento para toda a família",
+    },
     Palestras: { titulo: "Palestras", subtitulo: "Aprenda com especialistas" },
-    Religioso: { titulo: "Eventos Religiosos", subtitulo: "Celebrações e encontros espirituais" },
+    Religioso: {
+      titulo: "Eventos Religiosos",
+      subtitulo: "Celebrações e encontros espirituais",
+    },
   };
 
   const formatarData = (dataString) => {
-    const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+    const meses = [
+      "Jan",
+      "Fev",
+      "Mar",
+      "Abr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Set",
+      "Out",
+      "Nov",
+      "Dez",
+    ];
     const data = new Date(dataString);
     const dia = data.getDate();
     const mes = meses[data.getMonth()];
@@ -193,13 +226,19 @@ function Home() {
                   onClick={() => navigate(`/evento/${evento.id}`)}
                 >
                   <div className="evento-imagem">
-                    <img src="/banner2.webp" alt={evento.titulo} />
+                    <img
+                      src={evento.imagem || "/banner2.webp"} // usa a imagem do evento ou fallback
+                      alt={evento.titulo}
+                    />
                     <span className="categoria-tag">{evento.categoria}</span>
                   </div>
+
                   <div className="evento-info">
                     <h3>{evento.titulo}</h3>
                     {/* <span className="evento-desc">{evento.descricao}</span> */}
-                    <span className="evento-data">{formatarData(evento.data_evento)}</span>
+                    <span className="evento-data">
+                      {formatarData(evento.data_evento)}
+                    </span>
                     <div className="evento-local">
                       <MapPin size={14} /> {evento.local}
                     </div>
