@@ -29,33 +29,44 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
+pool.on("error", (err) => console.error("Erro no pool do banco:", err));
 
-// Listener global de erros do pool
-pool.on("error", (err) => {
-  console.error("Erro no pool do banco:", err);
-});
-
-// ==================== FUNÇÃO AUXILIAR PARA UPLOAD DE IMAGEM ====================
+// ==================== UPLOAD IMAGEM SUPABASE ====================
 async function uploadImagem(fileBuffer) {
   const webpBuffer = await sharp(fileBuffer).webp({ quality: 80 }).toBuffer();
   const nomeArquivo = `${Date.now()}.webp`;
-
   const { error } = await supabase.storage
     .from("eventos")
-    .upload(`imagens/${nomeArquivo}`, webpBuffer, { contentType: "image/webp", upsert: false });
-
+    .upload(`imagens/${nomeArquivo}`, webpBuffer, { contentType: "image/webp" });
   if (error) throw error;
+  const { data } = supabase.storage.from("eventos").getPublicUrl(`imagens/${nomeArquivo}`);
+  return data.publicUrl;
+}
 
-  const { data: publicUrlData } = supabase.storage
-    .from("eventos")
-    .getPublicUrl(`imagens/${nomeArquivo}`);
+// ==================== MIDDLEWARES ====================
+function autenticarToken(req, res, next) {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ erro: "Token ausente" });
 
-  return publicUrlData.publicUrl;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.usuarioId = decoded.id;
+    next();
+  } catch {
+    return res.status(401).json({ erro: "Token inválido" });
+  }
+}
+
+async function verificarOrganizador(req, res, next) {
+  const { rows } = await pool.query("SELECT organizador FROM usuarios WHERE id = $1", [req.usuarioId]);
+  if (rows.length === 0 || rows[0].organizador !== "S")
+    return res.status(403).json({ erro: "Acesso restrito a organizadores" });
+  next();
 }
 
 // ==================== USUÁRIOS ====================
 app.post("/api/cadastro", async (req, res) => {
-  const { nome, cpfCnpj, email, senha } = req.body;
+  const { nome, cpfCnpj, email, senha, organizador = "N" } = req.body;
   if (!nome || !cpfCnpj || !email || !senha)
     return res.status(400).json({ erro: "Preencha todos os campos" });
   if (senha.length < 6)
@@ -63,15 +74,17 @@ app.post("/api/cadastro", async (req, res) => {
 
   try {
     const emailExistente = await pool.query("SELECT id FROM usuarios WHERE email = $1", [email]);
-    if (emailExistente.rowCount > 0) return res.status(400).json({ erro: "Email já cadastrado!" });
+    if (emailExistente.rowCount > 0)
+      return res.status(400).json({ erro: "Email já cadastrado!" });
 
     const cpfExistente = await pool.query("SELECT id FROM usuarios WHERE cpf_cnpj = $1", [cpfCnpj]);
-    if (cpfExistente.rowCount > 0) return res.status(400).json({ erro: "CPF/CNPJ já cadastrado!" });
+    if (cpfExistente.rowCount > 0)
+      return res.status(400).json({ erro: "CPF/CNPJ já cadastrado!" });
 
     const hash = await bcrypt.hash(senha, 10);
     await pool.query(
-      "INSERT INTO usuarios (nome, cpf_cnpj, email, senha) VALUES ($1, $2, $3, $4)",
-      [nome, cpfCnpj, email, hash]
+      "INSERT INTO usuarios (nome, cpf_cnpj, email, senha, organizador) VALUES ($1, $2, $3, $4, $5)",
+      [nome, cpfCnpj, email, hash, organizador]
     );
 
     res.json({ mensagem: "Usuário cadastrado com sucesso" });
@@ -93,13 +106,14 @@ app.post("/api/login", async (req, res) => {
     const senhaValida = await bcrypt.compare(senha, usuario.senha);
     if (!senhaValida) return res.status(401).json({ erro: "Senha inválida" });
 
-    const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, { expiresIn: "2h" });
 
     res.json({
       mensagem: "Login realizado com sucesso",
       token,
       nome: usuario.nome,
       cpfCnpj: usuario.cpf_cnpj,
+      organizador: usuario.organizador,
     });
   } catch (err) {
     console.error("Erro no login:", err);
@@ -107,28 +121,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// ==================== EVENTOS ====================
-app.post("/api/eventos", upload.single("imagem"), async (req, res) => {
-  const { titulo, descricao, data_evento, local, categoria } = req.body;
-  if (!titulo || !descricao || !data_evento || !local || !categoria)
-    return res.status(400).json({ erro: "Preencha todos os campos" });
-
-  try {
-    let imagemUrl = null;
-    if (req.file) imagemUrl = await uploadImagem(req.file.buffer);
-
-    await pool.query(
-      "INSERT INTO eventos (titulo, descricao, data_evento, local, categoria, imagem) VALUES ($1, $2, $3, $4, $5, $6)",
-      [titulo, descricao, data_evento, local, categoria, imagemUrl]
-    );
-
-    res.json({ mensagem: "Evento criado com sucesso" });
-  } catch (err) {
-    console.error("Erro ao criar evento:", err);
-    res.status(500).json({ erro: "Erro ao criar evento" });
-  }
-});
-
+// ==================== EVENTOS (públicos e organizadores) ====================
 app.get("/api/eventos", async (req, res) => {
   try {
     const { rows } = await pool.query(
@@ -141,88 +134,35 @@ app.get("/api/eventos", async (req, res) => {
   }
 });
 
-app.put("/api/eventos/:id", upload.single("imagem"), async (req, res) => {
-  const { id } = req.params;
+// ---- Rotas exclusivas de organizador ----
+app.post("/api/organizador/eventos", autenticarToken, verificarOrganizador, upload.single("imagem"), async (req, res) => {
   const { titulo, descricao, data_evento, local, categoria } = req.body;
   if (!titulo || !descricao || !data_evento || !local || !categoria)
     return res.status(400).json({ erro: "Preencha todos os campos" });
 
   try {
-    const { rows } = await pool.query("SELECT imagem FROM eventos WHERE id = $1", [id]);
-    const eventoAtual = rows[0];
-    if (!eventoAtual) return res.status(404).json({ erro: "Evento não encontrado" });
-
-    let imagemUrl = eventoAtual.imagem;
+    let imagemUrl = null;
     if (req.file) imagemUrl = await uploadImagem(req.file.buffer);
 
     await pool.query(
-      `UPDATE eventos
-       SET titulo = $1, descricao = $2, data_evento = $3, local = $4, categoria = $5, imagem = $6
-       WHERE id = $7`,
-      [titulo, descricao, data_evento, local, categoria, imagemUrl, id]
+      "INSERT INTO eventos (titulo, descricao, data_evento, local, categoria, imagem, organizador_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      [titulo, descricao, data_evento, local, categoria, imagemUrl, req.usuarioId]
     );
 
-    res.json({ mensagem: "Evento atualizado com sucesso" });
+    res.json({ mensagem: "Evento criado com sucesso" });
   } catch (err) {
-    console.error("Erro ao atualizar evento:", err);
-    res.status(500).json({ erro: "Erro ao atualizar evento" });
+    console.error("Erro ao criar evento:", err);
+    res.status(500).json({ erro: "Erro ao criar evento" });
   }
 });
 
-// ==================== INGRESSOS ====================
-app.post("/api/ingressos", async (req, res) => {
-  const { evento_id, tipo_ingresso, preco, quantidade } = req.body;
-  if (!evento_id || !tipo_ingresso || !preco || !quantidade)
-    return res.status(400).json({ erro: "Preencha todos os campos" });
-
+app.get("/api/organizador/eventos", autenticarToken, verificarOrganizador, async (req, res) => {
   try {
-    await pool.query(
-      "INSERT INTO ingressos (evento_id, tipo_ingresso, preco, quantidade) VALUES ($1, $2, $3, $4)",
-      [evento_id, tipo_ingresso, preco, quantidade]
-    );
-    res.json({ mensagem: "Ingresso cadastrado com sucesso" });
+    const { rows } = await pool.query("SELECT * FROM eventos WHERE organizador_id = $1", [req.usuarioId]);
+    res.json(rows);
   } catch (err) {
-    console.error("Erro ao cadastrar ingresso:", err);
-    res.status(500).json({ erro: "Erro ao cadastrar ingresso" });
-  }
-});
-
-app.get("/api/ingressos/:eventoId", async (req, res) => {
-  const { eventoId } = req.params;
-  try {
-    const { rows } = await pool.query(
-      "SELECT id, tipo_ingresso, preco, quantidade FROM ingressos WHERE evento_id = $1",
-      [eventoId]
-    );
-    res.json(rows || []);
-  } catch (err) {
-    console.error("Erro ao buscar ingressos:", err);
-    res.status(500).json({ erro: "Erro ao buscar ingressos" });
-  }
-});
-
-// ==================== PIX ====================
-app.post("/api/pix", async (req, res) => {
-  const { pedidoId, valor } = req.body;
-  if (!pedidoId || !valor)
-    return res.status(400).json({ erro: "Pedido ou valor inválido" });
-
-  try {
-    const paymentData = {
-      transaction_amount: Number(valor),
-      description: `Pedido #${pedidoId}`,
-      payment_method_id: "pix",
-      payer: { email: "cliente@email.com" },
-    };
-
-    const payment = await mercadopago.payment.create(paymentData);
-    const qrCode = payment.response.point_of_interaction.transaction_data.qr_code;
-    const qrCodeBase64 = payment.response.point_of_interaction.transaction_data.qr_code_base64;
-
-    res.json({ qrCode, qrCodeBase64 });
-  } catch (err) {
-    console.error("Erro ao gerar PIX:", err);
-    res.status(500).json({ erro: "Erro ao gerar PIX" });
+    console.error("Erro ao buscar eventos do organizador:", err);
+    res.status(500).json({ erro: "Erro ao buscar eventos" });
   }
 });
 

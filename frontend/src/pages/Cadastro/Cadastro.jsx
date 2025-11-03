@@ -10,6 +10,7 @@ function Cadastro() {
   const [cpfCnpj, setCpfCnpj] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [organizador, setOrganizador] = useState("N");
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
 
@@ -30,12 +31,11 @@ function Cadastro() {
 
     try {
       const resposta = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/cadastro`, // Vite
-        // `${process.env.REACT_APP_API_URL}/api/cadastro`, // CRA
+        `${import.meta.env.VITE_API_URL}/api/cadastro`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nome, cpfCnpj: valorLimpo, email, senha }),
+          body: JSON.stringify({ nome, cpfCnpj: valorLimpo, email, senha, organizador }),
         }
       );
 
@@ -126,6 +126,30 @@ function Cadastro() {
               onChange={(e) => setSenha(e.target.value)}
               required
             />
+
+            {/* Campo novo: é organizador */}
+            <div className="organizador-group">
+              <label>É organizador?</label>
+              <div className="radioGroup">
+                <input
+                  type="radio"
+                  id="organizadorSim"
+                  name="organizador"
+                  checked={organizador === "S"}
+                  onChange={() => setOrganizador("S")}
+                />
+                <label htmlFor="organizadorSim">Sim</label>
+
+                <input
+                  type="radio"
+                  id="organizadorNao"
+                  name="organizador"
+                  checked={organizador === "N"}
+                  onChange={() => setOrganizador("N")}
+                />
+                <label htmlFor="organizadorNao">Não</label>
+              </div>
+            </div>
           </div>
 
           {erro && <div style={{ color: "red", marginTop: "8px" }}>{erro}</div>}
