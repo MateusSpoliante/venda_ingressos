@@ -6,13 +6,11 @@ import {
   CalendarCheck2,
   LogOut,
   Loader2,
-  ShoppingCart,
   MapPin,
   MessageCircleMore,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../context/CartContext/CartContext";
 
 function HomeOrg() {
   const navigate = useNavigate();
@@ -22,7 +20,6 @@ function HomeOrg() {
   const [categoriaAtiva, setCategoriaAtiva] = useState("Meus Eventos");
   const [busca, setBusca] = useState("");
 
-  const { cartItems } = useCart();
   const nome = localStorage.getItem("nome");
 
   const iconStyle = {
@@ -37,7 +34,7 @@ function HomeOrg() {
     setTimeout(() => {
       localStorage.removeItem("token");
       localStorage.removeItem("nome");
-      localStorage.removeItem("organizador_id");
+      localStorage.removeItem("organizador");
       navigate("/login");
     }, 1500);
   };
@@ -48,11 +45,7 @@ function HomeOrg() {
       try {
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/organizador/eventos`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = await response.json();
         setEventos(Array.isArray(data) ? data : []);
@@ -66,8 +59,8 @@ function HomeOrg() {
     fetchEventos();
   }, []);
 
-  const eventosFiltrados = (eventos || []).filter((e) =>
-    e.titulo.toLowerCase().includes(busca.toLowerCase())
+  const eventosFiltrados = (eventos || []).filter((evento) =>
+    evento.titulo.toLowerCase().includes(busca.toLowerCase())
   );
 
   const categorias = [
@@ -88,18 +81,7 @@ function HomeOrg() {
 
   const formatarData = (dataString) => {
     const meses = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
+      "Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez",
     ];
     const data = new Date(dataString);
     const dia = data.getDate();
@@ -134,31 +116,21 @@ function HomeOrg() {
 
           <div className="header-actions">
             {nome && (
-              <>
-                <a href="/carrinho" className="cart-header" style={iconStyle}>
-                  <ShoppingCart size={20} />
-                  {cartItems.length > 0 && (
-                    <span className="cart-count">{cartItems.length}</span>
-                  )}
-                </a>
-                <span className="user-info" style={iconStyle}>
-                  <User size={16} /> Olá, {nome}
-                </span>
+              <span className="user-info" style={iconStyle}>
+                <User size={16} /> Olá, {nome}
                 <button
                   className="logout"
                   onClick={handleLogout}
-                  style={iconStyle}
+                  style={{ ...iconStyle, marginLeft: "10px" }}
                   disabled={loggingOut}
                 >
-                  {loggingOut ? (
-                    <Loader2 size={16} className="spin" />
-                  ) : (
+                  {loggingOut ? <Loader2 size={16} className="spin" /> : (
                     <>
                       <LogOut size={16} /> Sair
                     </>
                   )}
                 </button>
-              </>
+              </span>
             )}
           </div>
         </header>
@@ -207,9 +179,7 @@ function HomeOrg() {
 
                   <div className="evento-info">
                     <h3>{evento.titulo}</h3>
-                    <span className="evento-data">
-                      {formatarData(evento.data_evento)}
-                    </span>
+                    <span className="evento-data">{formatarData(evento.data_evento)}</span>
                     <div className="evento-local">
                       <MapPin size={14} /> {evento.local}
                     </div>

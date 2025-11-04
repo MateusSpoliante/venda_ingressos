@@ -23,7 +23,7 @@ const router = createBrowserRouter([
       {
         path: "home",
         element: (
-          <PrivateRoute>
+          <PrivateRoute tipo="cliente">
             <Home />
           </PrivateRoute>
         ),
@@ -31,11 +31,12 @@ const router = createBrowserRouter([
       {
         path: "homeorg",
         element: (
-          <PrivateRoute>
+          <PrivateRoute tipo="organizador">
             <HomeOrg />
           </PrivateRoute>
         ),
       },
+
       {
         path: "carrinho",
         element: (
