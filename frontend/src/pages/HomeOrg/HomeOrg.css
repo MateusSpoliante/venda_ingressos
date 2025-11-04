@@ -35,6 +35,7 @@
   background: #fff;
   border-bottom: 2px solid var(--cor-secundaria);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: relative; /* para search-bar absolute */
   flex-wrap: wrap;
   gap: 16px;
 }
@@ -72,15 +73,18 @@
   transform: scale(1.01);
 }
 
-/* ========== SEARCH BAR ========== */
+/* ========== SEARCH BAR FIXA CENTRAL ========== */
 .search-bar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   background: var(--cor-cinza);
   border-radius: 6px;
   padding: 6px 12px;
-  width: 100%;
-  max-width: 380px;
+  width: 380px;
+  z-index: 1;
 }
 
 .search-bar input {
@@ -289,7 +293,7 @@
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 8px; /* já define o espaçamento entre titulo, data e local */
+  gap: 8px; 
 }
 
 .evento-info h3 {
@@ -298,30 +302,19 @@
   color: var(--cor-texto);
 }
 
-
 .evento-data {
   font-size: 1rem;
   color: #888;
-  margin-top: 0; /* sem margem extra */
+  margin-top: 0; 
 }
 
-
-/* .evento-desc {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: #585555;
-}
-*/
 .evento-local {
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 0.85rem;
   color: #555;
-  margin-top: auto; /* empurra o local para o final do card */
+  margin-top: auto; 
 }
 
 /* ========== BOTÕES FLUTUANTES ========== */
@@ -357,7 +350,7 @@
   color: #fff;
 }
 
-/* ================= AJUSTES PROFISSIONAIS DE RESPONSIVIDADE ================= */
+/* ================= AJUSTES DE RESPONSIVIDADE ================= */
 
 /* Tablets médios (até 768px) */
 @media (max-width: 768px) {
@@ -378,6 +371,8 @@
   }
 
   .search-bar {
+    position: static;
+    transform: none;
     width: 100%;
     max-width: 360px;
     margin-top: 8px;
@@ -427,7 +422,6 @@
   }
 
   .search-bar {
-    width: 100%;
     max-width: 300px;
   }
 
@@ -481,8 +475,8 @@
   }
 
   .search-bar {
-    width: 95%;
     max-width: 240px;
+    width: 95%;
   }
 
   .nav button {
