@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import CreateEvent from "../../components/CreateEventForm/CreateEvent.jsx";
 
 function HomeOrg() {
   const navigate = useNavigate();
@@ -59,8 +60,9 @@ function HomeOrg() {
     fetchEventos();
   }, []);
 
+  // Filtragem segura com optional chaining
   const eventosFiltrados = (eventos || []).filter((evento) =>
-    evento.titulo.toLowerCase().includes(busca.toLowerCase())
+    evento.titulo?.toLowerCase().includes(busca?.toLowerCase() || "")
   );
 
   const categorias = [
@@ -141,10 +143,7 @@ function HomeOrg() {
               key={cat.nome}
               className={categoriaAtiva === cat.nome ? "active" : ""}
               style={iconStyle}
-              onClick={() => {
-                setCategoriaAtiva(cat.nome);
-                if (cat.nome === "Criar Evento") navigate("/criarEvento");
-              }}
+              onClick={() => setCategoriaAtiva(cat.nome)}
             >
               {cat.icon} {cat.nome}
             </button>
@@ -156,7 +155,24 @@ function HomeOrg() {
           <p>{categoriasTextos[categoriaAtiva]?.subtitulo || ""}</p>
 
           {categoriaAtiva === "Criar Evento" ? (
-            <p>Redirecionando para criação de evento...</p>
+            <CreateEvent
+              onEventoCriado={(novoEvento) => {
+                // Garante que todos os campos tenham valor
+                setEventos([
+                  ...eventos,
+                  {
+                    id: novoEvento.id,
+                    titulo: novoEvento.titulo || "Sem título",
+                    descricao: novoEvento.descricao || "",
+                    data_evento: novoEvento.data_evento || new Date().toISOString(),
+                    local: novoEvento.local || "",
+                    categoria: novoEvento.categoria || "Outro",
+                    imagem: novoEvento.imagem || null,
+                  },
+                ]);
+                setCategoriaAtiva("Meus Eventos"); // volta para "Meus Eventos" após criar
+              }}
+            />
           ) : loadingEventos ? (
             <p>Carregando eventos...</p>
           ) : eventosFiltrados.length === 0 ? (
@@ -172,16 +188,16 @@ function HomeOrg() {
                   <div className="evento-imagem">
                     <img
                       src={evento.imagem || "/banner2.webp"}
-                      alt={evento.titulo}
+                      alt={evento.titulo || "Evento"}
                     />
                     <span className="categoria-tag">{evento.categoria}</span>
                   </div>
 
                   <div className="evento-info">
-                    <h3>{evento.titulo}</h3>
+                    <h3>{evento.titulo || "Sem título"}</h3>
                     <span className="evento-data">{formatarData(evento.data_evento)}</span>
                     <div className="evento-local">
-                      <MapPin size={14} /> {evento.local}
+                      <MapPin size={14} /> {evento.local || "-"}
                     </div>
                   </div>
                 </div>

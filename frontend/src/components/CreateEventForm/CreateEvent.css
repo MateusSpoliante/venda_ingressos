@@ -1,0 +1,65 @@
+.create-event {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 25px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.create-event input,
+.create-event textarea,
+.create-event select {
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.create-event input:focus,
+.create-event textarea:focus,
+.create-event select:focus {
+  outline: none;
+  border-color: #054062;
+  box-shadow: 0 0 5px rgba(5, 64, 98, 0.3);
+}
+
+.create-event textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.create-event button {
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  background-color: #054062;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.create-event button:hover:not(:disabled) {
+  background-color: #036;
+}
+
+.create-event button:disabled {
+  background-color: #888;
+  cursor: not-allowed;
+}
+
+/* responsividade */
+@media (max-width: 600px) {
+  .create-event {
+    padding: 20px;
+    margin: 15px;
+  }
+}
