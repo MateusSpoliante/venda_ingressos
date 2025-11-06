@@ -1,5 +1,5 @@
-// src/components/LocalForm.jsx
 import { useState, useEffect } from "react";
+import "./CreateEventForm/CreateEvent.css";
 
 function LocalForm({ onChange }) {
   const [estados, setEstados] = useState([]);
@@ -7,19 +7,16 @@ function LocalForm({ onChange }) {
   const [estado, setEstado] = useState("");
   const [cidade, setCidade] = useState("");
 
-  // Buscar todos os estados ao montar o componente
   useEffect(() => {
     fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados")
       .then((res) => res.json())
       .then((data) => {
-        // Ordenar estados por nome
         const sorted = data.sort((a, b) => a.nome.localeCompare(b.nome));
         setEstados(sorted);
       })
       .catch((err) => console.error("Erro ao buscar estados:", err));
   }, []);
 
-  // Quando o usuário seleciona um estado, buscar cidades desse estado
   const handleEstadoChange = (e) => {
     const uf = e.target.value;
     setEstado(uf);
@@ -46,9 +43,8 @@ function LocalForm({ onChange }) {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-      <label>Estado:</label>
-      <select value={estado} onChange={handleEstadoChange}>
+    <div className="state-city-wrapper">
+      <select value={estado} onChange={handleEstadoChange} required>
         <option value="">Selecione um estado</option>
         {estados.map((e) => (
           <option key={e.id} value={e.sigla}>
@@ -57,8 +53,12 @@ function LocalForm({ onChange }) {
         ))}
       </select>
 
-      <label>Cidade:</label>
-      <select value={cidade} onChange={handleCidadeChange} disabled={!estado}>
+      <select
+        value={cidade}
+        onChange={handleCidadeChange}
+        disabled={!estado}
+        required
+      >
         <option value="">Selecione uma cidade</option>
         {cidades.map((c) => (
           <option key={c.id} value={c.nome}>

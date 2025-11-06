@@ -87,18 +87,28 @@ function CreateEvent({ onEventoCriado }) {
         required
       />
 
+    {/*   <label
+        htmlFor="data"
+        style={{
+          marginBottom: "-6px",
+        }}
+      >
+        Data e hora do evento
+      </label> */}
       <input
+        id="data"
         type="datetime-local"
         value={data}
         onChange={(e) => setData(e.target.value)}
         required
+        style={{ marginBottom: "12px" }}
       />
 
       <LocalForm onChange={handleLocalChange} />
 
       <input
         type="text"
-        placeholder="Digite o endereço completo do local (Rua, número, bairro)"
+        placeholder="Local onde irá acontecer o evento (ex: Teatro Municipal)"
         value={local}
         onChange={(e) => setLocal(e.target.value)}
         required
@@ -116,7 +126,7 @@ function CreateEvent({ onEventoCriado }) {
         ))}
       </select>
 
-      <input
+      <input className="imgUpload"
         type="file"
         accept="image/*"
         onChange={(e) => setImagem(e.target.files[0])}

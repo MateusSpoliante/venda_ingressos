@@ -1,25 +1,28 @@
 .create-event {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  max-width: 500px;
-  margin: 20px auto;
-  padding: 25px;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  gap: 18px;
+  max-width: 620px;
+  width: 90%;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+  overflow: visible;
 }
 
 .create-event input,
 .create-event textarea,
 .create-event select {
-  padding: 12px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
   width: 100%;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  padding: 14px 16px;
+  font-size: 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+  background-color: #fafafa;
 }
 
 .create-event input:focus,
@@ -27,54 +30,95 @@
 .create-event select:focus {
   outline: none;
   border-color: #054062;
-  box-shadow: 0 0 5px rgba(5, 64, 98, 0.3);
+  background-color: #fff;
+  box-shadow: 0 0 6px rgba(5, 64, 98, 0.3);
 }
 
 .create-event textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 110px;
 }
 
 .create-event button {
-  padding: 12px;
-  font-size: 15px;
-  font-weight: 500;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
   background-color: #054062;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
 }
 
 .create-event button:hover:not(:disabled) {
-  background-color: #036;
+  background-color: #063b57;
+  transform: translateY(-1px);
 }
 
 .create-event button:disabled {
-  background-color: #888;
+  background-color: #9ca3af;
   cursor: not-allowed;
 }
 
-/* Centraliza os selects de Estado e Cidade */
+.create-event input[type="file"] {
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ====== LOCALFORM ====== */
 .state-city-wrapper {
   display: flex;
   gap: 10px;
-  justify-content: center; /* centraliza horizontalmente */
-  margin-bottom: 12px;
+  width: 100%;
+  position: relative;
+  z-index: 2;
 }
 
 .state-city-wrapper select {
-  flex: 1; /* ocupa espaço igual */
-  max-width: 220px; /* para não ficarem muito largos */
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background-color: #fafafa;
+  transition: all 0.25s ease;
 }
 
-/* responsividade */
+.state-city-wrapper select:focus {
+  outline: none;
+  border-color: #054062;
+  background-color: #fff;
+  box-shadow: 0 0 6px rgba(5, 64, 98, 0.3);
+}
+
+/* Dropdown fix */
+.rmsc,
+.css-b62m3t-container {
+  z-index: 9999 !important;
+}
+
+/* ====== RESPONSIVO ====== */
+@media (max-width: 900px) {
+  .create-event {
+    max-width: 85%;
+    padding: 25px;
+  }
+}
+
 @media (max-width: 600px) {
+  .create-event {
+    width: 95%;
+    padding: 22px;
+    gap: 16px;
+  }
+
   .state-city-wrapper {
     flex-direction: column;
     gap: 12px;
-    align-items: center; /* centraliza no mobile */
   }
 
   .state-city-wrapper select {

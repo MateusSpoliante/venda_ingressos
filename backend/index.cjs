@@ -32,9 +32,18 @@ const upload = multer({ storage: multer.memoryStorage() });
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
+  max: 10, // máximo de conexões simultâneas
+  idleTimeoutMillis: 30000, // encerra conexões ociosas (30s)
+  connectionTimeoutMillis: 5000, // tempo máximo pra tentar conectar
 });
 
-pool.on("error", (err) => console.error("Erro no pool do banco:", err));
+pool.on("error", (err) => {
+  console.error("Erro no pool do banco:", err);
+  if (err.code === "57P01" || err.message.includes("db_termination")) {
+    console.warn("Tentando reconectar ao banco...");
+    setTimeout(() => pool.connect().catch(() => {}), 5000);
+  }
+});
 
 // ==================== UPLOAD IMAGEM SUPABASE ====================
 async function uploadImagem(fileBuffer) {

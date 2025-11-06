@@ -17,7 +17,11 @@
 .body-home {
   background: #f4f6f8;
   min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
+
 
 /* ========== CONTAINER GLOBAL ========== */
 .container {
@@ -35,7 +39,8 @@
   background: #fff;
   border-bottom: 2px solid var(--cor-secundaria);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  position: relative; /* para search-bar absolute */
+  position: relative;
+  /* para search-bar absolute */
   flex-wrap: wrap;
   gap: 16px;
 }
@@ -293,7 +298,7 @@
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 8px; 
+  gap: 8px;
 }
 
 .evento-info h3 {
@@ -305,7 +310,7 @@
 .evento-data {
   font-size: 1rem;
   color: #888;
-  margin-top: 0; 
+  margin-top: 0;
 }
 
 .evento-local {
@@ -314,7 +319,7 @@
   gap: 5px;
   font-size: 0.85rem;
   color: #555;
-  margin-top: auto; 
+  margin-top: auto;
 }
 
 /* ========== BOTÕES FLUTUANTES ========== */
@@ -490,7 +495,7 @@
     padding: 0 10px;
   }
 
-  .evento-card {    
+  .evento-card {
     min-height: 260px;
   }
 
