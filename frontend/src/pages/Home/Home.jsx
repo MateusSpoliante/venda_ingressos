@@ -240,7 +240,8 @@ function Home() {
                       {formatarData(evento.data_evento)}
                     </span>
                     <div className="evento-local">
-                      <MapPin size={14} /> {evento.local}
+                      <MapPin size={14} style={{ marginTop: "-1.2px" }} />{" "}
+                      {`${evento.cidade || "-"}, ${evento.estado || "-"}`}
                     </div>
                   </div>
                 </div>
