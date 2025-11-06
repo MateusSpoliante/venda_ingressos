@@ -83,7 +83,18 @@ function HomeOrg() {
 
   const formatarData = (dataString) => {
     const meses = [
-      "Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez",
+      "Jan",
+      "Fev",
+      "Mar",
+      "Abr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Set",
+      "Out",
+      "Nov",
+      "Dez",
     ];
     const data = new Date(dataString);
     const dia = data.getDate();
@@ -126,7 +137,9 @@ function HomeOrg() {
                   style={{ ...iconStyle, marginLeft: "10px" }}
                   disabled={loggingOut}
                 >
-                  {loggingOut ? <Loader2 size={16} className="spin" /> : (
+                  {loggingOut ? (
+                    <Loader2 size={16} className="spin" />
+                  ) : (
                     <>
                       <LogOut size={16} /> Sair
                     </>
@@ -164,7 +177,8 @@ function HomeOrg() {
                     id: novoEvento.id,
                     titulo: novoEvento.titulo || "Sem título",
                     descricao: novoEvento.descricao || "",
-                    data_evento: novoEvento.data_evento || new Date().toISOString(),
+                    data_evento:
+                      novoEvento.data_evento || new Date().toISOString(),
                     local: novoEvento.local || "",
                     categoria: novoEvento.categoria || "Outro",
                     imagem: novoEvento.imagem || null,
@@ -195,9 +209,12 @@ function HomeOrg() {
 
                   <div className="evento-info">
                     <h3>{evento.titulo || "Sem título"}</h3>
-                    <span className="evento-data">{formatarData(evento.data_evento)}</span>
+                    <span className="evento-data">
+                      {formatarData(evento.data_evento)}
+                    </span>
                     <div className="evento-local">
-                      <MapPin size={14} /> {evento.local || "-"}
+                      <MapPin size={14} style={{ marginTop: "-1.4px" }} />{" "}
+                      {`${evento.cidade || "-"}, ${evento.estado || "-"}`}
                     </div>
                   </div>
                 </div>

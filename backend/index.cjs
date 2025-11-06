@@ -26,14 +26,14 @@ app.use(cors());
 app.use(express.json());
 
 // ==================== UPLOAD (memória) ====================
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({ storage: multer.memoryStorage() });
 
 // ==================== CONEXÃO BANCO ====================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
+
 pool.on("error", (err) => console.error("Erro no pool do banco:", err));
 
 // ==================== UPLOAD IMAGEM SUPABASE ====================
@@ -46,12 +46,13 @@ async function uploadImagem(fileBuffer) {
     .upload(`imagens/${nomeArquivo}`, webpBuffer, {
       contentType: "image/webp",
     });
+
   if (error) throw error;
 
-  const { data: publicData } = supabase.storage
+  const { data } = supabase.storage
     .from("eventos")
     .getPublicUrl(`imagens/${nomeArquivo}`);
-  return publicData.publicUrl;
+  return data.publicUrl;
 }
 
 // ==================== MIDDLEWARES ====================
@@ -64,7 +65,7 @@ function autenticarToken(req, res, next) {
     req.usuarioId = decoded.id;
     next();
   } catch {
-    return res.status(401).json({ erro: "Token inválido" });
+    res.status(401).json({ erro: "Token inválido" });
   }
 }
 
@@ -74,9 +75,9 @@ async function verificarOrganizador(req, res, next) {
       "SELECT organizador FROM usuarios WHERE id = $1",
       [req.usuarioId]
     );
-    if (rows.length === 0 || rows[0].organizador !== "S") {
+    if (rows.length === 0 || rows[0].organizador !== "S")
       return res.status(403).json({ erro: "Acesso restrito a organizadores" });
-    }
+
     next();
   } catch (err) {
     console.error("Erro ao verificar organizador:", err);
@@ -87,8 +88,10 @@ async function verificarOrganizador(req, res, next) {
 // ==================== USUÁRIOS ====================
 app.post("/api/cadastro", async (req, res) => {
   const { nome, cpfCnpj, email, senha, organizador = "N" } = req.body;
+
   if (!nome || !cpfCnpj || !email || !senha)
     return res.status(400).json({ erro: "Preencha todos os campos" });
+
   if (senha.length < 6)
     return res
       .status(400)
@@ -110,6 +113,7 @@ app.post("/api/cadastro", async (req, res) => {
       return res.status(400).json({ erro: "CPF/CNPJ já cadastrado!" });
 
     const hash = await bcrypt.hash(senha, 10);
+
     await pool.query(
       "INSERT INTO usuarios (nome, cpf_cnpj, email, senha, organizador) VALUES ($1, $2, $3, $4, $5)",
       [nome, cpfCnpj, email, hash, organizador]
@@ -124,6 +128,7 @@ app.post("/api/cadastro", async (req, res) => {
 
 app.post("/api/login", async (req, res) => {
   const { email, senha } = req.body;
+
   if (!email || !senha)
     return res.status(400).json({ erro: "Preencha email e senha" });
 
@@ -133,6 +138,7 @@ app.post("/api/login", async (req, res) => {
       [email]
     );
     const usuario = rows[0];
+
     if (!usuario)
       return res.status(401).json({ erro: "Usuário não encontrado" });
 
@@ -162,7 +168,7 @@ app.post("/api/login", async (req, res) => {
 app.get("/api/eventos", async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT id, titulo, descricao, data_evento, local, categoria, imagem FROM eventos ORDER BY data_evento ASC"
+      "SELECT id, titulo, descricao, data_evento, categoria, estado, cidade, local, imagem FROM eventos ORDER BY data_evento ASC"
     );
     res.json(rows);
   } catch (err) {
@@ -171,15 +177,25 @@ app.get("/api/eventos", async (req, res) => {
   }
 });
 
-// Exclusivos de organizador
+// Exclusivos do organizador
 app.post(
   "/api/organizador/eventos",
   autenticarToken,
   verificarOrganizador,
   upload.single("imagem"),
   async (req, res) => {
-    const { titulo, descricao, data_evento, local, categoria } = req.body;
-    if (!titulo || !descricao || !data_evento || !local || !categoria)
+    const { titulo, descricao, data_evento, categoria, estado, cidade, local } =
+      req.body;
+
+    if (
+      !titulo ||
+      !descricao ||
+      !data_evento ||
+      !categoria ||
+      !estado ||
+      !cidade ||
+      !local
+    )
       return res.status(400).json({ erro: "Preencha todos os campos" });
 
     try {
@@ -187,14 +203,17 @@ app.post(
       if (req.file) imagemUrl = await uploadImagem(req.file.buffer);
 
       await pool.query(
-        `INSERT INTO eventos (titulo, descricao, data_evento, local, categoria, imagem, organizador_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        `INSERT INTO eventos 
+        (titulo, descricao, data_evento, categoria, estado, cidade, local, imagem, organizador_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
         [
           titulo,
           descricao,
           data_evento,
-          local,
           categoria,
+          estado,
+          cidade,
+          local,
           imagemUrl,
           req.usuarioId,
         ]
@@ -225,6 +244,32 @@ app.get(
     }
   }
 );
+
+// ==================== BUSCA LOCAIS (Google Places API) ====================
+const axios = require("axios");
+
+app.post("/buscar-locais", async (req, res) => {
+  const { texto } = req.body;
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        texto
+      )}`
+    );
+    const data = await response.json();
+
+    // Retorna só o nome principal
+    const nomes = data
+      .map((item) => item.display_name?.split(",")[0]?.trim())
+      .filter((nome) => !!nome); // remove vazios
+
+    res.json({ locais: nomes });
+  } catch (error) {
+    console.error("Erro ao buscar locais:", error);
+    res.status(500).json({ erro: "Erro ao buscar locais" });
+  }
+});
 
 // ==================== SERVIDOR ====================
 const PORT = process.env.PORT || 3000;

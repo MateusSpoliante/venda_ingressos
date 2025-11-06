@@ -85,7 +85,7 @@ function Evento() {
 
         <div className="evento-container-2">
           <img
-            src={evento.imagem || "/banner2.webp"} // fallback caso não tenha imagem
+            src={evento.imagem || "/banner2.webp"}
             alt={evento.titulo}
             className="evento-imagem-2"
           />
@@ -107,8 +107,30 @@ function Evento() {
                 minute: "2-digit",
               })}
             </p>
-            <p style={{ display: "flex", alignItems: "center", gap: "0px" }}>
-              <MapPin size={16} /> {evento.local}
+
+            {/* Endereço completo */}
+            <p
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                flexWrap: "wrap",
+              }}
+            >
+              <MapPin size={14} />
+              <span>
+                {evento.endereco && <>{evento.endereco}</>}
+                {evento.cidade && evento.estado && (
+                  <>
+                    {evento.endereco ? " - " : ""}
+                    {evento.cidade}, {evento.estado}
+                  </>
+                )}
+              </span>
+            </p>
+
+            <p>
+              <strong>Local:</strong> {evento.local || "-"}
             </p>
 
             <h3 style={{ marginTop: "20px" }}>Ingressos disponíveis</h3>

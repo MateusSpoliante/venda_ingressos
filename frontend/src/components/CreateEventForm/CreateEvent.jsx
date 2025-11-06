@@ -1,10 +1,12 @@
 import { useState } from "react";
 import "./CreateEvent.css";
+import LocalForm from "../LocalForm.jsx";
 
 function CreateEvent({ onEventoCriado }) {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [data, setData] = useState("");
+  const [localData, setLocalData] = useState({ estado: "", cidade: "" });
   const [local, setLocal] = useState("");
   const [categoria, setCategoria] = useState("Teatro");
   const [imagem, setImagem] = useState(null);
@@ -22,6 +24,10 @@ function CreateEvent({ onEventoCriado }) {
     "Religioso",
   ];
 
+  const handleLocalChange = ({ estado, cidade }) => {
+    setLocalData({ estado, cidade });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -30,6 +36,8 @@ function CreateEvent({ onEventoCriado }) {
     formData.append("titulo", titulo);
     formData.append("descricao", descricao);
     formData.append("data_evento", data);
+    formData.append("estado", localData.estado);
+    formData.append("cidade", localData.cidade);
     formData.append("local", local);
     formData.append("categoria", categoria);
     if (imagem) formData.append("imagem", imagem);
@@ -47,21 +55,9 @@ function CreateEvent({ onEventoCriado }) {
       );
 
       const result = await res.json();
-
       if (res.ok) {
-        onEventoCriado({
-          id: result.id,
-          titulo: result.titulo,
-          descricao: result.descricao,
-          data_evento: result.data_evento,
-          local: result.local,
-          categoria: result.categoria,
-          imagem: result.imagem_url || (imagem ? URL.createObjectURL(imagem) : null),
-        });
-
+        onEventoCriado(result);
         alert("Evento criado com sucesso!");
-
-        // Recarrega a página para mostrar o evento atualizado
         window.location.reload();
       } else {
         alert(result.erro || "Erro ao criar evento");
@@ -83,25 +79,31 @@ function CreateEvent({ onEventoCriado }) {
         onChange={(e) => setTitulo(e.target.value)}
         required
       />
+
       <textarea
         placeholder="Descrição do evento"
         value={descricao}
         onChange={(e) => setDescricao(e.target.value)}
         required
       />
+
       <input
         type="datetime-local"
         value={data}
         onChange={(e) => setData(e.target.value)}
         required
       />
+
+      <LocalForm onChange={handleLocalChange} />
+
       <input
         type="text"
-        placeholder="Local"
+        placeholder="Digite o endereço completo do local (Rua, número, bairro)"
         value={local}
         onChange={(e) => setLocal(e.target.value)}
         required
       />
+
       <select
         value={categoria}
         onChange={(e) => setCategoria(e.target.value)}
@@ -113,11 +115,13 @@ function CreateEvent({ onEventoCriado }) {
           </option>
         ))}
       </select>
+
       <input
         type="file"
         accept="image/*"
         onChange={(e) => setImagem(e.target.files[0])}
       />
+
       <button type="submit" disabled={loading}>
         {loading ? "Criando..." : "Criar Evento"}
       </button>

@@ -56,10 +56,28 @@
   cursor: not-allowed;
 }
 
+/* Centraliza os selects de Estado e Cidade */
+.state-city-wrapper {
+  display: flex;
+  gap: 10px;
+  justify-content: center; /* centraliza horizontalmente */
+  margin-bottom: 12px;
+}
+
+.state-city-wrapper select {
+  flex: 1; /* ocupa espaço igual */
+  max-width: 220px; /* para não ficarem muito largos */
+}
+
 /* responsividade */
 @media (max-width: 600px) {
-  .create-event {
-    padding: 20px;
-    margin: 15px;
+  .state-city-wrapper {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center; /* centraliza no mobile */
+  }
+
+  .state-city-wrapper select {
+    max-width: 100%;
   }
 }
