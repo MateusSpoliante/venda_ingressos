@@ -254,6 +254,23 @@ app.get(
   }
 );
 
+// ==================== INGRESSOS ====================
+app.get("/api/ingressos/:eventoId", async (req, res) => {
+  const { eventoId } = req.params;
+
+  try {
+    const { rows } = await pool.query(
+      "SELECT id, evento_id, tipo_ingresso, preco, quantidade FROM ingressos WHERE evento_id = $1",
+      [eventoId]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("Erro ao buscar ingressos:", err);
+    res.status(500).json({ erro: "Erro ao buscar ingressos" });
+  }
+});
+
+
 // ==================== BUSCA LOCAIS (Google Places API) ====================
 const axios = require("axios");
 
