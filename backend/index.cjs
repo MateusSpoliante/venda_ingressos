@@ -4,15 +4,9 @@ const cors = require("cors");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const mercadopago = require("mercadopago");
 const multer = require("multer");
 const sharp = require("sharp");
 const { createClient } = require("@supabase/supabase-js");
-
-// ==================== CONFIG MERCADO PAGO ====================
-mercadopago.configurations.setAccessToken(
-  process.env.MERCADO_PAGO_ACCESS_TOKEN
-);
 
 // ==================== CONFIG SUPABASE ====================
 const supabase = createClient(
@@ -32,7 +26,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
-  max: 10, // máximo de conexões simultâneas
+  max: 10,
 });
 
 pool.on("error", (err) => {
@@ -43,7 +37,7 @@ pool.on("error", (err) => {
   }
 });
 
-// ==================== UPLOAD IMAGEM SUPABASE ====================
+// ==================== FUNÇÃO UPLOAD IMAGEM SUPABASE ====================
 async function uploadImagem(fileBuffer) {
   const webpBuffer = await sharp(fileBuffer).webp({ quality: 80 }).toBuffer();
   const nomeArquivo = `${Date.now()}.webp`;
@@ -100,9 +94,7 @@ app.post("/api/cadastro", async (req, res) => {
     return res.status(400).json({ erro: "Preencha todos os campos" });
 
   if (senha.length < 6)
-    return res
-      .status(400)
-      .json({ erro: "A senha deve ter pelo menos 6 caracteres" });
+    return res.status(400).json({ erro: "A senha deve ter pelo menos 6 caracteres" });
 
   try {
     const emailExistente = await pool.query(
@@ -191,18 +183,9 @@ app.post(
   verificarOrganizador,
   upload.single("imagem"),
   async (req, res) => {
-    const { titulo, descricao, data_evento, categoria, estado, cidade, local } =
-      req.body;
+    const { titulo, descricao, data_evento, categoria, estado, cidade, local } = req.body;
 
-    if (
-      !titulo ||
-      !descricao ||
-      !data_evento ||
-      !categoria ||
-      !estado ||
-      !cidade ||
-      !local
-    )
+    if (!titulo || !descricao || !data_evento || !categoria || !estado || !cidade || !local)
       return res.status(400).json({ erro: "Preencha todos os campos" });
 
     try {
@@ -213,17 +196,7 @@ app.post(
         `INSERT INTO eventos 
         (titulo, descricao, data_evento, categoria, estado, cidade, local, imagem, organizador_id)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-        [
-          titulo,
-          descricao,
-          data_evento,
-          categoria,
-          estado,
-          cidade,
-          local,
-          imagemUrl,
-          req.usuarioId,
-        ]
+        [titulo, descricao, data_evento, categoria, estado, cidade, local, imagemUrl, req.usuarioId]
       );
 
       res.json({ mensagem: "Evento criado com sucesso" });
@@ -268,25 +241,19 @@ app.get("/api/ingressos/:eventoId", async (req, res) => {
   }
 });
 
-
-// ==================== BUSCA LOCAIS (Google Places API) ====================
-const axios = require("axios");
-
+// ==================== BUSCA LOCAIS (OpenStreetMap) ====================
 app.post("/buscar-locais", async (req, res) => {
   const { texto } = req.body;
 
   try {
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-        texto
-      )}`
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(texto)}`
     );
     const data = await response.json();
 
-    // Retorna só o nome principal
     const nomes = data
       .map((item) => item.display_name?.split(",")[0]?.trim())
-      .filter((nome) => !!nome); // remove vazios
+      .filter(Boolean);
 
     res.json({ locais: nomes });
   } catch (error) {
@@ -297,6 +264,4 @@ app.post("/buscar-locais", async (req, res) => {
 
 // ==================== SERVIDOR ====================
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>
-  console.log(`Servidor rodando em http://localhost:${PORT}`)
-);
+app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
