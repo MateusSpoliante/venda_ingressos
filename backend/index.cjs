@@ -33,8 +33,6 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
   max: 10, // máximo de conexões simultâneas
-  idleTimeoutMillis: 30000, // encerra conexões ociosas (30s)
-  connectionTimeoutMillis: 5000, // tempo máximo pra tentar conectar
 });
 
 pool.on("error", (err) => {
