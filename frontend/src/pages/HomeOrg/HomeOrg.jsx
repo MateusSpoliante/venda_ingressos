@@ -48,7 +48,7 @@ function HomeOrg() {
           `${import.meta.env.VITE_API_URL}/api/organizador/eventos`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        const data = await response.json();
+        const data = await response.json();   
         setEventos(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Erro ao buscar eventos:", error);
@@ -197,7 +197,7 @@ function HomeOrg() {
                 <div
                   key={evento.id}
                   className="evento-card"
-                  onClick={() => navigate(`/evento/${evento.id}`)}
+                  onClick={() => navigate(`/eventoorg/${evento.id}`)}
                 >
                   <div className="evento-imagem">
                     <img

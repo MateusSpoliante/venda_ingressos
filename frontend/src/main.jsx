@@ -11,6 +11,7 @@ import { CartProvider } from "../src/context/CartContext/CartContext.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
 import Evento from "./pages/Evento/Evento.jsx";
 import Pagamento from "./pages/Pagamento/Pagamento.jsx";
+import EventoOrg from "./pages/EventoOrg/EventoOrg.jsx";
 
 const router = createBrowserRouter([
   {
@@ -50,6 +51,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Evento />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "eventoorg/:id",
+        element: (
+          <PrivateRoute tipo="organizador">
+            <EventoOrg />
           </PrivateRoute>
         ),
       },

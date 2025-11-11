@@ -1,38 +1,43 @@
 import "./Pagamento.css";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "../../context/CartContext/CartContext";
 import { QrCode, CheckCircle2 } from "lucide-react";
 import QRCode from "react-qr-code";
 
 export default function Pagamento() {
   const navigate = useNavigate();
-  const { total } = useCart();
+  const { total, clearCart } = useCart();
   const [metodo, setMetodo] = useState(null);
   const [mostrarQR, setMostrarQR] = useState(false);
   const [qrValue, setQrValue] = useState("");
   const [pagamentoConcluido, setPagamentoConcluido] = useState(false);
 
-  const handleContinuar = async () => {
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/pix`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ valor: total }),
-      });
-      const data = await res.json();
-      setQrValue(data.qrCode || "https://fakepixcode.com"); // QR fake pra teste
-      setMostrarQR(true);
+  const handleContinuar = () => {
+    const codigoFakePix = `00020126360014BR.GOV.BCB.PIX0114+551199999999520400005303986540${total.toFixed(
+      2
+    )}5802BR5913Teste Comércio6009SAO PAULO62070503***6304ABCD`;
 
-      // Simulação: após 10 segundos o pagamento é confirmado
-      setTimeout(() => {
-        setPagamentoConcluido(true);
-      }, 10000);
-    } catch (err) {
-      console.error("Erro ao gerar QR:", err);
-      alert("Erro ao gerar QR Code PIX");
-    }
+    setQrValue(codigoFakePix);
+    setMostrarQR(true);
+
+    // simula confirmação de pagamento
+    setTimeout(() => {
+      setPagamentoConcluido(true);
+      clearCart();
+    }, 500);
   };
+
+  // redireciona automaticamente pra home alguns segundos após o pagamento
+  useEffect(() => {
+    if (pagamentoConcluido) {
+      const timer = setTimeout(() => {
+        setMostrarQR(false);
+        navigate("/home"); // volta pra home de forma controlada
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [pagamentoConcluido, navigate]);
 
   const handleVoltar = () => {
     navigate("/carrinho");
@@ -94,9 +99,6 @@ export default function Pagamento() {
                 <CheckCircle2 className="icone-sucesso" size={90} />
                 <h3>Pagamento confirmado!</h3>
                 <p>Seu pedido foi registrado com sucesso. 🎉</p>
-                <button onClick={fecharPopup} className="fechar">
-                  Fechar
-                </button>
               </div>
             )}
           </div>

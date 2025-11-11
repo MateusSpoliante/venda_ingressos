@@ -1,0 +1,179 @@
+.eventoOrg-page {
+  background: #f4f6f8;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+}
+
+.eventoOrg-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.eventoOrg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.eventoOrg-back-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #054062;
+  font-weight: 500;
+}
+
+.eventoOrg-edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #054062;
+  font-size: 15px;
+}
+
+.eventoOrg-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.eventoOrg-img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+.eventoOrg-detalhes {
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.eventoOrg-detalhes h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #054062;
+}
+
+.eventoOrg-detalhes p {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #444;
+}
+
+.eventoOrg-btn-salvar {
+  background-color: #054062;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.eventoOrg-btn-salvar:hover {
+  background-color: #032f47;
+}
+
+.eventoOrg-ingresso-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
+}
+
+.eventoOrg-ingresso-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.eventoOrg-ingresso-item {
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.eventoOrg-ingresso-item:hover {
+  border-color: #00a859;
+}
+
+.btn-add-ingresso {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--cor-principal, #054062);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-add-ingresso:hover {
+  background-color: var(--cor-secundaria, #f97721);
+  transform: scale(1.03);
+}
+
+.btn-add-ingresso:active {
+  transform: scale(0.97);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 25px;
+  width: 400px;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .eventoOrg-img {
+    height: 250px;
+  }
+}

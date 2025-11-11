@@ -1,0 +1,66 @@
+.create-ingresso-page {
+  background: #f4f6f8;
+  min-height: 100% ;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Inter", sans-serif;
+}
+
+.create-ingresso-card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.create-ingresso-card h2 {
+  text-align: center;
+  color: #054062;
+  margin-bottom: 10px;
+}
+
+.create-ingresso-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.create-ingresso-card input {
+  padding: 12px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.create-ingresso-card input:focus {
+  border-color: #054062;
+}
+
+.create-ingresso-card button {
+  background-color: #054062;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.create-ingresso-card button:hover {
+  background-color: #032f47;
+}
+
+.create-ingresso-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

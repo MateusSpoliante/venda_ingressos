@@ -94,7 +94,9 @@ app.post("/api/cadastro", async (req, res) => {
     return res.status(400).json({ erro: "Preencha todos os campos" });
 
   if (senha.length < 6)
-    return res.status(400).json({ erro: "A senha deve ter pelo menos 6 caracteres" });
+    return res
+      .status(400)
+      .json({ erro: "A senha deve ter pelo menos 6 caracteres" });
 
   try {
     const emailExistente = await pool.query(
@@ -163,12 +165,25 @@ app.post("/api/login", async (req, res) => {
 
 // ==================== EVENTOS ====================
 
-// Públicos
+// Listar todos os eventos (público)
 app.get("/api/eventos", async (req, res) => {
   try {
-    const { rows } = await pool.query(
-      "SELECT id, titulo, descricao, data_evento, categoria, estado, cidade, local, imagem FROM eventos ORDER BY data_evento ASC"
-    );
+    const { rows } = await pool.query(`
+      SELECT 
+        e.id,
+        e.titulo,
+        e.descricao,
+        e.data_evento,
+        e.categoria,
+        e.estado,
+        e.cidade,
+        e.local,
+        e.imagem,
+        u.nome AS organizador_nome
+      FROM eventos e
+      JOIN usuarios u ON e.organizador_id = u.id
+      ORDER BY e.data_evento ASC
+    `);
     res.json(rows);
   } catch (err) {
     console.error("Erro ao buscar eventos:", err);
@@ -176,37 +191,7 @@ app.get("/api/eventos", async (req, res) => {
   }
 });
 
-// Exclusivos do organizador
-app.post(
-  "/api/organizador/eventos",
-  autenticarToken,
-  verificarOrganizador,
-  upload.single("imagem"),
-  async (req, res) => {
-    const { titulo, descricao, data_evento, categoria, estado, cidade, local } = req.body;
-
-    if (!titulo || !descricao || !data_evento || !categoria || !estado || !cidade || !local)
-      return res.status(400).json({ erro: "Preencha todos os campos" });
-
-    try {
-      let imagemUrl = null;
-      if (req.file) imagemUrl = await uploadImagem(req.file.buffer);
-
-      await pool.query(
-        `INSERT INTO eventos 
-        (titulo, descricao, data_evento, categoria, estado, cidade, local, imagem, organizador_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-        [titulo, descricao, data_evento, categoria, estado, cidade, local, imagemUrl, req.usuarioId]
-      );
-
-      res.json({ mensagem: "Evento criado com sucesso" });
-    } catch (err) {
-      console.error("Erro ao criar evento:", err);
-      res.status(500).json({ erro: "Erro ao criar evento" });
-    }
-  }
-);
-
+// Listar eventos do organizador logado
 app.get(
   "/api/organizador/eventos",
   autenticarToken,
@@ -214,7 +199,11 @@ app.get(
   async (req, res) => {
     try {
       const { rows } = await pool.query(
-        "SELECT * FROM eventos WHERE organizador_id = $1 ORDER BY data_evento ASC",
+        `SELECT 
+          id, titulo, descricao, data_evento, categoria, estado, cidade, local, imagem
+         FROM eventos 
+         WHERE organizador_id = $1 
+         ORDER BY data_evento ASC`,
         [req.usuarioId]
       );
       res.json(rows);
@@ -225,7 +214,202 @@ app.get(
   }
 );
 
+// Criar evento (somente organizador)
+app.post(
+  "/api/organizador/eventos",
+  autenticarToken,
+  verificarOrganizador,
+  upload.single("imagem"),
+  async (req, res) => {
+    const { titulo, descricao, data_evento, categoria, estado, cidade, local } =
+      req.body;
+
+    if (
+      !titulo ||
+      !descricao ||
+      !data_evento ||
+      !categoria ||
+      !estado ||
+      !cidade ||
+      !local
+    ) {
+      return res
+        .status(400)
+        .json({ erro: "Preencha todos os campos obrigatórios" });
+    }
+
+    try {
+      let imagemUrl = null;
+      if (req.file) imagemUrl = await uploadImagem(req.file.buffer);
+
+      await pool.query(
+        `INSERT INTO eventos 
+        (titulo, descricao, data_evento, categoria, estado, cidade, local, imagem, organizador_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [
+          titulo,
+          descricao,
+          data_evento,
+          categoria,
+          estado,
+          cidade,
+          local,
+          imagemUrl,
+          req.usuarioId,
+        ]
+      );
+
+      res.json({ mensagem: "Evento criado com sucesso" });
+    } catch (err) {
+      console.error("Erro ao criar evento:", err);
+      res.status(500).json({ erro: "Erro interno ao criar evento" });
+    }
+  }
+);
+
+// Atualizar evento (somente do próprio organizador)
+app.put(
+  "/api/organizador/eventos/:id",
+  autenticarToken,
+  verificarOrganizador,
+  async (req, res) => {
+    const { id } = req.params;
+    const { titulo, descricao, data_evento, categoria, local } = req.body;
+
+    if (!titulo || !descricao || !data_evento || !categoria || !local) {
+      return res
+        .status(400)
+        .json({ erro: "Preencha todos os campos obrigatórios" });
+    }
+
+    try {
+      const { rowCount } = await pool.query(
+        `UPDATE eventos 
+         SET titulo = $1, descricao = $2, data_evento = $3, categoria = $4, local = $5 
+         WHERE id = $6 AND organizador_id = $7`,
+        [titulo, descricao, data_evento, categoria, local, id, req.usuarioId]
+      );
+
+      if (rowCount === 0)
+        return res
+          .status(404)
+          .json({ erro: "Evento não encontrado ou sem permissão" });
+
+      res.json({ mensagem: "Evento atualizado com sucesso" });
+    } catch (err) {
+      console.error("Erro ao atualizar evento:", err);
+      res.status(500).json({ erro: "Erro ao atualizar evento" });
+    }
+  }
+);
+
+// Buscar evento por ID (público ou organizador)
+app.get("/api/eventos/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT 
+        e.id,
+        e.titulo,
+        e.descricao,
+        e.data_evento,
+        e.categoria,
+        e.estado,
+        e.cidade,
+        e.local,
+        e.imagem,
+        u.nome AS organizador_nome
+       FROM eventos e
+       JOIN usuarios u ON e.organizador_id = u.id
+       WHERE e.id = $1`,
+      [id]
+    );
+
+    if (rows.length === 0)
+      return res.status(404).json({ erro: "Evento não encontrado" });
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("Erro ao buscar evento:", err);
+    res.status(500).json({ erro: "Erro interno ao buscar evento" });
+  }
+});
+
+// Excluir evento (somente do próprio organizador)
+app.delete(
+  "/api/organizador/eventos/:id",
+  autenticarToken,
+  verificarOrganizador,
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      const { rowCount } = await pool.query(
+        "DELETE FROM eventos WHERE id = $1 AND organizador_id = $2",
+        [id, req.usuarioId]
+      );
+
+      if (rowCount === 0)
+        return res
+          .status(404)
+          .json({ erro: "Evento não encontrado ou sem permissão" });
+
+      res.json({ mensagem: "Evento excluído com sucesso" });
+    } catch (err) {
+      console.error("Erro ao excluir evento:", err);
+      res.status(500).json({ erro: "Erro ao excluir evento" });
+    }
+  }
+);
+
 // ==================== INGRESSOS ====================
+
+// Listar ingressos de um evento
+app.get("/api/ingressos/:eventoId", async (req, res) => {
+  const { eventoId } = req.params;
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, evento_id, tipo_ingresso, preco, quantidade 
+       FROM ingressos 
+       WHERE evento_id = $1`,
+      [eventoId]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("Erro ao buscar ingressos:", err);
+    res.status(500).json({ erro: "Erro ao buscar ingressos" });
+  }
+});
+
+// Criar ingressos para um evento (organizador)
+app.post(
+  "/api/organizador/ingressos",
+  autenticarToken,
+  verificarOrganizador,
+  async (req, res) => {
+    const { evento_id, tipo_ingresso, preco, quantidade } = req.body;
+
+    if (!evento_id || !tipo_ingresso || !preco || !quantidade)
+      return res
+        .status(400)
+        .json({ erro: "Preencha todos os campos obrigatórios" });
+
+    try {
+      await pool.query(
+        `INSERT INTO ingressos (evento_id, tipo_ingresso, preco, quantidade)
+         VALUES ($1, $2, $3, $4)`,
+        [evento_id, tipo_ingresso, preco, quantidade]
+      );
+
+      res.json({ mensagem: "Ingresso criado com sucesso" });
+    } catch (err) {
+      console.error("Erro ao criar ingresso:", err);
+      res.status(500).json({ erro: "Erro ao criar ingresso" });
+    }
+  }
+);
+
 app.get("/api/ingressos/:eventoId", async (req, res) => {
   const { eventoId } = req.params;
 
@@ -247,7 +431,9 @@ app.post("/buscar-locais", async (req, res) => {
 
   try {
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(texto)}`
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        texto
+      )}`
     );
     const data = await response.json();
 
@@ -264,4 +450,6 @@ app.post("/buscar-locais", async (req, res) => {
 
 // ==================== SERVIDOR ====================
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
+app.listen(PORT, () =>
+  console.log(`Servidor rodando em http://localhost:${PORT}`)
+);
