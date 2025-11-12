@@ -1,0 +1,79 @@
+.user-menu {
+    position: relative;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    gap: 8px;
+    color: var(--cor-principal);
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: "Inter", sans-serif;
+    font-size: 0.95rem;
+    padding: 2px;
+}
+
+.user-info svg {
+    stroke-width: 1.5;
+    /* deixa o contorno do ícone mais fino */
+}
+
+.user-info:hover {
+    color: var(--cor-secundaria);
+    transform: scale(1.02);
+}
+
+
+.user-dropdown {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    overflow: hidden;
+    min-width: 150px;
+}
+
+.logout {
+    border: none;
+    background: transparent;
+    color: var(--cor-principal);
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    justify-content: flex-start;
+    padding: 8px 14px;
+    border-radius: 4px;
+    transition: 0.3s;
+    font-family: "Inter", sans-serif;
+}
+
+.logout:hover {
+    background: var(--cor-cinza);
+    color: var(--cor-secundaria);
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

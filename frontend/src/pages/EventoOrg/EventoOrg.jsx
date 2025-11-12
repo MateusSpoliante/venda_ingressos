@@ -15,15 +15,8 @@ function EventoOrg() {
   const [mostrarForm, setMostrarForm] = useState(false);
 
   const categorias = [
-    "Teatro",
-    "Musical",
-    "Stand up",
-    "Infantil",
-    "Dança",
-    "Shows",
-    "Circo",
-    "Palestras",
-    "Religioso",
+    "Teatro", "Musical", "Stand up", "Infantil", "Dança",
+    "Shows", "Circo", "Palestras", "Religioso",
   ];
 
   const fetchDados = async () => {
@@ -69,7 +62,7 @@ function EventoOrg() {
 
       if (!res.ok) throw new Error("Erro ao atualizar evento");
       alert("Evento atualizado com sucesso!");
-      fetchDados(); // Atualiza sem recarregar a página
+      fetchDados();
       setEditando(false);
     } catch (err) {
       console.error(err);
@@ -83,57 +76,46 @@ function EventoOrg() {
   };
 
   const handleIngressoCriado = () => {
-    fetchDados(); // atualiza lista de ingressos automaticamente
+    fetchDados();
     setMostrarForm(false);
   };
 
   if (loading)
     return (
-      <div className="loading-container">
-        <div className="spinnerEvent"></div>
+      <div className="eventoOrg-loading">
+        <div className="eventoOrg-spinner"></div>
       </div>
     );
 
   if (!evento) return <p>Evento não encontrado.</p>;
 
   return (
-    <div className="evento-page-2">
-      <div className="container-2">
-        <header className="header-2">
+    <div className="eventoOrg-page">
+      <div className="eventoOrg-container">
+        <header className="eventoOrg-header">
           <button
-            className="back-btn-2"
+            className="eventoOrg-back-btn"
             onClick={() => navigate(-1)}
-            style={{ display: "flex", alignItems: "center", gap: "5px" }}
           >
             <ArrowLeft size={20} /> Voltar
           </button>
 
           <button
-            className="edit-btn"
+            className="eventoOrg-edit-btn"
             onClick={() => setEditando(!editando)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: "#054062",
-              fontSize: "15px",
-            }}
           >
             <Pencil size={18} /> {editando ? "Cancelar" : "Editar"}
           </button>
         </header>
 
-        <div className="evento-container-2">
+        <div className="eventoOrg-card">
           <img
             src={evento.imagem || "/banner2.webp"}
             alt={evento.titulo}
-            className="evento-imagem-2"
+            className="eventoOrg-img"
           />
 
-          <div className="evento-detalhes-2">
+          <div className="eventoOrg-detalhes">
             {editando ? (
               <>
                 <input
@@ -175,7 +157,10 @@ function EventoOrg() {
                   ))}
                 </select>
 
-                <button className="btn-salvar" onClick={handleSalvarAlteracoes}>
+                <button
+                  className="eventoOrg-btn-salvar"
+                  onClick={handleSalvarAlteracoes}
+                >
                   Salvar alterações
                 </button>
               </>
@@ -198,7 +183,6 @@ function EventoOrg() {
                     minute: "2-digit",
                   })}
                 </p>
-
                 <p style={{ display: "flex", alignItems: "center" }}>
                   <MapPin size={14} /> {evento.local || "-"}
                 </p>
@@ -210,17 +194,10 @@ function EventoOrg() {
 
             {!editando && (
               <>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginTop: "25px",
-                  }}
-                >
+                <div className="eventoOrg-ingresso-header">
                   <h3>Ingressos disponíveis</h3>
                   <button
-                    className="btn-add-ingresso"
+                    className="eventoOrg-btn-add-ingresso"
                     onClick={() => setMostrarForm(true)}
                   >
                     <Plus size={18} /> Adicionar Ingresso
@@ -230,9 +207,12 @@ function EventoOrg() {
                 {ingressos.length === 0 ? (
                   <p>Nenhum ingresso cadastrado.</p>
                 ) : (
-                  <div className="ingressos-radio-group">
+                  <div className="eventoOrg-ingresso-lista">
                     {ingressos.map((ing) => (
-                      <div key={ing.id} className="ingresso-radio">
+                      <div
+                        key={ing.id}
+                        className="eventoOrg-ingresso-item"
+                      >
                         <span>
                           {ing.tipo_ingresso} — R$
                           {Number(ing.preco).toFixed(2).replace(".", ",")} (
@@ -248,17 +228,16 @@ function EventoOrg() {
         </div>
       </div>
 
-      {/* MODAL DO FORM DE INGRESSO */}
       {mostrarForm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <button className="close-btn" onClick={() => setMostrarForm(false)}>
+        <div className="eventoOrg-modal-overlay">
+          <div className="eventoOrg-modal-content">
+            <button
+              className="eventoOrg-close-btn"
+              onClick={() => setMostrarForm(false)}
+            >
               <X size={20} />
             </button>
-            <CreateTicketForm
-              eventoId={id}
-              onClose={handleIngressoCriado}
-            />
+            <CreateTicketForm eventoId={id} onClose={handleIngressoCriado} />
           </div>
         </div>
       )}

@@ -1,0 +1,139 @@
+.venda-container {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 20px;
+    font-family: "Poppins", sans-serif;
+}
+
+.venda-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 40px;
+}
+
+/* ====== AGRUPAMENTO POR EVENTO ====== */
+.venda-grupo {
+    margin-bottom: 40px;
+}
+
+.venda-evento-titulo {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    border-left: 5px solid #007bff;
+    padding-left: 10px;
+}
+
+.venda-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* espaçamento entre os cards de evento */
+}
+
+.venda-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+    /* leve aumento pra dar mais “respiro” */
+}
+
+.venda-item {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    /* espaçamento maior entre itens dentro do card */
+    border-bottom: 1px solid #eee;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+}
+
+.venda-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.venda-evento-info {
+    display: flex;
+    gap: 20px;
+    /* espaço entre imagem e detalhes */
+    align-items: flex-start;
+}
+
+.venda-evento-img {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.venda-detalhes {
+    flex: 1;
+}
+
+.venda-detalhes h3 {
+    font-size: 1.2rem;
+    margin-bottom: 6px;
+}
+
+.venda-detalhes p {
+    margin: 4px 0;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+.venda-total {
+    margin-top: 10px;
+    font-weight: 600;
+    color: #222;
+    font-size: 1rem;
+}
+
+/* ====== RESUMO GERAL ====== */
+.venda-resumo {
+    margin-top: 30px;
+    text-align: right;
+}
+
+.venda-resumo-total {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+/* ====== ESTADOS ====== */
+.venda-vazio {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-top: 50px;
+    color: #666;
+}
+
+.venda-loading {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 1.05rem;
+    color: #555;
+}
+
+/* ====== BOTÃO VOLTAR ====== */
+.venda-voltar {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.venda-voltar-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.venda-voltar-btn:hover {
+    background-color: #0056b3;
+}

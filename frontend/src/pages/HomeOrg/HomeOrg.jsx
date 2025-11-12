@@ -1,21 +1,18 @@
 import "./HomeOrg.css";
 import {
   Search,
-  User,
   PlusCircle,
   CalendarCheck2,
-  LogOut,
-  Loader2,
   MapPin,
   MessageCircleMore,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CreateEvent from "../../components/CreateEventForm/CreateEvent.jsx";
+import UserMenuOrg from "../../components/UserMenuOrg/UserMenuOrg.jsx";
 
 function HomeOrg() {
   const navigate = useNavigate();
-  const [loggingOut, setLoggingOut] = useState(false);
   const [eventos, setEventos] = useState([]);
   const [loadingEventos, setLoadingEventos] = useState(true);
   const [categoriaAtiva, setCategoriaAtiva] = useState("Meus Eventos");
@@ -28,16 +25,6 @@ function HomeOrg() {
     alignItems: "center",
     justifyContent: "center",
     gap: "6px",
-  };
-
-  const handleLogout = () => {
-    setLoggingOut(true);
-    setTimeout(() => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("nome");
-      localStorage.removeItem("organizador");
-      navigate("/login");
-    }, 1500);
   };
 
   useEffect(() => {
@@ -129,23 +116,7 @@ function HomeOrg() {
 
           <div className="header-actions">
             {nome && (
-              <span className="user-info" style={iconStyle}>
-                <User size={16} /> Olá, {nome}
-                <button
-                  className="logout"
-                  onClick={handleLogout}
-                  style={{ ...iconStyle, marginLeft: "10px" }}
-                  disabled={loggingOut}
-                >
-                  {loggingOut ? (
-                    <Loader2 size={16} className="spin" />
-                  ) : (
-                    <>
-                      <LogOut size={16} /> Sair
-                    </>
-                  )}
-                </button>
-              </span>
+              <UserMenuOrg/>
             )}
           </div>
         </header>

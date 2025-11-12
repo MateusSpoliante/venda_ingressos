@@ -1,7 +1,6 @@
 import "./Home.css";
 import {
   Search,
-  User,
   Drama,
   Music,
   Smile,
@@ -12,8 +11,6 @@ import {
   Mic,
   Church,
   CalendarCheck2,
-  LogOut,
-  Loader2,
   ShoppingCart,
   MapPin,
   MessageCircleMore,
@@ -21,10 +18,10 @@ import {
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext/CartContext";
+import UserMenu from "../../components/UserMenu/UserMenu";
 
 function Home() {
   const navigate = useNavigate();
-  const [loggingOut, setLoggingOut] = useState(false);
   const [eventos, setEventos] = useState([]);
   const [loadingEventos, setLoadingEventos] = useState(true);
   const [categoriaAtiva, setCategoriaAtiva] = useState("Todos");
@@ -38,15 +35,6 @@ function Home() {
     alignItems: "center",
     justifyContent: "center",
     gap: "6px",
-  };
-
-  const handleLogout = () => {
-    setLoggingOut(true);
-    setTimeout(() => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("nome");
-      navigate("/login");
-    }, 1500);
   };
 
   useEffect(() => {
@@ -174,23 +162,7 @@ function Home() {
                     <span className="cart-count">{cartItems.length}</span>
                   )}
                 </a>
-                <span className="user-info" style={iconStyle}>
-                  <User size={16} /> Olá, {nome}
-                </span>
-                <button
-                  className="logout"
-                  onClick={handleLogout}
-                  style={iconStyle}
-                  disabled={loggingOut}
-                >
-                  {loggingOut ? (
-                    <Loader2 size={16} className="spin" />
-                  ) : (
-                    <>
-                      <LogOut size={16} /> Sair
-                    </>
-                  )}
-                </button>
+                <UserMenu />
               </>
             )}
           </div>
