@@ -127,6 +127,8 @@
   }
 
   .ingresso-radio {
+    position: relative;
+    /* necessário pro badge */
     display: flex;
     align-items: center;
     gap: 10px;
@@ -148,10 +150,39 @@
     border-color: #00a859;
   }
 
+  /* Desabilitado (carrinho) */
   .ingresso-radio.disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  /* ====== AJUSTES PARA ESGOTADO ====== */
+
+  /* Texto riscado e opaco */
+  .ingresso-radio.esgotado .ingresso-texto {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+
+  /* Badge profissional "ESGOTADO" */
+  .badge-esgotado {
+    background: #d93025;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: auto;
+    letter-spacing: 0.5px;
+  }
+
+  /* Impede clique */
+  .ingresso-radio.esgotado {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+
 
   /* Loading */
   .loading-container {
@@ -171,8 +202,13 @@
   }
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   /* Responsivo */
@@ -186,9 +222,11 @@
     .evento-imagem-2 {
       height: 200px;
     }
+
     .evento-detalhes-2 h1 {
       font-size: 22px;
     }
+
     .evento-detalhes-2 p {
       font-size: 14px;
     }

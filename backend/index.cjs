@@ -426,6 +426,21 @@ app.post("/api/pedidos", autenticarToken, async (req, res) => {
     const pedidoId = pedidoRes.rows[0].id;
 
     for (const item of itens) {
+      // ===== VERIFICA SE O INGRESSO TEM QUANTIDADE > 0 =====
+      const ingressoCheck = await client.query(
+        `SELECT quantidade FROM ingressos WHERE id = $1`,
+        [item.ingresso_id]
+      );
+
+      if (ingressoCheck.rows.length === 0) {
+        throw new Error(`Ingresso ID ${item.ingresso_id} não encontrado`);
+      }
+
+      if (ingressoCheck.rows[0].quantidade <= 0) {
+        throw new Error(`Ingresso ID ${item.ingresso_id} está esgotado`);
+      }
+
+      // ===== INSERE ITEM =====
       await client.query(
         `INSERT INTO pedido_itens (pedido_id, ingresso_id, quantidade, preco_unitario)
          VALUES ($1, $2, $3, $4)`,
@@ -438,7 +453,7 @@ app.post("/api/pedidos", autenticarToken, async (req, res) => {
   } catch (err) {
     await client.query("ROLLBACK");
     console.error("Erro ao criar pedido:", err);
-    res.status(500).json({ erro: "Erro ao criar pedido" });
+    res.status(400).json({ erro: err.message || "Erro ao criar pedido" });
   } finally {
     client.release();
   }

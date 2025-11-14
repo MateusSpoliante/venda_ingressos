@@ -48,9 +48,11 @@ function Evento() {
 
   const handleAddToCart = () => {
     if (!selectedIngresso) return;
+
     const jaExiste = cartItems.some(
       (item) => item.ingresso_id === selectedIngresso.id
     );
+
     if (!jaExiste) {
       addToCart({
         ingresso_id: selectedIngresso.id,
@@ -93,6 +95,7 @@ function Evento() {
           <div className="evento-detalhes-2">
             <h1>{evento.titulo}</h1>
             <p>{evento.descricao}</p>
+
             <p>
               <strong>Data:</strong>{" "}
               {new Date(evento.data_evento).toLocaleDateString("pt-BR", {
@@ -100,6 +103,7 @@ function Evento() {
                 month: "short",
               })}
             </p>
+
             <p>
               <strong>Horário:</strong>{" "}
               {new Date(evento.data_evento).toLocaleTimeString("pt-BR", {
@@ -108,7 +112,6 @@ function Evento() {
               })}
             </p>
 
-            {/* Endereço completo */}
             <p
               style={{
                 display: "flex",
@@ -133,6 +136,7 @@ function Evento() {
             </p>
 
             <h3 style={{ marginTop: "20px" }}>Ingressos disponíveis</h3>
+
             {ingressos.length === 0 ? (
               <p>Nenhum ingresso disponível.</p>
             ) : (
@@ -141,26 +145,50 @@ function Evento() {
                   const jaNoCarrinho = cartItems.some(
                     (item) => item.ingresso_id === ing.id
                   );
+
+                  const esgotado = ing.quantidade === 0;
+
+                  const limiteAtingido =
+                    ing.limite_por_cpf &&
+                    cartItems
+                      .filter((i) => i.ingresso_id === ing.id)
+                      .reduce((sum, item) => sum + item.quantidade, 0) >=
+                      ing.limite_por_cpf;
+
                   return (
                     <label
                       key={ing.id}
-                      className={`ingresso-radio ${
-                        jaNoCarrinho ? "disabled" : ""
-                      } ${selectedIngresso?.id === ing.id ? "selected" : ""}`}
+                      className={`ingresso-radio 
+                        ${jaNoCarrinho ? "disabled" : ""} 
+                        ${esgotado ? "esgotado" : ""} 
+                        ${limiteAtingido ? "esgotado" : ""} 
+                        ${selectedIngresso?.id === ing.id ? "selected" : ""}
+                      `}
                     >
                       <input
                         type="radio"
                         name="ingresso"
                         value={ing.id}
-                        disabled={jaNoCarrinho}
+                        disabled={jaNoCarrinho || esgotado || limiteAtingido}
                         onChange={() => setSelectedIngresso(ing)}
                         checked={selectedIngresso?.id === ing.id}
                       />
-                      <span>
+
+                      <span className="ingresso-texto">
                         {ing.tipo_ingresso} - R${" "}
                         {Number(ing.preco).toFixed(2).replace(".", ",")}
                         {jaNoCarrinho && " (Já no carrinho)"}
                       </span>
+
+                      {esgotado && (
+                        <span className="badge-esgotado">ESGOTADO</span>
+                      )}
+
+                      {limiteAtingido && (
+                        <span className="badge-esgotado">
+                          Limite por CPF atingido
+                        </span>
+                      )}
                     </label>
                   );
                 })}
@@ -179,10 +207,14 @@ function Evento() {
               onClick={handleAddToCart}
               disabled={
                 !selectedIngresso ||
-                (selectedIngresso &&
-                  cartItems.some(
-                    (item) => item.ingresso_id === selectedIngresso.id
-                  ))
+                cartItems.some(
+                  (item) => item.ingresso_id === selectedIngresso.id
+                ) ||
+                (selectedIngresso?.limite_por_cpf &&
+                  cartItems
+                    .filter((i) => i.ingresso_id === selectedIngresso.id)
+                    .reduce((sum, item) => sum + item.quantidade, 0) >=
+                    selectedIngresso.limite_por_cpf)
               }
             >
               {selectedIngresso &&

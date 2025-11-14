@@ -15,8 +15,15 @@ function EventoOrg() {
   const [mostrarForm, setMostrarForm] = useState(false);
 
   const categorias = [
-    "Teatro", "Musical", "Stand up", "Infantil", "Dança",
-    "Shows", "Circo", "Palestras", "Religioso",
+    "Teatro",
+    "Musical",
+    "Stand up",
+    "Infantil",
+    "Dança",
+    "Shows",
+    "Circo",
+    "Palestras",
+    "Religioso",
   ];
 
   const fetchDados = async () => {
@@ -93,10 +100,7 @@ function EventoOrg() {
     <div className="eventoOrg-page">
       <div className="eventoOrg-container">
         <header className="eventoOrg-header">
-          <button
-            className="eventoOrg-back-btn"
-            onClick={() => navigate(-1)}
-          >
+          <button className="eventoOrg-back-btn" onClick={() => navigate(-1)}>
             <ArrowLeft size={20} /> Voltar
           </button>
 
@@ -172,8 +176,7 @@ function EventoOrg() {
                   <strong>Data:</strong>{" "}
                   {new Date(evento.data_evento).toLocaleDateString("pt-BR", {
                     day: "2-digit",
-                    month: "short",
-                    year: "numeric",
+                    month: "short"
                   })}
                 </p>
                 <p>
@@ -184,10 +187,19 @@ function EventoOrg() {
                   })}
                 </p>
                 <p style={{ display: "flex", alignItems: "center" }}>
-                  <MapPin size={14} /> {evento.local || "-"}
+                  <MapPin size={14} />
+                  <span>
+                    {evento.endereco && <>{evento.endereco}</>}
+                    {evento.cidade && evento.estado && (
+                      <>
+                        {evento.endereco ? " - " : ""}
+                        {evento.cidade}, {evento.estado}
+                      </>
+                    )}
+                  </span>
                 </p>
                 <p>
-                  <strong>Categoria:</strong> {evento.categoria || "-"}
+                  <strong>Local:</strong> {evento.local || "-"}
                 </p>
               </>
             )}
@@ -209,10 +221,7 @@ function EventoOrg() {
                 ) : (
                   <div className="eventoOrg-ingresso-lista">
                     {ingressos.map((ing) => (
-                      <div
-                        key={ing.id}
-                        className="eventoOrg-ingresso-item"
-                      >
+                      <div key={ing.id} className="eventoOrg-ingresso-item">
                         <span>
                           {ing.tipo_ingresso} — R$
                           {Number(ing.preco).toFixed(2).replace(".", ",")} (

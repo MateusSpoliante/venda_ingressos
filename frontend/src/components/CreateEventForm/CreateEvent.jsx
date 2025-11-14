@@ -10,6 +10,7 @@ function CreateEvent({ onEventoCriado }) {
   const [local, setLocal] = useState("");
   const [categoria, setCategoria] = useState("Teatro");
   const [imagem, setImagem] = useState(null);
+  const [limitePorCpf, setLimitePorCpf] = useState("");
   const [loading, setLoading] = useState(false);
 
   const categorias = [
@@ -40,6 +41,8 @@ function CreateEvent({ onEventoCriado }) {
     formData.append("cidade", localData.cidade);
     formData.append("local", local);
     formData.append("categoria", categoria);
+    formData.append("limite_por_cpf", limitePorCpf);
+
     if (imagem) formData.append("imagem", imagem);
 
     const token = localStorage.getItem("token");
@@ -87,14 +90,6 @@ function CreateEvent({ onEventoCriado }) {
         required
       />
 
-    {/*   <label
-        htmlFor="data"
-        style={{
-          marginBottom: "-6px",
-        }}
-      >
-        Data e hora do evento
-      </label> */}
       <input
         id="data"
         type="datetime-local"
@@ -126,7 +121,17 @@ function CreateEvent({ onEventoCriado }) {
         ))}
       </select>
 
-      <input className="imgUpload"
+      <input
+        type="number"
+        placeholder="Limite por CPF (ex: 2)"
+        value={limitePorCpf}
+        onChange={(e) => setLimitePorCpf(e.target.value)}
+        required
+        min="1"
+      />
+
+      <input
+        className="imgUpload"
         type="file"
         accept="image/*"
         onChange={(e) => setImagem(e.target.files[0])}
