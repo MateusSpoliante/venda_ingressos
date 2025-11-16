@@ -29,8 +29,18 @@ function CreateEvent({ onEventoCriado }) {
     setLocalData({ estado, cidade });
   };
 
+  // ===================== DATA MÍNIMA =====================
+  const hojeStr = new Date().toISOString().slice(0, 16); // formato YYYY-MM-DDTHH:mm
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validação extra da data antes de enviar
+    if (new Date(data) < new Date()) {
+      alert("Não é possível criar um evento com data anterior a hoje");
+      return;
+    }
+
     setLoading(true);
 
     const formData = new FormData();
@@ -97,6 +107,7 @@ function CreateEvent({ onEventoCriado }) {
         onChange={(e) => setData(e.target.value)}
         required
         style={{ marginBottom: "12px" }}
+        min={hojeStr} // limita datas antigas
       />
 
       <LocalForm onChange={handleLocalChange} />

@@ -221,6 +221,7 @@ app.post(
   async (req, res) => {
     const { titulo, descricao, data_evento, categoria, estado, cidade, local } =
       req.body;
+
     if (
       !titulo ||
       !descricao ||
@@ -233,6 +234,17 @@ app.post(
       return res
         .status(400)
         .json({ erro: "Preencha todos os campos obrigatórios" });
+
+    // ================= VALIDAÇÃO DATA =================
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0); // ignora hora
+    const dataEventoObj = new Date(data_evento);
+
+    if (dataEventoObj < hoje) {
+      return res.status(400).json({
+        erro: "Não é possível criar um evento com data anterior a hoje",
+      });
+    }
 
     try {
       let imagemUrl = null;
@@ -266,24 +278,56 @@ app.put(
   "/api/organizador/eventos/:id",
   autenticarToken,
   verificarOrganizador,
+  upload.single("imagem"),
   async (req, res) => {
     const { id } = req.params;
     const { titulo, descricao, data_evento, categoria, local } = req.body;
+
     if (!titulo || !descricao || !data_evento || !categoria || !local)
       return res
         .status(400)
         .json({ erro: "Preencha todos os campos obrigatórios" });
 
     try {
+      let imagemUrl = null;
+      if (req.file) {
+        imagemUrl = await uploadImagem(req.file.buffer);
+      }
+
+      // Campos a atualizar
+      const campos = [
+        "titulo",
+        "descricao",
+        "data_evento",
+        "categoria",
+        "local",
+      ];
+      const valores = [titulo, descricao, data_evento, categoria, local];
+
+      if (imagemUrl) {
+        campos.push("imagem");
+        valores.push(imagemUrl);
+      }
+
+      // Adiciona id e organizador_id no final do array
+      valores.push(id, req.usuarioId);
+
+      // Monta SET dinâmico
+      const setQuery = campos.map((c, i) => `${c} = $${i + 1}`).join(", ");
+
+      // id = penúltimo valor, organizador_id = último valor
       const { rowCount } = await pool.query(
-        `UPDATE eventos SET titulo = $1, descricao = $2, data_evento = $3, categoria = $4, local = $5
-       WHERE id = $6 AND organizador_id = $7`,
-        [titulo, descricao, data_evento, categoria, local, id, req.usuarioId]
+        `UPDATE eventos SET ${setQuery} WHERE id = $${
+          valores.length - 1
+        } AND organizador_id = $${valores.length}`,
+        valores
       );
+
       if (rowCount === 0)
         return res
           .status(404)
           .json({ erro: "Evento não encontrado ou sem permissão" });
+
       res.json({ mensagem: "Evento atualizado com sucesso" });
     } catch (err) {
       console.error("Erro ao atualizar evento:", err);

@@ -13,6 +13,7 @@ function EventoOrg() {
   const [ingressos, setIngressos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mostrarForm, setMostrarForm] = useState(false);
+  const [imagem, setImagem] = useState(null); // estado para nova imagem
 
   const categorias = [
     "Teatro",
@@ -48,14 +49,12 @@ function EventoOrg() {
       if (!resIngressos.ok) throw new Error("Erro ao buscar ingressos");
       const dataIngressos = await resIngressos.json();
 
-      // Garante array de ingressos mesmo que o backend retorne { ingressos: [...] }
       const ingressosArray = Array.isArray(dataIngressos)
         ? dataIngressos
         : Array.isArray(dataIngressos.ingressos)
         ? dataIngressos.ingressos
         : [];
 
-      console.log("Ingressos recebidos:", ingressosArray); // debug
       setIngressos(ingressosArray);
     } catch (err) {
       console.error("Erro ao buscar dados:", err);
@@ -72,22 +71,33 @@ function EventoOrg() {
   const handleSalvarAlteracoes = async () => {
     try {
       const token = localStorage.getItem("token");
+      const formData = new FormData();
+
+      formData.append("titulo", form.titulo);
+      formData.append("descricao", form.descricao);
+      formData.append("data_evento", form.data_evento);
+      formData.append("categoria", form.categoria);
+      formData.append("local", form.local);
+      if (imagem) formData.append("imagem", imagem); // adiciona imagem se houver
+
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/api/organizador/eventos/${id}`,
         {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(form),
+          body: formData,
         }
       );
 
-      if (!res.ok) throw new Error("Erro ao atualizar evento");
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.erro || "Erro ao atualizar evento");
+
       alert("Evento atualizado com sucesso!");
       fetchDados();
       setEditando(false);
+      setImagem(null); // limpa estado da imagem
     } catch (err) {
       console.error(err);
       alert("Erro ao salvar alterações");
@@ -131,7 +141,7 @@ function EventoOrg() {
 
         <div className="eventoOrg-card">
           <img
-            src={evento.imagem || "/banner2.webp"}
+            src={imagem ? URL.createObjectURL(imagem) : evento.imagem || "/banner2.webp"}
             alt={evento.titulo}
             className="eventoOrg-img"
           />
@@ -165,7 +175,6 @@ function EventoOrg() {
                   onChange={handleChange}
                   placeholder="Local"
                 />
-
                 <select
                   name="categoria"
                   value={form.categoria || "Teatro"}
@@ -177,6 +186,13 @@ function EventoOrg() {
                     </option>
                   ))}
                 </select>
+
+                {/* input imagem */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImagem(e.target.files[0])}
+                />
 
                 <button
                   className="eventoOrg-btn-salvar"
@@ -244,7 +260,6 @@ function EventoOrg() {
                           {Number(ing.preco).toFixed(2).replace(".", ",")} (
                           {ing.quantidade} disponíveis)
                         </span>
-
                         <span className="eventoOrg-ingresso-limite">
                           {ing.limite_por_cpf
                             ? `Limite por CPF: ${ing.limite_por_cpf}`
