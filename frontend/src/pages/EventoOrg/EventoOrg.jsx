@@ -29,9 +29,15 @@ function EventoOrg() {
   const fetchDados = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem("token");
+
       const [resEvento, resIngressos] = await Promise.all([
-        fetch(`${import.meta.env.VITE_API_URL}/api/eventos/${id}`),
-        fetch(`${import.meta.env.VITE_API_URL}/api/ingressos/${id}`),
+        fetch(`${import.meta.env.VITE_API_URL}/api/eventos/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        fetch(`${import.meta.env.VITE_API_URL}/api/ingressos/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
       ]);
 
       if (!resEvento.ok) throw new Error("Erro ao buscar evento");
@@ -39,10 +45,21 @@ function EventoOrg() {
       setEvento(dataEvento);
       setForm(dataEvento);
 
+      if (!resIngressos.ok) throw new Error("Erro ao buscar ingressos");
       const dataIngressos = await resIngressos.json();
-      setIngressos(Array.isArray(dataIngressos) ? dataIngressos : []);
+
+      // Garante array de ingressos mesmo que o backend retorne { ingressos: [...] }
+      const ingressosArray = Array.isArray(dataIngressos)
+        ? dataIngressos
+        : Array.isArray(dataIngressos.ingressos)
+        ? dataIngressos.ingressos
+        : [];
+
+      console.log("Ingressos recebidos:", ingressosArray); // debug
+      setIngressos(ingressosArray);
     } catch (err) {
       console.error("Erro ao buscar dados:", err);
+      setIngressos([]);
     } finally {
       setLoading(false);
     }
@@ -176,7 +193,7 @@ function EventoOrg() {
                   <strong>Data:</strong>{" "}
                   {new Date(evento.data_evento).toLocaleDateString("pt-BR", {
                     day: "2-digit",
-                    month: "short"
+                    month: "short",
                   })}
                 </p>
                 <p>
@@ -186,7 +203,7 @@ function EventoOrg() {
                     minute: "2-digit",
                   })}
                 </p>
-                <p style={{ display: "flex", alignItems: "center"}}>
+                <p style={{ display: "flex", alignItems: "center" }}>
                   <MapPin size={14} />
                   <span>
                     {evento.endereco && <>{evento.endereco}</>}
@@ -226,6 +243,12 @@ function EventoOrg() {
                           {ing.tipo_ingresso} — R$
                           {Number(ing.preco).toFixed(2).replace(".", ",")} (
                           {ing.quantidade} disponíveis)
+                        </span>
+
+                        <span className="eventoOrg-ingresso-limite">
+                          {ing.limite_por_cpf
+                            ? `Limite por CPF: ${ing.limite_por_cpf}`
+                            : "Sem limite"}
                         </span>
                       </div>
                     ))}

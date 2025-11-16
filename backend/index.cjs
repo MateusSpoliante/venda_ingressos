@@ -334,13 +334,30 @@ app.delete(
 );
 
 // ==================== INGRESSOS ====================
-app.get("/api/ingressos/:eventoId", async (req, res) => {
+app.get("/api/ingressos/:eventoId", autenticarToken, async (req, res) => {
   const { eventoId } = req.params;
+  const usuarioId = req.usuarioId;
+
   try {
     const { rows } = await pool.query(
-      "SELECT id, evento_id, tipo_ingresso, preco, quantidade FROM ingressos WHERE evento_id = $1",
-      [eventoId]
+      `SELECT 
+         i.id,
+         i.evento_id,
+         i.tipo_ingresso,
+         i.preco,
+         i.quantidade,
+         i.limite_por_cpf,
+         COALESCE(SUM(pi.quantidade), 0) AS quantidade_comprada_pelo_cpf
+       FROM ingressos i
+       LEFT JOIN pedido_itens pi
+         ON i.id = pi.ingresso_id
+       LEFT JOIN pedidos p
+         ON pi.pedido_id = p.id AND p.usuario_id = $2
+       WHERE i.evento_id = $1
+       GROUP BY i.id`,
+      [eventoId, usuarioId]
     );
+
     res.json(rows);
   } catch (err) {
     console.error("Erro ao buscar ingressos:", err);
@@ -353,7 +370,9 @@ app.post(
   autenticarToken,
   verificarOrganizador,
   async (req, res) => {
-    const { evento_id, tipo_ingresso, preco, quantidade } = req.body;
+    const { evento_id, tipo_ingresso, preco, quantidade, limite_por_cpf } =
+      req.body;
+
     if (!evento_id || !tipo_ingresso || !preco || !quantidade)
       return res
         .status(400)
@@ -361,9 +380,11 @@ app.post(
 
     try {
       await pool.query(
-        `INSERT INTO ingressos (evento_id, tipo_ingresso, preco, quantidade) VALUES ($1, $2, $3, $4)`,
-        [evento_id, tipo_ingresso, preco, quantidade]
+        `INSERT INTO ingressos (evento_id, tipo_ingresso, preco, quantidade, limite_por_cpf) 
+         VALUES ($1, $2, $3, $4, $5)`,
+        [evento_id, tipo_ingresso, preco, quantidade, limite_por_cpf || 0]
       );
+
       res.json({ mensagem: "Ingresso criado com sucesso" });
     } catch (err) {
       console.error("Erro ao criar ingresso:", err);
@@ -403,6 +424,7 @@ app.post("/buscar-locais", async (req, res) => {
 });
 
 // ==================== PEDIDOS ====================
+// ==================== PEDIDOS ====================
 app.post("/api/pedidos", autenticarToken, async (req, res) => {
   const { itens } = req.body;
   if (!Array.isArray(itens) || itens.length === 0)
@@ -412,39 +434,65 @@ app.post("/api/pedidos", autenticarToken, async (req, res) => {
   try {
     await client.query("BEGIN");
 
-    const valor_total = itens.reduce(
-      (total, item) => total + item.quantidade * item.preco_unitario,
-      0
-    );
+    // Verifica limite por ingresso e calcula valor total
+    let valor_total = 0;
 
+    for (const item of itens) {
+      // Busca ingresso e limite
+      const ingressoRes = await client.query(
+        "SELECT quantidade, limite_por_cpf FROM ingressos WHERE id = $1",
+        [item.ingresso_id]
+      );
+      if (ingressoRes.rows.length === 0)
+        throw new Error(`Ingresso ID ${item.ingresso_id} não encontrado`);
+
+      const ingresso = ingressoRes.rows[0];
+
+      // Quantidade disponível
+      if (ingresso.quantidade < item.quantidade)
+        throw new Error(`Ingressos insuficientes para ID ${item.ingresso_id}`);
+
+      // Verifica total comprado + atual
+      const { rows: totalComprado } = await client.query(
+        `SELECT COALESCE(SUM(pi.quantidade),0) AS total
+         FROM pedido_itens pi
+         JOIN pedidos p ON pi.pedido_id = p.id
+         WHERE pi.ingresso_id = $1 AND p.usuario_id = $2`,
+        [item.ingresso_id, req.usuarioId]
+      );
+      const jaComprado = parseInt(totalComprado[0].total, 10);
+
+      if (
+        ingresso.limite_por_cpf &&
+        jaComprado + item.quantidade > ingresso.limite_por_cpf
+      ) {
+        throw new Error(
+          `Você atingiu o limite de ${ingresso.limite_por_cpf} para este ingresso (já comprou ${jaComprado})`
+        );
+      }
+
+      valor_total += item.quantidade * item.preco_unitario;
+    }
+
+    // Cria pedido
     const pedidoRes = await client.query(
       `INSERT INTO pedidos (usuario_id, data_pedido, status_pagamento, valor_total)
-       VALUES ($1, NOW(), 'pendente', $2)
-       RETURNING id`,
+       VALUES ($1, NOW(), 'pendente', $2) RETURNING id`,
       [req.usuarioId, valor_total]
     );
     const pedidoId = pedidoRes.rows[0].id;
 
+    // Insere itens e atualiza estoque
     for (const item of itens) {
-      // ===== VERIFICA SE O INGRESSO TEM QUANTIDADE > 0 =====
-      const ingressoCheck = await client.query(
-        `SELECT quantidade FROM ingressos WHERE id = $1`,
-        [item.ingresso_id]
-      );
-
-      if (ingressoCheck.rows.length === 0) {
-        throw new Error(`Ingresso ID ${item.ingresso_id} não encontrado`);
-      }
-
-      if (ingressoCheck.rows[0].quantidade <= 0) {
-        throw new Error(`Ingresso ID ${item.ingresso_id} está esgotado`);
-      }
-
-      // ===== INSERE ITEM =====
       await client.query(
         `INSERT INTO pedido_itens (pedido_id, ingresso_id, quantidade, preco_unitario)
          VALUES ($1, $2, $3, $4)`,
         [pedidoId, item.ingresso_id, item.quantidade, item.preco_unitario]
+      );
+
+      await client.query(
+        `UPDATE ingressos SET quantidade = quantidade - $1 WHERE id = $2`,
+        [item.quantidade, item.ingresso_id]
       );
     }
 
@@ -452,7 +500,6 @@ app.post("/api/pedidos", autenticarToken, async (req, res) => {
     res.json({ mensagem: "Pedido criado com sucesso", pedido_id: pedidoId });
   } catch (err) {
     await client.query("ROLLBACK");
-    console.error("Erro ao criar pedido:", err);
     res.status(400).json({ erro: err.message || "Erro ao criar pedido" });
   } finally {
     client.release();

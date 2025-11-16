@@ -12,9 +12,24 @@ export function CartProvider({ children }) {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Adiciona item ao carrinho
+  // Adiciona item ao carrinho com validação de limite e estoque
   function addToCart(item) {
     const itemExiste = cartItems.find(i => i.ingresso_id === item.ingresso_id);
+
+    const quantidadeNoCarrinho = itemExiste ? itemExiste.quantidade : 0;
+    const totalDesejado = quantidadeNoCarrinho + 1;
+
+    // Valida limite por CPF
+    if (item.limite_por_cpf && totalDesejado > item.limite_por_cpf) {
+      alert(`Você atingiu o limite de ${item.limite_por_cpf} para este ingresso.`);
+      return;
+    }
+
+    // Valida estoque disponível
+    if (item.quantidade_disponivel !== undefined && totalDesejado > item.quantidade_disponivel) {
+      alert("Não há ingressos suficientes disponíveis.");
+      return;
+    }
 
     if (itemExiste) {
       setCartItems(cartItems.map(i =>
@@ -49,7 +64,10 @@ export function CartProvider({ children }) {
     setCartItems([]);
   }
 
-  const total = cartItems.reduce((acc, i) => acc + Number(i.preco) * i.quantidade, 0);
+  const total = cartItems.reduce(
+    (acc, i) => acc + Number(i.preco) * i.quantidade,
+    0
+  );
 
   return (
     <CartContext.Provider

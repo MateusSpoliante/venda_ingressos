@@ -8,6 +8,7 @@ export default function CreateIngresso() {
     tipo_ingresso: "",
     preco: "",
     quantidade: "",
+    limite_por_cpf: "" // ADICIONADO
   });
   const [loading, setLoading] = useState(false);
 
@@ -40,7 +41,7 @@ export default function CreateIngresso() {
       if (!res.ok) throw new Error("Erro ao criar ingresso");
 
       alert("Ingresso criado com sucesso!");
-      window.location.reload(); // recarrega a mesma página
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert("Erro ao criar ingresso");
@@ -82,6 +83,17 @@ export default function CreateIngresso() {
             placeholder="Quantidade disponível"
             required
             min="1"
+          />
+
+          {/* NOVO CAMPO */}
+          <input
+            type="number"
+            name="limite_por_cpf"
+            value={form.limite_por_cpf}
+            onChange={handleChange}
+            placeholder="Limite por CPF (ex: 2, 4...)"
+            min="0"
+            required
           />
 
           <button type="submit" disabled={loading}>
