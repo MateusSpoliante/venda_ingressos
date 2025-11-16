@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Pedidos.css";
+import { ArrowLeft } from "lucide-react";
 
 export default function Pedidos() {
   const [pedidos, setPedidos] = useState([]);
@@ -52,7 +53,15 @@ export default function Pedidos() {
 
   return (
     <div className="pedidos-container">
-      <h1 className="pedidos-title">Meus Ingressos</h1>
+      <div className="venda-header">
+        <ArrowLeft
+          size={28}
+          className="venda-back-icon"
+          onClick={handleGoHome}
+          style={{ marginBottom: "-10px" }}
+        />
+        <h1 className="venda-title">Meus ingressos</h1>
+      </div>
 
       {pedidos.length === 0 ? (
         <div className="pedidos-vazio">
@@ -69,7 +78,7 @@ export default function Pedidos() {
                     <div key={idx} className="pedido-item">
                       <div className="pedido-evento-info">
                         <img
-                          src={item.evento_imagem || "/placeholder.jpg"}
+                          src={item.evento_imagem || "/banner2.webp"}
                           alt={item.evento_titulo || "Evento"}
                           className="pedido-evento-img"
                         />
@@ -90,8 +99,7 @@ export default function Pedidos() {
                           </p>
                           {item.preco_total && (
                             <p className="pedido-total">
-                              Total: R${" "}
-                              {(item.preco_total || 0).toFixed(2)}
+                              Total: R$ {(item.preco_total || 0).toFixed(2)}
                             </p>
                           )}
                         </div>
@@ -104,12 +112,6 @@ export default function Pedidos() {
           </div>
         ))
       )}
-
-      <div className="pedidos-voltar">
-        <button onClick={handleGoHome} className="voltar-home">
-          Voltar para a Home
-        </button>
-      </div>
     </div>
   );
 }

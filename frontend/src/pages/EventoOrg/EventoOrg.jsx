@@ -186,7 +186,7 @@ function EventoOrg() {
                     minute: "2-digit",
                   })}
                 </p>
-                <p style={{ display: "flex", alignItems: "center" }}>
+                <p style={{ display: "flex", alignItems: "center"}}>
                   <MapPin size={14} />
                   <span>
                     {evento.endereco && <>{evento.endereco}</>}

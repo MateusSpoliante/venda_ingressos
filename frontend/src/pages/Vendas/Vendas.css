@@ -1,139 +1,282 @@
+/* ===================== VARIÁVEIS ===================== */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #f8f9fa;
+    --card-background: #ffffff;
+    --border-color: #e9ecef;
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.12);
+    --success-color: #28a745;
+}
+
+/* ===================== CONTAINER ===================== */
 .venda-container {
-    max-width: 900px;
-    margin: 60px auto;
-    padding: 20px;
-    font-family: "Poppins", sans-serif;
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 30px 20px;
+    background-color: var(--background-color);
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+/* ===================== HEADER ===================== */
+.venda-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+    position: relative;
+    padding-bottom: 18px;
+}
+
+.venda-header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--primary-color);
+    bottom: -5px;
+    border-radius: 4px;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.15);
+}
+
+.venda-back-icon {
+    position: absolute;
+    left: 0;
+    cursor: pointer;
+    transition: 0.2s ease;
+    color: #343a40;
+}
+
+.venda-back-icon:hover {
+    opacity: 0.7;
+    transform: scale(1.1);
 }
 
 .venda-title {
+    font-size: 2.4em;
+    color: #343a40;
+    margin: 0;
+    font-weight: 700;
     text-align: center;
-    font-size: 2rem;
-    margin-bottom: 40px;
+    z-index: 2;
 }
 
-/* ====== AGRUPAMENTO POR EVENTO ====== */
-.venda-grupo {
-    margin-bottom: 40px;
-}
-
-.venda-evento-titulo {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #333;
+/* ===================== EMPTY & LOADING ===================== */
+.venda-loading,
+.venda-vazio {
+    text-align: center;
+    padding: 50px;
+    font-size: 1.2em;
+    color: var(--secondary-color);
+    background-color: var(--card-background);
+    border-radius: 8px;
     margin-bottom: 20px;
-    border-left: 5px solid #007bff;
-    padding-left: 10px;
+    border: 1px dashed var(--border-color);
 }
 
+/* ===================== LISTA (CARDS) ===================== */
 .venda-lista {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    /* espaçamento entre os cards de evento */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 28px;
+    margin-bottom: 30px;
 }
 
+/* ===================== CARD ===================== */
 .venda-card {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    padding: 24px;
-    /* leve aumento pra dar mais “respiro” */
-}
-
-.venda-item {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    box-shadow: var(--shadow-light);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    /* espaçamento maior entre itens dentro do card */
-    border-bottom: 1px solid #eee;
-    margin-bottom: 12px;
-    padding-bottom: 12px;
+    min-height: 420px;
 }
 
-.venda-item:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
+.venda-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
 }
 
-.venda-evento-info {
-    display: flex;
-    gap: 20px;
-    /* espaço entre imagem e detalhes */
-    align-items: flex-start;
-}
-
+/* ===================== IMAGEM ===================== */
 .venda-evento-img {
-    width: 120px;
-    height: 80px;
+    width: 100%;
+    height: 260px;
     object-fit: cover;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* ===================== DETALHES DO EVENTO ===================== */
+.venda-evento-detalhes {
+    padding: 24px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.venda-evento-detalhes h3 {
+    font-size: 1.6em;
+    color: #495057;
+    margin-bottom: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===================== LISTA DE ITENS ===================== */
+.venda-itens {
+    margin-bottom: 18px;
+    padding: 16px 18px;
+    background: linear-gradient(to right, #f2f6fa, #ffffff);
+    border-radius: 10px;
+    box-shadow: var(--shadow-light);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    /* LIMITE DE 4 INGRESSOS VISÍVEIS */
+    max-height: 260px;
+    /* Altura ideal p/ ~4 itens */
+    overflow-y: auto;
+}
+
+/* Rolagem mais bonita (opcional) */
+.venda-itens::-webkit-scrollbar {
+    width: 6px;
+}
+
+.venda-itens::-webkit-scrollbar-thumb {
+    background: #cfd4da;
     border-radius: 10px;
 }
 
-.venda-detalhes {
-    flex: 1;
-}
 
-.venda-detalhes h3 {
-    font-size: 1.2rem;
-    margin-bottom: 6px;
-}
-
-.venda-detalhes p {
-    margin: 4px 0;
-    color: #555;
-    font-size: 0.95rem;
-}
-
-.venda-total {
-    margin-top: 10px;
-    font-weight: 600;
-    color: #222;
-    font-size: 1rem;
-}
-
-/* ====== RESUMO GERAL ====== */
-.venda-resumo {
-    margin-top: 30px;
-    text-align: right;
-}
-
-.venda-resumo-total {
-    font-size: 1.1rem;
-    font-weight: 700;
-}
-
-/* ====== ESTADOS ====== */
-.venda-vazio {
-    text-align: center;
-    font-size: 1.1rem;
-    margin-top: 50px;
-    color: #666;
-}
-
-.venda-loading {
-    text-align: center;
-    margin-top: 40px;
-    font-size: 1.05rem;
-    color: #555;
-}
-
-/* ====== BOTÃO VOLTAR ====== */
-.venda-voltar {
-    text-align: center;
-    margin-top: 50px;
-}
-
-.venda-voltar-btn {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 18px;
+.venda-item {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    cursor: pointer;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.25s ease;
+}
+
+.venda-item p {
+    margin: 0;
+    font-size: 0.95em;
+    color: #444;
     font-weight: 500;
 }
 
-.venda-voltar-btn:hover {
-    background-color: #0056b3;
+.venda-item strong {
+    color: #222;
+    font-weight: 600;
+}
+
+.venda-item .venda-item-info {
+    display: flex;
+    gap: 25px;
+    font-size: 0.9em;
+    color: #555;
+}
+
+/* ===================== TOTAL DO EVENTO ===================== */
+.venda-total {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border-color);
+}
+
+/* ===================== RESUMO GERAL ===================== */
+.venda-resumo {
+    text-align: right;
+    padding: 15px;
+    background-color: var(--success-color);
+    color: white;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.venda-resumo-total {
+    font-size: 1.6em;
+    margin: 0;
+    font-weight: 700;
+}
+
+/* ===================== RESPONSIVIDADE ===================== */
+
+/* Tablets */
+@media (max-width: 900px) {
+    .venda-lista {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .venda-card {
+        min-height: 380px;
+    }
+
+    .venda-evento-img {
+        height: 220px;
+    }
+
+    .venda-title {
+        font-size: 2.05em;
+    }
+}
+
+/* Celulares grandes */
+@media (max-width: 600px) {
+    .venda-lista {
+        grid-template-columns: 1fr;
+    }
+
+    .venda-evento-img {
+        height: 160px;
+    }
+
+    .venda-title {
+        font-size: 1.8em;
+    }
+
+    .venda-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .venda-item .venda-item-info {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .venda-resumo {
+        text-align: center;
+    }
+}
+
+/* Celulares pequenos */
+@media (max-width: 420px) {
+    .venda-title {
+        font-size: 1.6em;
+    }
+
+    .venda-evento-img {
+        height: 140px;
+    }
+
+    .venda-card {
+        border-radius: 10px;
+    }
+
+    .venda-item {
+        font-size: 0.9em;
+    }
 }

@@ -81,6 +81,10 @@
     color: #444;
   }
 
+  .eventoOrg-detalhes-2 span {
+    margin-top: 1.5px;
+  }
+
   .evento-detalhes-2 strong {
     font-weight: 600;
   }
