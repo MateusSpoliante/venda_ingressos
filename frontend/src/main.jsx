@@ -14,6 +14,7 @@ import Pagamento from "./pages/Pagamento/Pagamento.jsx";
 import EventoOrg from "./pages/EventoOrg/EventoOrg.jsx";
 import Pedidos from "./pages/Pedidos/Pedidos.jsx";
 import VendasOrganizador from "./pages/Vendas/Vendas.jsx";
+import Transferencia from "./pages/Transferencia/Transferencia.jsx";
 
 const router = createBrowserRouter([
   {
@@ -85,6 +86,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute tipo="organizador">
             <VendasOrganizador />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "minhas-transferencias",
+        element: (
+          <PrivateRoute tipo="cliente">
+            <Transferencia />
           </PrivateRoute>
         ),
       },

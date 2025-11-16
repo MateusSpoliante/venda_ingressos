@@ -16,26 +16,26 @@ function Evento() {
   useEffect(() => {
     const fetchDados = async () => {
       try {
-        const token = localStorage.getItem("token"); // token do login
+        const token = localStorage.getItem("token");
 
         // busca evento
         const resEvento = await fetch(`${import.meta.env.VITE_API_URL}/api/eventos/${id}`);
         const dataEvento = await resEvento.json();
         setEvento(dataEvento);
 
-        // busca ingressos autenticado
+        // busca ingressos
         const resIngressos = await fetch(`${import.meta.env.VITE_API_URL}/api/ingressos/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const dataIngressos = await resIngressos.json();
 
         const ingressosFormatados = Array.isArray(dataIngressos) ? dataIngressos : [];
-
-        // seleciona ingresso comprado automaticamente se existir
-        const comprado = ingressosFormatados.find((i) => i.ja_comprado);
-        if (comprado) setSelectedIngresso(comprado);
-
         setIngressos(ingressosFormatados);
+
+        // seleciona automaticamente o primeiro ingresso disponível
+        const primeiroDisponivel = ingressosFormatados.find(ing => ing.quantidade > 0);
+        if (primeiroDisponivel) setSelectedIngresso(primeiroDisponivel);
+
       } catch (err) {
         console.error("Erro ao buscar dados:", err);
       } finally {
@@ -52,26 +52,14 @@ function Evento() {
   const handleAddToCart = () => {
     if (!selectedIngresso) return;
 
-    const quantidadeNoCarrinho = cartItems
-      .filter((item) => item.ingresso_id === selectedIngresso.id)
-      .reduce((sum, item) => sum + item.quantidade, 0);
-
-    if (selectedIngresso.limite_por_cpf && quantidadeNoCarrinho >= selectedIngresso.limite_por_cpf) {
-      alert("Você atingiu o limite por CPF para este ingresso");
-      return;
-    }
-
-    const jaExiste = cartItems.some((item) => item.ingresso_id === selectedIngresso.id);
-    if (!jaExiste) {
-      addToCart({
-        ingresso_id: selectedIngresso.id,
-        evento_id: evento.id,
-        titulo: evento.titulo,
-        tipo_ingresso: selectedIngresso.tipo_ingresso,
-        preco: Number(selectedIngresso.preco),
-        quantidade: 1,
-      });
-    }
+    addToCart({
+      ingresso_id: selectedIngresso.id,
+      evento_id: evento.id,
+      titulo: evento.titulo,
+      tipo_ingresso: selectedIngresso.tipo_ingresso,
+      preco: Number(selectedIngresso.preco),
+      quantidade: 1,
+    });
   };
 
   return (
@@ -114,17 +102,23 @@ function Evento() {
               <p>Nenhum ingresso disponível.</p>
             ) : (
               <div className="ingressos-radio-group">
-                {ingressos.map((ing) => {
-                  const jaNoCarrinho = cartItems.some((item) => item.ingresso_id === ing.id);
+                {ingressos.map(ing => {
+                  const jaNoCarrinho = cartItems.some(item => item.ingresso_id === ing.id);
                   const esgotado = ing.quantidade === 0;
-                  const limiteAtingido = ing.limite_por_cpf &&
-                    (ing.quantidade_comprada_pelo_cpf || 0) +
-                      cartItems.filter(i => i.ingresso_id === ing.id).reduce((sum, item) => sum + item.quantidade, 0) >=
-                    ing.limite_por_cpf;
-                  const jaComprado = ing.ja_comprado;
 
-                  const disabled = jaNoCarrinho || esgotado || limiteAtingido || jaComprado;
-                  const riscado = esgotado || limiteAtingido || jaComprado;
+                  // Quantidade comprada confirmada via API
+                  const quantidadeCompradaPeloUsuario = ing.quantidade_comprada_pelo_cpf || 0;
+
+                  // Limite atingido só com base em pedidos finalizados
+                  const limiteAtingido = ing.limite_por_cpf
+                    ? quantidadeCompradaPeloUsuario >= ing.limite_por_cpf
+                    : false;
+
+                  // O ingresso só fica riscado se o limite já foi atingido pela API ou se estiver esgotado
+                  const riscado = esgotado || limiteAtingido;
+
+                  // Desabilita apenas se estiver esgotado ou já no carrinho
+                  const disabled = jaNoCarrinho || esgotado;
 
                   return (
                     <label
@@ -137,17 +131,15 @@ function Evento() {
                         value={ing.id}
                         disabled={disabled}
                         onChange={() => setSelectedIngresso(ing)}
-                        checked={selectedIngresso?.id === ing.id || jaComprado}
+                        checked={selectedIngresso?.id === ing.id}
                       />
                       <span className="ingresso-texto">
                         {ing.tipo_ingresso} - R$ {Number(ing.preco).toFixed(2).replace(".", ",")}
                         {ing.limite_por_cpf ? ` | Limite por CPF: ${ing.limite_por_cpf}` : ""}
                         {jaNoCarrinho && " (Já no carrinho)"}
-                        {jaComprado && " (Comprado)"}
                       </span>
                       {esgotado && <span className="badge-esgotado">ESGOTADO</span>}
                       {limiteAtingido && <span className="badge-esgotado">Limite por CPF atingido</span>}
-                      {jaComprado && <span className="badge-esgotado">Comprado</span>}
                     </label>
                   );
                 })}
@@ -157,10 +149,7 @@ function Evento() {
             <button
               className={`btn-comprar-2 ${selectedIngresso && cartItems.some(item => item.ingresso_id === selectedIngresso.id) ? "added" : ""}`}
               onClick={handleAddToCart}
-              disabled={!selectedIngresso || cartItems.some(item => item.ingresso_id === selectedIngresso.id) ||
-                (selectedIngresso?.limite_por_cpf &&
-                  cartItems.filter(i => i.ingresso_id === selectedIngresso.id).reduce((sum, item) => sum + item.quantidade, 0) >= selectedIngresso.limite_por_cpf)
-              }
+              disabled={!selectedIngresso}
             >
               {selectedIngresso && cartItems.some(item => item.ingresso_id === selectedIngresso.id) ? (
                 <>

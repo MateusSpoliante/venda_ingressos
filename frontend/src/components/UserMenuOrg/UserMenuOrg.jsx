@@ -11,6 +11,7 @@ function UserMenu() {
 
   const handleLogout = () => {
     setLoggingOut(true);
+    setMenuAberto(false);
     setTimeout(() => {
       localStorage.removeItem("token");
       localStorage.removeItem("nome");
@@ -24,11 +25,12 @@ function UserMenu() {
         className="user-info"
         onClick={() => setMenuAberto((prev) => !prev)}
         style={{ cursor: "pointer", gap: "6px" }}
+        disabled={loggingOut}
       >
         Olá, {nome} <UserCircle2 size={36} />
       </button>
 
-      {menuAberto && (
+      {menuAberto && !loggingOut && (
         <div
           className="user-dropdown"
           style={{
@@ -61,24 +63,30 @@ function UserMenu() {
           <button
             onClick={handleLogout}
             className="logout"
-            disabled={loggingOut}
             style={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "center", // centraliza o loader
               gap: "6px",
               width: "100%",
-              justifyContent: "flex-start",
               padding: "8px 14px",
             }}
           >
             {loggingOut ? (
-              <Loader2 size={14} className="spin" />
+              <Loader2 size={20} className="spin" />
             ) : (
               <>
                 <LogOut size={14} /> Sair
               </>
             )}
           </button>
+        </div>
+      )}
+
+      {loggingOut && (
+        <div className="overlay-loading">
+          <Loader2 size={36} className="spin" />
+          <span>Saindo...</span>
         </div>
       )}
     </div>

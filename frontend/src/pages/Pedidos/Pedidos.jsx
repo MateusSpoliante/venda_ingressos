@@ -13,6 +13,13 @@ export default function Pedidos() {
     navigate("/home");
   }
 
+  function handleTransferir(item) {
+  // Aqui você pode abrir um modal, ou navegar para uma tela de transferência
+  // Exemplo de navegação:
+  navigate("/transferir-ingresso", { state: { ingresso: item } });
+}
+
+
   useEffect(() => {
     const fetchPedidos = async () => {
       try {
@@ -102,6 +109,14 @@ export default function Pedidos() {
                               Total: R$ {(item.preco_total || 0).toFixed(2)}
                             </p>
                           )}
+
+                          {/* Botão de Transferir Ingresso */}
+                          <button
+                            className="btn-transferir"
+                            onClick={() => handleTransferir(item)}
+                          >
+                            Transferir Ingresso
+                          </button>
                         </div>
                       </div>
                     </div>

@@ -15,7 +15,6 @@ export function CartProvider({ children }) {
   // Adiciona item ao carrinho com validação de limite e estoque
   function addToCart(item) {
     const itemExiste = cartItems.find(i => i.ingresso_id === item.ingresso_id);
-
     const quantidadeNoCarrinho = itemExiste ? itemExiste.quantidade : 0;
     const totalDesejado = quantidadeNoCarrinho + 1;
 
@@ -42,12 +41,12 @@ export function CartProvider({ children }) {
     }
   }
 
-  // Remove item do carrinho
+  // Remove item do carrinho completamente
   function removeFromCart(ingresso_id) {
     setCartItems(prev => prev.filter(i => i.ingresso_id !== ingresso_id));
   }
 
-  // Diminui quantidade ou remove se chegar a 0
+  // Diminui quantidade do item ou remove se chegar a 0
   function decreaseQuantity(ingresso_id) {
     setCartItems(prev =>
       prev
@@ -60,10 +59,12 @@ export function CartProvider({ children }) {
     );
   }
 
+  // Limpa todo o carrinho
   function clearCart() {
     setCartItems([]);
   }
 
+  // Total do carrinho
   const total = cartItems.reduce(
     (acc, i) => acc + Number(i.preco) * i.quantidade,
     0

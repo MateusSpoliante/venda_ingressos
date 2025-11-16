@@ -1,4 +1,4 @@
-import { LogOut, Loader2, UserCircle2, TicketCheck } from "lucide-react";
+import { LogOut, Loader2, UserCircle2, TicketCheck, Send } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UserMenu.css";
@@ -11,6 +11,7 @@ function UserMenu() {
 
   const handleLogout = () => {
     setLoggingOut(true);
+    setMenuAberto(false);
     setTimeout(() => {
       localStorage.removeItem("token");
       localStorage.removeItem("nome");
@@ -24,11 +25,12 @@ function UserMenu() {
         className="user-info"
         onClick={() => setMenuAberto((prev) => !prev)}
         style={{ cursor: "pointer", gap: "6px" }}
+        disabled={loggingOut}
       >
         Olá, {nome} <UserCircle2 size={36} />
       </button>
 
-      {menuAberto && (
+      {menuAberto && !loggingOut && (
         <div
           className="user-dropdown"
           style={{
@@ -59,9 +61,8 @@ function UserMenu() {
           </button>
 
           <button
-            onClick={handleLogout}
+            onClick={() => navigate("/minhas-transferencias")}
             className="logout"
-            disabled={loggingOut}
             style={{
               display: "flex",
               alignItems: "center",
@@ -71,14 +72,30 @@ function UserMenu() {
               padding: "8px 14px",
             }}
           >
-            {loggingOut ? (
-              <Loader2 size={14} className="spin" />
-            ) : (
-              <>
-                <LogOut size={14} /> Sair
-              </>
-            )}
+            <Send size={16} /> Minhas Transferências
           </button>
+
+          <button
+            onClick={handleLogout}
+            className="logout"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              width: "100%",
+              justifyContent: "flex-start",
+              padding: "8px 14px",
+            }}
+          >
+            <LogOut size={14} /> Sair
+          </button>
+        </div>
+      )}
+
+      {loggingOut && (
+        <div className="overlay-loading">
+          <Loader2 size={36} className="spin" />
+          <span>Saindo...</span>
         </div>
       )}
     </div>

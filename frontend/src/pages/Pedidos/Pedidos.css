@@ -160,6 +160,23 @@
   transform: translateY(-2px);
 }
 
+.btn-transferir {
+  margin-top: 10px;
+  padding: 6px 12px;
+  background-color: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-transferir:hover {
+  background-color: #4338ca;
+}
+
+
 /* ====================== */
 /* --- RESPONSIVIDADE --- */
 /* ====================== */
