@@ -9,6 +9,8 @@
  *     description: Controle de ingressos
  *   - name: Pedidos
  *     description: Criação e listagem de pedidos
+ *   - name: Transferência
+ *     description: Transferência de ingressos entre usuários
  */
 
 /**
@@ -215,16 +217,6 @@
 
 /**
  * @swagger
- * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- */
-
-/**
- * @swagger
  * /api/vendas/organizador:
  *   get:
  *     summary: Lista todas as vendas dos eventos do organizador logado
@@ -233,43 +225,124 @@
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Retorna uma lista de vendas com detalhes dos ingressos e eventos
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   evento_id:
- *                     type: integer
- *                     description: ID do evento
- *                   evento_titulo:
- *                     type: string
- *                     description: Título do evento
- *                   evento_imagem:
- *                     type: string
- *                     description: URL da imagem do evento
- *                   ingresso_id:
- *                     type: integer
- *                     description: ID do ingresso vendido
- *                   tipo_ingresso:
- *                     type: string
- *                     description: Tipo do ingresso
- *                   quantidade:
- *                     type: integer
- *                     description: Quantidade vendida
- *                   preco_unitario:
- *                     type: number
- *                     description: Preço unitário do ingresso
+ *         description: Retorna uma lista de vendas
  *       500:
  *         description: Erro ao buscar vendas do organizador
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 erro:
- *                   type: string
- *                   example: Erro ao buscar vendas do organizador
+ */
+
+/* ============================================================
+   ===============  ROTAS DE TRANSFERÊNCIA  ====================
+   ============================================================ */
+
+/**
+ * @swagger
+ * /api/ingressos/transferir:
+ *   post:
+ *     summary: Cria uma solicitação de transferência de ingresso
+ *     tags: [Transferência]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ingresso_id:
+ *                 type: integer
+ *               cpf_destinatario:
+ *                 type: string
+ *               valor:
+ *                 type: number
+ *                 nullable: true
+ *     responses:
+ *       200:
+ *         description: Solicitação criada com sucesso
+ *       400:
+ *         description: Erro ao criar solicitação
+ */
+
+/**
+ * @swagger
+ * /api/ingressos/transferencias/recebidas:
+ *   get:
+ *     summary: Lista transferências recebidas pelo usuário autenticado
+ *     tags: [Transferência]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de transferências recebidas
+ */
+
+/**
+ * @swagger
+ * /api/ingressos/transferencias/enviadas:
+ *   get:
+ *     summary: Lista transferências enviadas pelo usuário autenticado
+ *     tags: [Transferência]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de transferências enviadas
+ */
+
+/**
+ * @swagger
+ * /api/ingressos/transferencias/aceitar:
+ *   post:
+ *     summary: Aceita uma solicitação de transferência
+ *     tags: [Transferência]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               transferencia_id:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Transferência concluída
+ *       400:
+ *         description: Erro ao concluir transferência
+ */
+
+/**
+ * @swagger
+ * /api/ingressos/transferencias/recusar:
+ *   post:
+ *     summary: Recusa uma solicitação de transferência
+ *     tags: [Transferência]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               transferencia_id:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Transferência recusada
+ *       400:
+ *         description: Erro ao recusar transferência
+ */
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */

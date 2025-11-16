@@ -393,6 +393,108 @@ app.post(
   }
 );
 
+// ==================== CRIAR SOLICITAÇÃO DE TRANSFERÊNCIA ====================
+app.post("/api/ingressos/transferir", autenticarToken, async (req, res) => {
+  const { ingresso_id, cpf_destinatario, valor } = req.body;
+  const cpf_remetente = req.usuarioCpf; // vindo do JWT
+
+  if (!ingresso_id || !cpf_destinatario)
+    return res.status(400).json({ erro: "Preencha todos os campos" });
+
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    // 1. Verifica se o ingresso pertence ao usuário logado
+    const ingressoCheck = await client.query(
+      `SELECT i.id, p.usuario_id, u.cpf_cnpj AS cpf_usuario
+       FROM ingressos i
+       JOIN pedido_itens pi ON i.id = pi.ingresso_id
+       JOIN pedidos p ON pi.pedido_id = p.id
+       JOIN usuarios u ON p.usuario_id = u.id
+       WHERE i.id = $1`,
+      [ingresso_id]
+    );
+
+    if (ingressoCheck.rows.length === 0)
+      throw new Error("Ingresso não encontrado");
+
+    const donoCpf = ingressoCheck.rows[0].cpf_usuario;
+
+    if (donoCpf !== cpf_remetente)
+      throw new Error("Você não pode transferir este ingresso");
+
+    // 2. Verifica se destinatário existe
+    const destinatarioCheck = await client.query(
+      `SELECT id, cpf_cnpj FROM usuarios WHERE cpf_cnpj = $1`,
+      [cpf_destinatario]
+    );
+
+    if (destinatarioCheck.rows.length === 0)
+      throw new Error("Destinatário não encontrado");
+
+    const para_usuario_id = destinatarioCheck.rows[0].id;
+
+    // 3. CRIA registro de transferência com status A (Andamento)
+    const insertTransfer = await client.query(
+      `INSERT INTO transferencia_ingresso 
+        (ingresso_id, de_usuario_id, para_usuario_id, valor, status, data_criacao)
+       VALUES 
+        ($1, (SELECT id FROM usuarios WHERE cpf_cnpj = $2), $3, $4, 'A', NOW())
+       RETURNING *`,
+      [ingresso_id, cpf_remetente, para_usuario_id, valor || null]
+    );
+
+    await client.query("COMMIT");
+
+    res.json({
+      mensagem: "Solicitação de transferência criada",
+      transferencia: insertTransfer.rows[0],
+    });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Erro na transferência:", err);
+    res.status(400).json({ erro: err.message });
+  } finally {
+    client.release();
+  }
+});
+
+// ==================== LISTAR TRANSFERÊNCIAS DO USUÁRIO ====================
+app.get("/api/ingressos/transferencias", autenticarToken, async (req, res) => {
+  const cpf_usuario = req.usuarioCpf;
+
+  try {
+    const { rows } = await pool.query(
+      `
+      SELECT 
+        t.id,
+        t.ingresso_id,
+        t.valor,
+        t.status,
+        t.data_criacao,
+        u1.nome AS nome_remetente,
+        u1.cpf_cnpj AS cpf_remetente,
+        u2.nome AS nome_destinatario,
+        u2.cpf_cnpj AS cpf_destinatario
+      FROM transferencia_ingresso t
+      JOIN usuarios u1 ON t.de_usuario_id = u1.id
+      JOIN usuarios u2 ON t.para_usuario_id = u2.id
+      WHERE u1.cpf_cnpj = $1  -- enviadas por mim
+         OR u2.cpf_cnpj = $1  -- recebidas por mim
+      ORDER BY t.data_criacao DESC
+      `,
+      [cpf_usuario]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Erro ao listar transferências:", err);
+    res.status(500).json({ erro: "Erro ao listar transferências" });
+  }
+});
+
 // ==================== BUSCA LOCAIS (OpenStreetMap) ====================
 // Nota: se seu Node for < 18, instale `node-fetch` e importe aqui.
 // Ex.: npm install node-fetch
@@ -423,7 +525,6 @@ app.post("/buscar-locais", async (req, res) => {
   }
 });
 
-// ==================== PEDIDOS ====================
 // ==================== PEDIDOS ====================
 app.post("/api/pedidos", autenticarToken, async (req, res) => {
   const { itens } = req.body;
