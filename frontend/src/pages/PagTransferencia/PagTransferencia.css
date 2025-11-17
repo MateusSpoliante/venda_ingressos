@@ -1,0 +1,267 @@
+.pagamento-container {
+  max-width: 700px;
+  margin: 60px auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  font-family: "Poppins", sans-serif;
+}
+
+.titulo {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #222;
+  margin-bottom: 25px;
+}
+
+.resumo {
+  text-align: center;
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 30px;
+}
+
+.resumo strong {
+  font-size: 1.4rem;
+  color: #008cff;
+}
+
+.opcoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 20px;
+  margin-bottom: 35px;
+}
+
+.opcao {
+  background: #f5f7fa;
+  border-radius: 14px;
+  padding: 25px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.opcao:hover {
+  transform: translateY(-3px);
+  background: #eef3f8;
+}
+
+.opcao.selecionado {
+  border-color: #008cff;
+  background: #e8f2ff;
+  box-shadow: 0 0 8px rgba(0, 140, 255, 0.3);
+}
+
+.opcao h3 {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  color: #222;
+}
+
+.opcao p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 6px;
+}
+
+.acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.continuar {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: #ccc;
+  color: white;
+  cursor: not-allowed;
+  transition: background 0.3s ease;
+}
+
+.continuar.ativo {
+  background: #008cff;
+  cursor: pointer;
+}
+
+.continuar.ativo:hover {
+  background: #0074d9;
+}
+
+.voltar {
+  background: none;
+  border: none;
+  color: #0074d9;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.voltar:hover {
+  text-decoration: underline;
+}
+
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+.popup h3 {
+  margin-bottom: 15px;
+}
+
+.popup p {
+  margin-top: 10px;
+  color: #555;
+}
+
+.popup .fechar {
+  margin-top: 15px;
+  background: #0057a3;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.popup .fechar:hover {
+  background: #00437f;
+}
+
+
+@media (max-width: 600px) {
+  .pagamento-container {
+    margin: 20px;
+    padding: 25px;
+  }
+
+  .opcoes {
+    grid-template-columns: 1fr;
+  }
+
+  .opcao {
+    padding: 20px;
+  }
+}
+
+
+/* === Animação e estilo melhorado do popup === */
+.popup {
+  background: #fff;
+  padding: 35px 25px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  animation: popupFadeIn 0.3s ease forwards;
+  max-width: 320px;
+  width: 90%;
+  position: relative;
+}
+
+@keyframes popupFadeIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.popup h3 {
+  font-size: 1.3rem;
+  color: #111;
+}
+
+.popup p {
+  font-size: 0.95rem;
+  color: #555;
+  margin-top: 10px;
+}
+
+.popup .fechar {
+  margin-top: 18px;
+  background: linear-gradient(90deg, #008cff, #0057a3);
+  color: #fff;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.popup .fechar:hover {
+  background: linear-gradient(90deg, #0074d9, #00437f);
+  transform: translateY(-2px);
+}
+
+/* === Estilo e animação da tela de sucesso === */
+.sucesso-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.icone-sucesso {
+  color: #2ecc71;
+  margin-bottom: 10px;
+  animation: popIn 0.4s ease forwards;
+}
+
+.sucesso-container h3 {
+  font-size: 1.4rem;
+  color: #222;
+}
+
+.sucesso-container p {
+  color: #555;
+  font-size: 1rem;
+  margin-top: 8px;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

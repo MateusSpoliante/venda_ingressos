@@ -3,10 +3,16 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Pedidos.css";
 import { ArrowLeft } from "lucide-react";
+import TransferirModal from "../../components/TransferirModal/TransferirModal.jsx";
 
 export default function Pedidos() {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Estado do modal
+  const [modalAberto, setModalAberto] = useState(false);
+  const [ingressoSelecionado, setIngressoSelecionado] = useState(null);
+
   const navigate = useNavigate();
 
   function handleGoHome() {
@@ -14,11 +20,24 @@ export default function Pedidos() {
   }
 
   function handleTransferir(item) {
-  // Aqui você pode abrir um modal, ou navegar para uma tela de transferência
-  // Exemplo de navegação:
-  navigate("/transferir-ingresso", { state: { ingresso: item } });
-}
+    setIngressoSelecionado(item);
+    setModalAberto(true);
+  }
 
+  function handleFecharModal() {
+    setModalAberto(false);
+    setIngressoSelecionado(null);
+  }
+
+  function handleTransferido(transferencia) {
+    if (transferencia) {
+      console.log("Transferência realizada:", transferencia);
+      alert("Transferência realizada com sucesso!");
+      handleFecharModal();
+    } else {
+      alert("Erro: transferência não retornou dados.");
+    }
+  }
 
   useEffect(() => {
     const fetchPedidos = async () => {
@@ -28,9 +47,6 @@ export default function Pedidos() {
           `${import.meta.env.VITE_API_URL}/api/pedidos/meus`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-
-        console.log("Pedidos recebidos:", data);
-
         setPedidos(
           data.map((p) => ({
             ...p,
@@ -44,7 +60,6 @@ export default function Pedidos() {
         setLoading(false);
       }
     };
-
     fetchPedidos();
   }, []);
 
@@ -79,10 +94,14 @@ export default function Pedidos() {
           <div key={data} className="pedidos-grupo">
             <h2 className="pedidos-data">{data}</h2>
             <div className="pedidos-lista">
-              {pedidosPorData[data].map((pedido) => (
-                <div key={pedido.pedido_id} className="pedido-card">
-                  {pedido.itens.map((item, idx) => (
-                    <div key={idx} className="pedido-item">
+              {pedidosPorData[data].map((pedido) =>
+                pedido.itens.map((item, idx) => {
+                  const precoFormatado = (item.preco_unitario || 0).toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  });
+                  return (
+                    <div key={idx} className="pedido-card">
                       <div className="pedido-evento-info">
                         <img
                           src={item.evento_imagem || "/banner2.webp"}
@@ -90,27 +109,17 @@ export default function Pedidos() {
                           className="pedido-evento-img"
                         />
                         <div className="pedido-evento-detalhes">
-                          <h3 className="evento-titulo">
-                            {item.evento_titulo || "Evento sem título"}
-                          </h3>
+                          <h3 className="evento-titulo">{item.evento_titulo}</h3>
                           <p className="tipo-ingresso">
-                            Tipo do Ingresso:{" "}
-                            {item.tipo_ingresso || "Não informado"}
+                            Tipo: {item.tipo_ingresso || "Não informado"}
                           </p>
                           <p className="pedido-quantidade">
                             Quantidade: {item.quantidade || 0}
                           </p>
                           <p className="pedido-preco">
-                            Preço unitário: R${" "}
-                            {item.preco_unitario?.toFixed(2) || "0,00"}
+                            Preço unitário: R$ {precoFormatado}
                           </p>
-                          {item.preco_total && (
-                            <p className="pedido-total">
-                              Total: R$ {(item.preco_total || 0).toFixed(2)}
-                            </p>
-                          )}
 
-                          {/* Botão de Transferir Ingresso */}
                           <button
                             className="btn-transferir"
                             onClick={() => handleTransferir(item)}
@@ -120,12 +129,23 @@ export default function Pedidos() {
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              ))}
+                  );
+                })
+              )}
             </div>
           </div>
         ))
+      )}
+
+      {modalAberto && ingressoSelecionado && (
+        <TransferirModal
+          ingresso={{
+            ...ingressoSelecionado,
+            preco: ingressoSelecionado.preco_unitario || 0,
+          }}
+          onClose={handleFecharModal}
+          onTransferido={handleTransferido}
+        />
       )}
     </div>
   );

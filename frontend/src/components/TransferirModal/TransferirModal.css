@@ -1,0 +1,135 @@
+/* --- Overlay e Container do Modal --- */
+
+.modal-overlay {
+  /* Fundo escuro que cobre toda a tela */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Cor de fundo escura com transparência */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Garante que o modal fique acima de outros elementos */
+}
+
+.modal-content {
+  /* O cartão branco do modal */
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 450px;
+  animation: slideIn 0.3s ease-out; /* Adiciona uma pequena animação de entrada */
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* --- Títulos e Informações do Ingresso --- */
+
+.modal-content h2 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.modal-content p {
+  color: #666;
+  font-size: 1em;
+  margin-bottom: 20px;
+}
+
+/* --- Formulário --- */
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content label {
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: #444;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box; /* Garante que o padding não aumente a largura total */
+  font-size: 1em;
+}
+
+.modal-content input[type="text"]:focus,
+.modal-content input[type="number"]:focus {
+  border-color: #007bff; /* Cor de destaque ao focar */
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* --- Botões --- */
+
+.modal-content button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: bold;
+  transition: background-color 0.2s, opacity 0.2s;
+  margin-top: 10px;
+}
+
+.modal-content button[type="submit"] {
+  background-color: #28a745; /* Cor verde para a ação principal (Transferir) */
+  color: white;
+}
+
+.modal-content button[type="submit"]:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.modal-content button[type="submit"]:disabled {
+  background-color: #90ee90; /* Cor mais clara quando desabilitado */
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.modal-content .btn-cancel {
+  background-color: #dc3545; /* Cor vermelha para Cancelar */
+  color: white;
+}
+
+.modal-content .btn-cancel:hover {
+  background-color: #c82333;
+}
+
+/* --- Mensagem de Erro --- */
+
+.erro {
+  color: #dc3545; /* Cor de erro vermelha */
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  font-weight: 500;
+  text-align: center;
+}

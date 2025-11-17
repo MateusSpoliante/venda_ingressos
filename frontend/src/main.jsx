@@ -15,6 +15,7 @@ import EventoOrg from "./pages/EventoOrg/EventoOrg.jsx";
 import Pedidos from "./pages/Pedidos/Pedidos.jsx";
 import VendasOrganizador from "./pages/Vendas/Vendas.jsx";
 import Transferencia from "./pages/Transferencia/Transferencia.jsx";
+import PagTransferencia from "./pages/PagTransferencia/PagTransferencia.jsx";
 
 const router = createBrowserRouter([
   {
@@ -92,8 +93,16 @@ const router = createBrowserRouter([
       {
         path: "minhas-transferencias",
         element: (
-          <PrivateRoute tipo="cliente">
+          <PrivateRoute>
             <Transferencia />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "pag-transferencia/:id",
+        element: (
+          <PrivateRoute>
+            <PagTransferencia />
           </PrivateRoute>
         ),
       },

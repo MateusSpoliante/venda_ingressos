@@ -1,66 +1,239 @@
-/* Transferencia.css */
+/* --- Variáveis de Paleta Atualizada --- */
+:root {
+  --primary-color: #054062;
+  --secondary-color: #f97721;
+  --background-color: #efefef;
+  --card-background: #ffffff;
+  --text-color: #222;
+  --subtle-text: #666;
+  --border-color: #e0e0e0;
 
+  --status-success: #1e8449;
+  --status-pending: #ffc107;
+  --status-danger: #c0392b;
+}
+
+/* --- Container Principal --- */
 .transferencia-container {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
-  font-family: "Poppins", sans-serif;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px 40px 20px;
+  font-family: 'Arial', sans-serif;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  min-height: 80vh;
 }
 
-.transferencia-container h2 {
-  font-size: 1.8rem;
+/* --- Cabeçalho (transferencia-header) --- */
+.transferencia-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  padding-top: 20px;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 15px;
+}
+
+.transferencia-header h2 {
+  font-size: 2em;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+/* --- Ícone de Voltar --- */
+.venda-back-icon2 {
+  cursor: pointer;
+  color: var(--primary-color);
+  transition: color 0.2s;
+}
+
+.venda-back-icon2:hover {
+  color: var(--secondary-color);
+}
+
+/* --- Abas (transferencia-tabs) --- */
+.transferencia-tabs {
+  display: flex;
   margin-bottom: 20px;
-  color: #1f1f1f;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
 }
 
+.transferencia-tabs button {
+  flex: 1;
+  padding: 12px;
+  cursor: pointer;
+  border: none;
+  background: var(--border-color);
+  color: var(--subtle-text);
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.transferencia-tabs button.ativa {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.transferencia-tabs button:hover:not(.ativa) {
+  background: #d4d4d4;
+  color: var(--text-color);
+}
+
+/* --- Tabela (transferencia-table) --- */
 .transferencia-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 15px;
+  background-color: var(--card-background);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
 .transferencia-table th,
 .transferencia-table td {
-  padding: 10px 12px;
+  padding: 12px 15px;
   text-align: left;
+  font-size: 0.95em;
+  vertical-align: middle;
 }
 
 .transferencia-table th {
-  border-bottom: 2px solid #ddd;
-  background-color: #f8f8f8;
+  background-color: var(--background-color);
+  border-bottom: 2px solid var(--border-color);
   font-weight: 600;
+  color: var(--subtle-text);
+  text-transform: uppercase;
 }
 
 .transferencia-table td {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 500;
 }
 
 .transferencia-table tr:hover {
-  background-color: #f1f1f1;
+  background-color: #fcfcfc;
 }
 
+/* --- Mensagem Vazia --- */
 .transferencia-empty {
   margin-top: 20px;
   font-size: 1rem;
-  color: #555;
+  color: var(--subtle-text);
+  text-align: center;
+  padding: 30px;
+  border: 1px dashed var(--border-color);
+  background-color: var(--card-background);
+  border-radius: 8px;
 }
 
+/* --- Status --- */
+.transferencia-table tr:not(:has(.acoes-transferencia)) td:last-child {
+  font-weight: 600;
+}
+
+/* --- Ações --- */
+.acoes-transferencia {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-aceitar,
+.btn-recusar {
+  padding: 8px 15px;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+
+.btn-aceitar {
+  background-color: var(--secondary-color);
+  color: #fff;
+}
+
+.btn-aceitar:hover {
+  background-color: #d8681d;
+  transform: translateY(-1px);
+}
+
+.btn-recusar {
+  background-color: var(--status-danger);
+  color: #fff;
+}
+
+.btn-recusar:hover {
+  background-color: #922b21;
+  transform: translateY(-1px);
+}
+
+/* --- Loader --- */
 .spin {
   display: block;
   margin: 50px auto;
   animation: spin 1s linear infinite;
+  color: var(--primary-color);
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
-/* Responsivo */
-@media (max-width: 600px) {
+/* --- Responsivo --- */
+@media (max-width: 768px) {
+  .transferencia-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .transferencia-tabs {
+    flex-direction: column;
+  }
+
+  .transferencia-tabs button {
+    margin-bottom: 5px;
+  }
+
   .transferencia-table th,
   .transferencia-table td {
-    padding: 8px 6px;
-    font-size: 0.9rem;
+    padding: 8px 10px;
+    font-size: 0.9em;
+  }
+
+  .venda-back-icon {
+    width: 38px;
+    height: 38px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .transferencia-header h2 {
+    font-size: 1.6em;
+  }
+
+  .transferencia-table th,
+  .transferencia-table td {
+    font-size: 0.8em;
+  }
+
+  .venda-back-icon {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
   }
 }

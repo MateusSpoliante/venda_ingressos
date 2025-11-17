@@ -14,6 +14,10 @@
  */
 
 /**
+ * ===================== USUÁRIOS =====================
+ */
+
+/**
  * @swagger
  * /api/cadastro:
  *   post:
@@ -65,6 +69,10 @@
  */
 
 /**
+ * ===================== EVENTOS =====================
+ */
+
+/**
  * @swagger
  * /api/eventos:
  *   get:
@@ -107,7 +115,7 @@
  *                 type: string
  *               descricao:
  *                 type: string
- *               data_evento:
+ *               dataEvento:
  *                 type: string
  *                 format: date-time
  *               categoria:
@@ -124,6 +132,10 @@
  *     responses:
  *       200:
  *         description: Evento criado com sucesso
+ */
+
+/**
+ * ===================== INGRESSOS =====================
  */
 
 /**
@@ -158,9 +170,9 @@
  *           schema:
  *             type: object
  *             properties:
- *               evento_id:
+ *               eventoId:
  *                 type: integer
- *               tipo_ingresso:
+ *               tipoIngresso:
  *                 type: string
  *               preco:
  *                 type: number
@@ -169,6 +181,10 @@
  *     responses:
  *       200:
  *         description: Ingresso criado com sucesso
+ */
+
+/**
+ * ===================== PEDIDOS =====================
  */
 
 /**
@@ -191,11 +207,11 @@
  *                 items:
  *                   type: object
  *                   properties:
- *                     ingresso_id:
+ *                     ingressoId:
  *                       type: integer
  *                     quantidade:
  *                       type: integer
- *                     preco_unitario:
+ *                     precoUnitario:
  *                       type: number
  *     responses:
  *       200:
@@ -230,9 +246,9 @@
  *         description: Erro ao buscar vendas do organizador
  */
 
-/* ============================================================
-   ===============  ROTAS DE TRANSFERÊNCIA  ====================
-   ============================================================ */
+/**
+ * ===================== TRANSFERÊNCIAS =====================
+ */
 
 /**
  * @swagger
@@ -249,9 +265,9 @@
  *           schema:
  *             type: object
  *             properties:
- *               ingresso_id:
+ *               ingressoId:
  *                 type: integer
- *               cpf_destinatario:
+ *               cpfDestinatario:
  *                 type: string
  *               valor:
  *                 type: number
@@ -267,7 +283,7 @@
  * @swagger
  * /api/ingressos/transferencias/recebidas:
  *   get:
- *     summary: Lista transferências recebidas pelo usuário autenticado
+ *     summary: Lista transferências recebidas pelo usuário
  *     tags: [Transferência]
  *     security:
  *       - bearerAuth: []
@@ -280,7 +296,7 @@
  * @swagger
  * /api/ingressos/transferencias/enviadas:
  *   get:
- *     summary: Lista transferências enviadas pelo usuário autenticado
+ *     summary: Lista transferências enviadas pelo usuário
  *     tags: [Transferência]
  *     security:
  *       - bearerAuth: []
@@ -304,7 +320,7 @@
  *           schema:
  *             type: object
  *             properties:
- *               transferencia_id:
+ *               transferenciaId:
  *                 type: integer
  *     responses:
  *       200:
@@ -328,13 +344,17 @@
  *           schema:
  *             type: object
  *             properties:
- *               transferencia_id:
+ *               transferenciaId:
  *                 type: integer
  *     responses:
  *       200:
  *         description: Transferência recusada
  *       400:
  *         description: Erro ao recusar transferência
+ */
+
+/**
+ * ===================== COMPONENTES =====================
  */
 
 /**

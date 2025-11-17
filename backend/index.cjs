@@ -440,7 +440,7 @@ app.post(
 // ==================== CRIAR SOLICITAÇÃO DE TRANSFERÊNCIA ====================
 app.post("/api/ingressos/transferir", autenticarToken, async (req, res) => {
   const { ingresso_id, cpf_destinatario, valor } = req.body;
-  const cpf_remetente = req.usuarioCpf; // vindo do JWT
+  const usuarioLogadoId = req.usuarioId; // ID do usuário logado
 
   if (!ingresso_id || !cpf_destinatario)
     return res.status(400).json({ erro: "Preencha todos os campos" });
@@ -450,68 +450,83 @@ app.post("/api/ingressos/transferir", autenticarToken, async (req, res) => {
   try {
     await client.query("BEGIN");
 
-    // 1. Verifica se o ingresso pertence ao usuário logado
+    // 1️⃣ Verifica se o ingresso foi comprado pelo usuário logado
     const ingressoCheck = await client.query(
-      `SELECT i.id, p.usuario_id, u.cpf_cnpj AS cpf_usuario
+      `SELECT i.id, i.preco, p.usuario_id AS dono_id
        FROM ingressos i
        JOIN pedido_itens pi ON i.id = pi.ingresso_id
        JOIN pedidos p ON pi.pedido_id = p.id
-       JOIN usuarios u ON p.usuario_id = u.id
-       WHERE i.id = $1`,
-      [ingresso_id]
+       WHERE i.id = $1 AND p.usuario_id = $2`,
+      [ingresso_id, usuarioLogadoId]
     );
 
-    if (ingressoCheck.rows.length === 0)
-      throw new Error("Ingresso não encontrado");
+    if (ingressoCheck.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res
+        .status(400)
+        .json({ erro: "Ingresso não encontrado ou não pertence a você" });
+    }
 
-    const donoCpf = ingressoCheck.rows[0].cpf_usuario;
+    const donoId = ingressoCheck.rows[0].dono_id;
+    const valorIngresso = parseFloat(ingressoCheck.rows[0].preco);
 
-    if (donoCpf !== cpf_remetente)
-      throw new Error("Você não pode transferir este ingresso");
-
-    // 2. Verifica se destinatário existe
+    // 2️⃣ Verifica se o destinatário existe
     const destinatarioCheck = await client.query(
       `SELECT id, cpf_cnpj FROM usuarios WHERE cpf_cnpj = $1`,
       [cpf_destinatario]
     );
 
-    if (destinatarioCheck.rows.length === 0)
-      throw new Error("Destinatário não encontrado");
+    if (destinatarioCheck.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({ erro: "Destinatário não encontrado" });
+    }
 
     const para_usuario_id = destinatarioCheck.rows[0].id;
 
-    // 3. CRIA registro de transferência com status A (Andamento)
+    // 3️⃣ Valida valor da transferência
+    if (valor && parseFloat(valor) > valorIngresso) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({
+        erro: `O valor não pode ser maior que o preço do ingresso (R$ ${valorIngresso.toFixed(
+          2
+        )})`,
+      });
+    }
+
+    // 4️⃣ Cria registro de transferência
     const insertTransfer = await client.query(
       `INSERT INTO transferencia_ingresso 
         (ingresso_id, de_usuario_id, para_usuario_id, valor, status, data_criacao)
-       VALUES 
-        ($1, (SELECT id FROM usuarios WHERE cpf_cnpj = $2), $3, $4, 'A', NOW())
+       VALUES ($1, $2, $3, $4, 'A', NOW())
        RETURNING *`,
-      [ingresso_id, cpf_remetente, para_usuario_id, valor || null]
+      [ingresso_id, usuarioLogadoId, para_usuario_id, valor || null]
     );
 
     await client.query("COMMIT");
 
     res.json({
-      mensagem: "Solicitação de transferência criada",
+      mensagem: "Solicitação de transferência criada com sucesso",
       transferencia: insertTransfer.rows[0],
     });
   } catch (err) {
     await client.query("ROLLBACK");
     console.error("Erro na transferência:", err);
-    res.status(400).json({ erro: err.message });
+    res.status(500).json({ erro: "Erro interno ao transferir ingresso" });
   } finally {
     client.release();
   }
 });
 
-// ==================== LISTAR TRANSFERÊNCIAS DO USUÁRIO ====================
-app.get("/api/ingressos/transferencias", autenticarToken, async (req, res) => {
-  const cpf_usuario = req.usuarioCpf;
+// ==================== LISTAR TRANSFERÊNCIAS RECEBIDAS ====================
+app.get(
+  "/api/ingressos/transferencias/recebidas",
+  autenticarToken,
+  async (req, res) => {
+    try {
+      const usuarioId = req.usuarioId;
 
-  try {
-    const { rows } = await pool.query(
-      `
+      const { rows: transferencias } = await pool.query(
+        `
       SELECT 
         t.id,
         t.ingresso_id,
@@ -525,23 +540,208 @@ app.get("/api/ingressos/transferencias", autenticarToken, async (req, res) => {
       FROM transferencia_ingresso t
       JOIN usuarios u1 ON t.de_usuario_id = u1.id
       JOIN usuarios u2 ON t.para_usuario_id = u2.id
-      WHERE u1.cpf_cnpj = $1  -- enviadas por mim
-         OR u2.cpf_cnpj = $1  -- recebidas por mim
+      WHERE t.para_usuario_id = $1
       ORDER BY t.data_criacao DESC
-      `,
-      [cpf_usuario]
-    );
+    `,
+        [usuarioId]
+      );
 
-    res.json(rows);
-  } catch (err) {
-    console.error("Erro ao listar transferências:", err);
-    res.status(500).json({ erro: "Erro ao listar transferências" });
+      if (transferencias.length === 0) {
+        return res.json({
+          mensagem: "Você não possui transferências recebidas.",
+          data: [],
+        });
+      }
+
+      res.json({ data: transferencias });
+    } catch (err) {
+      console.error("Erro ao listar transferências recebidas:", err);
+      res.status(500).json({ erro: "Erro ao listar transferências recebidas" });
+    }
   }
-});
+);
+
+// ==================== LISTAR TRANSFERÊNCIAS ENVIADAS ====================
+app.get(
+  "/api/ingressos/transferencias/enviadas",
+  autenticarToken,
+  async (req, res) => {
+    try {
+      const usuarioId = req.usuarioId;
+
+      const { rows } = await pool.query(
+        `
+      SELECT 
+        t.id,
+        t.ingresso_id,
+        t.valor,
+        t.status,
+        t.data_criacao,
+        u1.nome AS nome_remetente,
+        u1.cpf_cnpj AS cpf_remetente,
+        u2.nome AS nome_destinatario,
+        u2.cpf_cnpj AS cpf_destinatario
+      FROM transferencia_ingresso t
+      JOIN usuarios u1 ON t.de_usuario_id = u1.id
+      JOIN usuarios u2 ON t.para_usuario_id = u2.id
+      WHERE t.de_usuario_id = $1
+      ORDER BY t.data_criacao DESC
+    `,
+        [usuarioId]
+      );
+
+      if (rows.length === 0) {
+        return res.json({
+          mensagem: "Você não possui transferências enviadas.",
+          data: [],
+        });
+      }
+
+      res.json({ data: rows });
+    } catch (err) {
+      console.error("Erro ao listar transferências enviadas:", err);
+      res.status(500).json({ erro: "Erro ao listar transferências enviadas" });
+    }
+  }
+);
+
+// ==================== OBTER TRANSFERÊNCIA POR ID ====================
+app.get(
+  "/api/ingressos/transferencias/:id",
+  autenticarToken,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const { rows } = await pool.query(
+        `
+        SELECT 
+          t.id,
+          t.ingresso_id,
+          t.valor,
+          t.status,
+          t.data_criacao,
+          u1.nome AS nome_remetente,
+          u1.cpf_cnpj AS cpf_remetente,
+          u2.nome AS nome_destinatario,
+          u2.cpf_cnpj AS cpf_destinatario
+        FROM transferencia_ingresso t
+        JOIN usuarios u1 ON t.de_usuario_id = u1.id
+        JOIN usuarios u2 ON t.para_usuario_id = u2.id
+        WHERE t.id = $1
+      `,
+        [id]
+      );
+
+      if (rows.length === 0)
+        return res.status(404).json({ erro: "Transferência não encontrada" });
+
+      res.json({ transferencia: rows[0] });
+    } catch (err) {
+      console.error("Erro ao buscar transferência:", err);
+      res.status(500).json({ erro: "Erro ao buscar transferência" });
+    }
+  }
+);
+
+// ==================== ACEITAR TRANSFERÊNCIA ====================
+app.post(
+  "/api/ingressos/transferencias/aceitar",
+  autenticarToken,
+  async (req, res) => {
+    const { transferenciaId } = req.body;
+    const usuarioId = req.usuarioId;
+
+    if (!transferenciaId) {
+      return res.status(400).json({ erro: "Informe o ID da transferência" });
+    }
+
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+
+      // Buscar transferência válida e o pedido relacionado
+      const { rows } = await client.query(
+        `SELECT t.id AS transferencia_id, p.id AS pedido_id
+         FROM transferencia_ingresso t
+         JOIN ingressos i ON i.id = t.ingresso_id
+         JOIN pedido_itens pi ON pi.ingresso_id = i.id
+         JOIN pedidos p ON p.id = pi.pedido_id
+         WHERE t.id = $1 AND t.status = 'A'`,
+        [transferenciaId]
+      );
+
+      if (rows.length === 0) {
+        await client.query("ROLLBACK");
+        return res
+          .status(400)
+          .json({ erro: "Transferência não encontrada ou já processada" });
+      }
+
+      const transf = rows[0];
+
+      // Atualizar apenas o dono do pedido
+      await client.query(`UPDATE pedidos SET usuario_id = $1 WHERE id = $2`, [
+        usuarioId,
+        transf.pedido_id,
+      ]);
+
+      // Finalizar transferência com data de conclusão
+      await client.query(
+        `UPDATE transferencia_ingresso
+         SET status = 'C', data_finalizacao = NOW()
+         WHERE id = $1`,
+        [transferenciaId]
+      );
+
+      await client.query("COMMIT");
+      res.json({ mensagem: "Transferência aceita com sucesso" });
+    } catch (err) {
+      await client.query("ROLLBACK");
+      console.error("Erro ao aceitar transferência:", err);
+      res.status(500).json({ erro: "Erro ao aceitar transferência" });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+app.post(
+  "/api/ingressos/transferencias/recusar",
+  autenticarToken,
+  async (req, res) => {
+    const { transferenciaId } = req.body;
+    const usuarioId = req.usuarioId;
+
+    if (!transferenciaId) {
+      return res.status(400).json({ erro: "Informe o ID da transferência" });
+    }
+
+    try {
+      const { rowCount } = await pool.query(
+        `
+        UPDATE transferencia_ingresso
+        SET status = 'R', data_finalizacao = NOW()
+        WHERE id = $1 AND para_usuario_id = $2 AND status = 'A'
+        `,
+        [transferenciaId, usuarioId]
+      );
+
+      if (rowCount === 0) {
+        return res
+          .status(400)
+          .json({ erro: "Transferência não encontrada ou já processada" });
+      }
+
+      res.json({ mensagem: "Transferência recusada com sucesso" });
+    } catch (err) {
+      console.error("Erro ao recusar transferência:", err);
+      res.status(500).json({ erro: "Erro ao recusar transferência" });
+    }
+  }
+);
 
 // ==================== BUSCA LOCAIS (OpenStreetMap) ====================
-// Nota: se seu Node for < 18, instale `node-fetch` e importe aqui.
-// Ex.: npm install node-fetch
 app.post("/buscar-locais", async (req, res) => {
   const { texto } = req.body;
   try {
@@ -674,6 +874,48 @@ app.put("/api/pedidos/:id/status", autenticarToken, async (req, res) => {
   } catch (err) {
     console.error("Erro ao atualizar status do pedido:", err);
     res.status(500).json({ erro: "Erro ao atualizar status do pedido" });
+  }
+});
+
+app.get("/api/pedidos/meus", autenticarToken, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `
+      SELECT 
+        p.id AS pedido_id,
+        p.usuario_id,
+        p.data_pedido,
+        p.status_pagamento,
+        p.valor_total,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'ingresso_id', i.id,
+              'evento_id', i.evento_id,
+              'tipo_ingresso', i.tipo_ingresso,
+              'preco_unitario', pi.preco_unitario,
+              'quantidade', pi.quantidade,
+              'preco_total', (pi.preco_unitario * pi.quantidade),
+              'evento_titulo', e.titulo,
+              'evento_imagem', e.imagem
+            )
+          ) FILTER (WHERE i.id IS NOT NULL), '[]'
+        ) AS itens
+      FROM pedidos p
+      LEFT JOIN pedido_itens pi ON p.id = pi.pedido_id
+      LEFT JOIN ingressos i ON pi.ingresso_id = i.id
+      LEFT JOIN eventos e ON i.evento_id = e.id
+      WHERE p.usuario_id = $1
+      GROUP BY p.id
+      ORDER BY p.data_pedido DESC
+      `,
+      [req.usuarioId]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Erro ao buscar pedidos do usuário:", err);
+    res.status(500).json({ erro: "Erro ao buscar pedidos" });
   }
 });
 
