@@ -3,6 +3,8 @@ import { Loader2, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "./Transferencia.css";
 
+const API_URL = import.meta.env.VITE_API_URL || ""; // define a URL do backend
+
 function Transferencia() {
   const [enviadas, setEnviadas] = useState([]);
   const [recebidas, setRecebidas] = useState([]);
@@ -13,6 +15,7 @@ function Transferencia() {
   function handleGoHome() {
     navigate("/home");
   }
+
   useEffect(() => {
     const carregarTransferencias = async () => {
       setLoading(true);
@@ -21,7 +24,7 @@ function Transferencia() {
         const token = localStorage.getItem("token");
 
         const fetchJsonSafe = async (url) => {
-          const res = await fetch(url, {
+          const res = await fetch(`${API_URL}${url}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
 
@@ -55,7 +58,7 @@ function Transferencia() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("/api/ingressos/transferencias/recusar", {
+      const res = await fetch(`${API_URL}/api/ingressos/transferencias/recusar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,17 +88,11 @@ function Transferencia() {
 
   return (
     <div className="transferencia-container">
-      {/* CABEÇALHO COM BOTÃO VOLTAR */}
       <div className="transferencia-header">
-        <ArrowLeft
-          size={28}
-          className="venda-back-icon2"
-          onClick={handleGoHome}
-        />
+        <ArrowLeft size={28} className="venda-back-icon2" onClick={handleGoHome} />
         <h2>Minhas Transferências</h2>
       </div>
 
-      {/* ABAS */}
       <div className="transferencia-tabs">
         <button
           className={abaAtiva === "recebidas" ? "ativa" : ""}
@@ -103,7 +100,6 @@ function Transferencia() {
         >
           Recebidas
         </button>
-
         <button
           className={abaAtiva === "enviadas" ? "ativa" : ""}
           onClick={() => setAbaAtiva("enviadas")}
@@ -112,7 +108,6 @@ function Transferencia() {
         </button>
       </div>
 
-      {/* LISTA OU MENSAGEM VAZIA */}
       {lista.length === 0 ? (
         <p className="transferencia-empty">Nenhuma transferência {abaAtiva}.</p>
       ) : (
@@ -137,20 +132,9 @@ function Transferencia() {
                 <td>{t.ingresso_id}</td>
                 <td>{t.nome_remetente}</td>
                 <td>{t.nome_destinatario}</td>
-                <td>
-                  {t.data_criacao
-                    ? new Date(t.data_criacao).toLocaleString()
-                    : "-"}
-                </td>
-                <td>
-                  {t.data_finalizacao
-                    ? new Date(t.data_finalizacao).toLocaleString()
-                    : "-"}
-                </td>
-                <td>
-                  {t.valor ? `R$ ${parseFloat(t.valor).toFixed(2)}` : "-"}
-                </td>
-
+                <td>{t.data_criacao ? new Date(t.data_criacao).toLocaleString() : "-"}</td>
+                <td>{t.data_finalizacao ? new Date(t.data_finalizacao).toLocaleString() : "-"}</td>
+                <td>{t.valor ? `R$ ${parseFloat(t.valor).toFixed(2)}` : "-"}</td>
                 <td>
                   {abaAtiva === "recebidas" && t.status === "A" ? (
                     <div className="acoes-transferencia">
@@ -160,10 +144,7 @@ function Transferencia() {
                       >
                         Aceitar
                       </button>
-                      <button
-                        className="btn-recusar"
-                        onClick={() => recusarTransferencia(t.id)}
-                      >
+                      <button className="btn-recusar" onClick={() => recusarTransferencia(t.id)}>
                         Recusar
                       </button>
                     </div>
