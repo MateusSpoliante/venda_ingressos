@@ -6,12 +6,13 @@
   background: #f5f6f7;
 }
 
+/* Container do login */
 .login-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+
   background: #ffffff;
-  /* branco clean */
   padding: 30px 25px;
   width: 420px;
   border-radius: 2.5px;
@@ -19,27 +20,27 @@
 }
 
 /* Logo + título */
-.logoDiv {
+.logoDiv1 {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.logoDiv img {
+.logoDiv1 img {
   margin: -20px;
-  margin-bottom: -22px;
-  width: 120px;
-  height: 120px;
+  margin-bottom: -15px;
+  width: 85px;
+  height: 85px;
 }
 
-.ticket-title h1 {
+.ticket-title1 h1 {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: bold;
   color: #5789a6;
   text-align: center;
-  -webkit-text-stroke: 2px #04324c;
+  -webkit-text-stroke: 1.4px #04324c;
 }
 
 /* Linha divisória */
@@ -65,7 +66,6 @@
   font-size: 1.5rem;
   font-weight: bold;
   color: #111;
-  text-align: left;
   width: 100%;
 }
 
@@ -98,7 +98,7 @@
   background-color: #e4e4e4;
 }
 
-/* Botão */
+/* Botões */
 .link-cad {
   text-decoration: none;
   width: 100%;
@@ -157,110 +157,43 @@ form a:hover {
 }
 
 /* ===== Responsividade ===== */
-
 @media (max-width: 768px) {
-  body {
-    min-height: 100vh;
+  .logoDiv1 img {
+    width: 95px;
+    height: 95px;
   }
 
-  .login-container {
-    max-width: 400px;
-  }
-
-  .logoDiv img {
-    width: 90px;
-    height: 90px;
-    margin: -10px;
-    margin-bottom: -15px;
-  }
-
-  .ticket-title h1 {
-    font-size: 1.5rem;
-    -webkit-text-stroke: 1.5px #04324c;
-  }
-
-  .login-box h2 {
-    font-size: 1.2rem;
-  }
-
-  .input-group input {
-    font-size: 0.95rem;
-    padding: 8px;
-  }
-
-  .btn-login,
-  .btn-cad-login {
-    font-size: 0.95rem;
-    padding: 10px;
+  .ticket-title1 h1 {
+    font-size: 1.7rem;
   }
 }
 
 @media (max-width: 480px) {
-  body {
-    min-height: 100vh;
+  .logoDiv1 img {
+    width: 105px;
+    height: 105px;
   }
 
-  .login-container {
-    max-width: 400px;
-    max-height: 450px;
-    border-radius: 2.5px;
-    justify-content: center;
-  }
-
-  .ticket-title h1 {
-    font-size: 1.3rem;
-    -webkit-text-stroke: 0.8px #04324c;
-    color: #5789a6;
-  }
-
-  .logoDiv img {
-    width: 75px;
-    height: 75px;
-  }
-
-  .btn-login,
-  .btn-cad-login {
-    padding: 9px;
-    font-size: 0.9rem;
+  .ticket-title1 h1 {
+    font-size: 1.8rem;
   }
 }
 
 @media (max-width: 360px) {
-  body {
-    min-height: 100vh;
+  .logoDiv1 img {
+    width: 115px;
+    height: 115px;
   }
 
-  .login-container {
-    max-width: 250px;
-    max-height: 420px;
-    border-radius: 2.5px;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .ticket-title h1 {
-    font-size: 1.2rem;
-    -webkit-text-stroke: 0.7px #04324c;
-    color: #5789a6;
-  }
-
-  .logoDiv img {
-    width: 75px;
-    height: 75px;
-  }
-
-  .btn-login,
-  .btn-cad-login {
-    padding: 9px;
-    font-size: 0.9rem;
+  .ticket-title1 h1 {
+    font-size: 1.9rem;
   }
 }
 
+/* ===== Spinner no botão ===== */
 .spinner {
   border: 3px solid #f3f3f3;
-  /* cor da borda */
   border-top: 3px solid #054062;
-  /* cor da borda superior */
   border-radius: 50%;
   width: 18px;
   height: 18px;
@@ -270,11 +203,6 @@ form a:hover {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

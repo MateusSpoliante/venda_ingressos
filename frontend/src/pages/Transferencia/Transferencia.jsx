@@ -58,14 +58,17 @@ function Transferencia() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(`${API_URL}/api/ingressos/transferencias/recusar`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ transferenciaId: id }),
-      });
+      const res = await fetch(
+        `${API_URL}/api/ingressos/transferencias/recusar`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ transferenciaId: id }),
+        }
+      );
 
       const data = await res.json();
       if (!res.ok) return alert(data.erro || "Erro ao recusar");
@@ -89,7 +92,11 @@ function Transferencia() {
   return (
     <div className="transferencia-container">
       <div className="transferencia-header">
-        <ArrowLeft size={28} className="venda-back-icon2" onClick={handleGoHome} />
+        <ArrowLeft
+          size={28}
+          className="venda-back-icon2"
+          onClick={handleGoHome}
+        />
         <h2>Minhas Transferências</h2>
       </div>
 
@@ -128,14 +135,24 @@ function Transferencia() {
           <tbody>
             {lista.map((t) => (
               <tr key={t.id}>
-                <td>{t.id}</td>
-                <td>{t.ingresso_id}</td>
-                <td>{t.nome_remetente}</td>
-                <td>{t.nome_destinatario}</td>
-                <td>{t.data_criacao ? new Date(t.data_criacao).toLocaleString() : "-"}</td>
-                <td>{t.data_finalizacao ? new Date(t.data_finalizacao).toLocaleString() : "-"}</td>
-                <td>{t.valor ? `R$ ${parseFloat(t.valor).toFixed(2)}` : "-"}</td>
-                <td>
+                <td data-label="ID">{t.id}</td>
+                <td data-label="Ingresso">{t.ingresso_id}</td>
+                <td data-label="Remetente">{t.nome_remetente}</td>
+                <td data-label="Destinatário">{t.nome_destinatario}</td>
+                <td data-label="Data Criação">
+                  {t.data_criacao
+                    ? new Date(t.data_criacao).toLocaleString()
+                    : "-"}
+                </td>
+                <td data-label="Data Finalização">
+                  {t.data_finalizacao
+                    ? new Date(t.data_finalizacao).toLocaleString()
+                    : "-"}
+                </td>
+                <td data-label="Valor">
+                  {t.valor ? `R$ ${parseFloat(t.valor).toFixed(2)}` : "-"}
+                </td>
+                <td data-label="Status">
                   {abaAtiva === "recebidas" && t.status === "A" ? (
                     <div className="acoes-transferencia">
                       <button
@@ -144,7 +161,10 @@ function Transferencia() {
                       >
                         Aceitar
                       </button>
-                      <button className="btn-recusar" onClick={() => recusarTransferencia(t.id)}>
+                      <button
+                        className="btn-recusar"
+                        onClick={() => recusarTransferencia(t.id)}
+                      >
                         Recusar
                       </button>
                     </div>
