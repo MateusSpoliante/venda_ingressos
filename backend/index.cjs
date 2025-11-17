@@ -19,7 +19,7 @@ const supabase = createClient(
 const app = express();
 app.use(
   cors({
-    origin: "https://openticket.onrender.com", // domínio real do frontend
+    origin: "https://openticket-rust.vercel.app/", // domínio real do frontend
     credentials: true,
   })
 );
