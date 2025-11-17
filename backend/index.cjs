@@ -17,7 +17,13 @@ const supabase = createClient(
 
 // ==================== CONFIG EXPRESS ====================
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://openticket.onrender.com", // domínio real do frontend
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 setupSwagger(app);
 
