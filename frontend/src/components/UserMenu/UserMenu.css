@@ -28,7 +28,6 @@
     transform: scale(1.02);
 }
 
-
 .user-dropdown {
     position: absolute;
     top: 110%;
@@ -39,7 +38,8 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     z-index: 100;
     overflow: hidden;
-    min-width: 150px;
+    min-width: 200px;
+    /* aumentei de 150px para 200px */
 }
 
 .logout {
@@ -57,7 +57,10 @@
     border-radius: 4px;
     transition: 0.3s;
     font-family: "Inter", sans-serif;
+    white-space: nowrap;
+    /* evita que o texto quebre */
 }
+
 
 .logout:hover {
     background: var(--cor-cinza);

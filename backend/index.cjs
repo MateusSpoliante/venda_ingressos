@@ -749,7 +749,6 @@ app.post(
     }
   }
 );
-
 // ==================== BUSCA LOCAIS (OpenStreetMap) ====================
 app.post("/buscar-locais", async (req, res) => {
   const { texto } = req.body;
@@ -779,6 +778,7 @@ app.post("/buscar-locais", async (req, res) => {
 });
 
 // ==================== PEDIDOS ====================
+// Criar pedido
 app.post("/api/pedidos", autenticarToken, async (req, res) => {
   const { itens } = req.body;
   if (!Array.isArray(itens) || itens.length === 0)
@@ -803,7 +803,6 @@ app.post("/api/pedidos", autenticarToken, async (req, res) => {
       if (ingresso.quantidade < item.quantidade)
         throw new Error(`Ingressos insuficientes para ID ${item.ingresso_id}`);
 
-      // Total que o usuário já comprou deste ingresso
       const { rows: totalComprado } = await client.query(
         `SELECT COALESCE(SUM(pi.quantidade),0) AS total
          FROM pedido_itens pi
@@ -813,7 +812,6 @@ app.post("/api/pedidos", autenticarToken, async (req, res) => {
       );
       const jaComprado = parseInt(totalComprado[0].total, 10);
 
-      // Validação do limite por CPF
       if (ingresso.limite_por_cpf && jaComprado >= ingresso.limite_por_cpf) {
         throw new Error(
           `Você já atingiu o limite de ${ingresso.limite_por_cpf} para este ingresso`
@@ -830,10 +828,10 @@ app.post("/api/pedidos", autenticarToken, async (req, res) => {
       valor_total += item.quantidade * item.preco_unitario;
     }
 
-    // Cria pedido já como pago
+    // Cria pedido já como 'P' (Pago)
     const pedidoRes = await client.query(
-      `INSERT INTO pedidos (usuario_id, data_pedido, status_pagamento, valor_total)
-       VALUES ($1, NOW(), 'pago', $2) RETURNING id`,
+      `INSERT INTO pedidos (usuario_id, data_pedido, status, valor_total)
+       VALUES ($1, NOW(), 'P', $2) RETURNING id`,
       [req.usuarioId, valor_total]
     );
     const pedidoId = pedidoRes.rows[0].id;
@@ -862,23 +860,25 @@ app.post("/api/pedidos", autenticarToken, async (req, res) => {
   }
 });
 
+// Atualizar status do pedido
 app.put("/api/pedidos/:id/status", autenticarToken, async (req, res) => {
   const { id } = req.params;
-  const { status_pagamento } = req.body;
-  if (!["pendente", "pago"].includes(status_pagamento))
-    return res
-      .status(400)
-      .json({ erro: "Status inválido (use pendente ou pago)" });
+  const { status } = req.body;
+
+  if (!["P", "A", "T"].includes(status))
+    return res.status(400).json({ erro: "Status inválido (use P, A ou T)" });
 
   try {
     const { rowCount } = await pool.query(
-      `UPDATE pedidos SET status_pagamento = $1 WHERE id = $2 AND usuario_id = $3`,
-      [status_pagamento, id, req.usuarioId]
+      `UPDATE pedidos SET status = $1 WHERE id = $2 AND usuario_id = $3`,
+      [status, id, req.usuarioId]
     );
+
     if (rowCount === 0)
       return res
         .status(404)
         .json({ erro: "Pedido não encontrado ou sem permissão" });
+
     res.json({ mensagem: "Status atualizado com sucesso" });
   } catch (err) {
     console.error("Erro ao atualizar status do pedido:", err);
@@ -886,38 +886,41 @@ app.put("/api/pedidos/:id/status", autenticarToken, async (req, res) => {
   }
 });
 
+// Buscar pedidos do usuário
 app.get("/api/pedidos/meus", autenticarToken, async (req, res) => {
   try {
     const { rows } = await pool.query(
       `
-      SELECT 
-        p.id AS pedido_id,
-        p.usuario_id,
-        p.data_pedido,
-        p.status_pagamento,
-        p.valor_total,
-        COALESCE(
-          json_agg(
-            json_build_object(
-              'ingresso_id', i.id,
-              'evento_id', i.evento_id,
-              'tipo_ingresso', i.tipo_ingresso,
-              'preco_unitario', pi.preco_unitario,
-              'quantidade', pi.quantidade,
-              'preco_total', (pi.preco_unitario * pi.quantidade),
-              'evento_titulo', e.titulo,
-              'evento_imagem', e.imagem
-            )
-          ) FILTER (WHERE i.id IS NOT NULL), '[]'
-        ) AS itens
-      FROM pedidos p
-      LEFT JOIN pedido_itens pi ON p.id = pi.pedido_id
-      LEFT JOIN ingressos i ON pi.ingresso_id = i.id
-      LEFT JOIN eventos e ON i.evento_id = e.id
-      WHERE p.usuario_id = $1
-      GROUP BY p.id
-      ORDER BY p.data_pedido DESC
-      `,
+     SELECT 
+  p.id AS pedido_id,
+  p.usuario_id,
+  p.data_pedido,
+  p.status,
+  p.valor_total,
+  COALESCE(
+    json_agg(
+      json_build_object(
+        'ingresso_id', i.id,
+        'evento_id', i.evento_id,
+        'tipo_ingresso', i.tipo_ingresso,
+        'preco_unitario', COALESCE(pi.preco_unitario::float, 0),
+        'quantidade', COALESCE(pi.quantidade, 0),
+        'evento_titulo', e.titulo,
+        'evento_imagem', e.imagem,
+        'status', p.status
+      )
+    ) FILTER (WHERE i.id IS NOT NULL), '[]'
+  ) AS itens
+FROM pedidos p
+LEFT JOIN pedido_itens pi ON p.id = pi.pedido_id
+LEFT JOIN ingressos i ON pi.ingresso_id = i.id
+LEFT JOIN eventos e ON i.evento_id = e.id
+WHERE p.usuario_id = $1
+GROUP BY p.id
+ORDER BY p.data_pedido DESC;
+
+
+    `,
       [req.usuarioId]
     );
 
@@ -927,7 +930,6 @@ app.get("/api/pedidos/meus", autenticarToken, async (req, res) => {
     res.status(500).json({ erro: "Erro ao buscar pedidos" });
   }
 });
-
 app.get(
   "/api/organizador/pedidos",
   autenticarToken,

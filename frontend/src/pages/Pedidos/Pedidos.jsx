@@ -33,6 +33,19 @@ export default function Pedidos() {
     if (transferencia) {
       console.log("Transferência realizada:", transferencia);
       alert("Transferência realizada com sucesso!");
+
+      // Atualiza o estado local para marcar o ingresso como transferido
+      setPedidos((prevPedidos) =>
+        prevPedidos.map((pedido) => ({
+          ...pedido,
+          itens: pedido.itens.map((i) =>
+            i.ingresso_id === ingressoSelecionado.ingresso_id
+              ? { ...i, status: "T" }
+              : i
+          ),
+        }))
+      );
+
       handleFecharModal();
     } else {
       alert("Erro: transferência não retornou dados.");
@@ -96,12 +109,21 @@ export default function Pedidos() {
             <div className="pedidos-lista">
               {pedidosPorData[data].map((pedido) =>
                 pedido.itens.map((item, idx) => {
-                  const precoFormatado = (item.preco_unitario || 0).toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  });
+                  const precoFormatado = (item.preco_unitario || 0).toLocaleString(
+                    "pt-BR",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  );
+
+                  const isTransferido = item.status === "T";
+
                   return (
-                    <div key={idx} className="pedido-card">
+                    <div
+                      key={idx}
+                      className={`pedido-card ${isTransferido ? "transferido" : ""}`}
+                    >
                       <div className="pedido-evento-info">
                         <img
                           src={item.evento_imagem || "/banner2.webp"}
@@ -116,17 +138,21 @@ export default function Pedidos() {
                           <p className="pedido-quantidade">
                             Quantidade: {item.quantidade || 0}
                           </p>
-                          <p className="pedido-preco">
-                            Preço unitário: R$ {precoFormatado}
-                          </p>
+                          <p className="pedido-preco">Preço unitário: R$ {precoFormatado}</p>
 
-                          <button
-                            className="btn-transferir"
-                            onClick={() => handleTransferir(item)}
-                          >
-                            Transferir Ingresso
-                          </button>
+                          {!isTransferido && (
+                            <button
+                              className="btn-transferir"
+                              onClick={() => handleTransferir(item)}
+                            >
+                              Transferir Ingresso
+                            </button>
+                          )}
                         </div>
+
+                        {isTransferido && (
+                          <div className="transferido-overlay">Transferido</div>
+                        )}
                       </div>
                     </div>
                   );

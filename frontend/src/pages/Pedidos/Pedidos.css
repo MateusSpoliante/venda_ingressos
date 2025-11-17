@@ -1,12 +1,19 @@
 /* --- Variáveis de Paleta (Reutilizando a última definida) --- */
 :root {
-  --primary-color: #054062; /* Azul Marinho Principal */
-  --secondary-color: #f97721; /* Laranja de Destaque */
-  --background-color: #efefef; /* Fundo Leve (Cinza muito claro) */
-  --card-background: #ffffff; /* Fundo de Cartões e Tabela */
-  --text-color: #222; /* Texto Escuro Forte */
-  --subtle-text: #666; /* Texto Secundário/Sutil */
-  --border-color: #e0e0e0; /* Borda Suave */
+  --primary-color: #054062;
+  /* Azul Marinho Principal */
+  --secondary-color: #f97721;
+  /* Laranja de Destaque */
+  --background-color: #efefef;
+  /* Fundo Leve (Cinza muito claro) */
+  --card-background: #ffffff;
+  /* Fundo de Cartões e Tabela */
+  --text-color: #222;
+  /* Texto Escuro Forte */
+  --subtle-text: #666;
+  /* Texto Secundário/Sutil */
+  --border-color: #e0e0e0;
+  /* Borda Suave */
 
   /* Cores de Status Semânticas */
   --status-success: #1e8449;
@@ -174,6 +181,72 @@
   color: var(--subtle-text);
   font-size: 1.1em;
 }
+/* --- Pedido Transferido (Ajustes para o estado 'transferido') --- */
+.pedido-card.transferido {
+  /* Reduz a opacidade para indicar que está inativo/finalizado */
+  opacity: 0.6;
+  /* Remove o efeito hover, pois o cartão está em um estado final */
+  pointer-events: none;
+  /* Garante que o efeito de sombra/escala não se aplique mais */
+  transform: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+  /* Cor de fundo sutilmente alterada para indicar estado */
+  background-color: #f7f7f7;
+  position: relative;
+  /* Volta o filtro para 'none' e usa 'opacity' para melhor controle */
+  filter: none;
+}
+
+/* Remove o hover para o estado transferido */
+.pedido-card.transferido:hover {
+  transform: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+}
+
+/* Opcional: Estilo específico para o botão no card transferido */
+.pedido-card.transferido .btn-transferir {
+  display: none; /* Oculta o botão se a ação não for mais permitida */
+}
+
+
+/* --- Overlay de Transferido --- */
+.transferido-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Fundo preto semi-transparente para alto contraste */
+  background-color: rgba(0, 0, 0, 0.4);
+  color: #ffffff;
+  font-weight: 700; /* Mais forte */
+  font-size: 1.6rem; /* Um pouco maior */
+  display: flex; /* Centraliza o texto usando flexbox */
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px; /* Combina com o card */
+  text-transform: uppercase; /* Dá mais destaque */
+  letter-spacing: 1px;
+  z-index: 10; /* Garante que fique acima de todos os elementos internos */
+  pointer-events: none;
+  opacity: 0; /* Começa oculto */
+  animation: fadeInTransferido 0.5s forwards; /* Animação simples para aparecer */
+}
+
+/* Animação para o overlay aparecer */
+@keyframes fadeInTransferido {
+  to {
+    opacity: 1;
+  }
+}
+
+/* --- Ajuste em Mobile (Garante que o overlay cubra 100% da área) --- */
+@media (max-width: 768px) {
+  .transferido-overlay {
+    font-size: 1.3rem; /* Ajuste para telas menores */
+  }
+}
+
 
 /* --- Responsividade --- */
 @media (max-width: 768px) {
@@ -192,8 +265,10 @@
 
   /* Ajustes da Imagem em Mobile (Mantido o comportamento de banner full width) */
   .pedido-evento-img {
-    width: 100%; /* Ocupa a largura total */
-    height: 150px; /* Altura fixa para mobile */
+    width: 100%;
+    /* Ocupa a largura total */
+    height: 150px;
+    /* Altura fixa para mobile */
     object-fit: cover;
   }
 
