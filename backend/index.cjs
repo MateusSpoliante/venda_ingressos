@@ -455,11 +455,10 @@ app.post("/api/ingressos/transferir", autenticarToken, async (req, res) => {
     return res.status(400).json({ erro: "Preencha todos os campos" });
 
   const client = await pool.connect();
-
   try {
     await client.query("BEGIN");
 
-    // 1️⃣ Verifica se o ingresso foi comprado pelo usuário logado
+    // 1️⃣ Verifica se o ingresso existe e pertence ao usuário logado
     const ingressoCheck = await client.query(
       `SELECT i.id, i.preco, p.usuario_id AS dono_id
        FROM ingressos i
@@ -476,24 +475,37 @@ app.post("/api/ingressos/transferir", autenticarToken, async (req, res) => {
         .json({ erro: "Ingresso não encontrado ou não pertence a você" });
     }
 
-    const donoId = ingressoCheck.rows[0].dono_id;
-    const valorIngresso = parseFloat(ingressoCheck.rows[0].preco);
+    // 2️⃣ Pega o CPF do usuário logado
+    const { rows: usuarioRows } = await client.query(
+      `SELECT cpf_cnpj FROM usuarios WHERE id = $1`,
+      [usuarioLogadoId]
+    );
+    const meuCpf = usuarioRows[0]?.cpf_cnpj;
 
-    // 2️⃣ Verifica se o destinatário existe
+    // 3️⃣ Verifica se está tentando transferir para ele mesmo
+    if (cpf_destinatario === meuCpf) {
+      await client.query("ROLLBACK");
+      return res
+        .status(400)
+        .json({ erro: "Não é possível transferir ingresso para você mesmo" });
+    }
+
+    // 4️⃣ Verifica se o destinatário existe
     const destinatarioCheck = await client.query(
-      `SELECT id, cpf_cnpj FROM usuarios WHERE cpf_cnpj = $1`,
+      `SELECT id FROM usuarios WHERE cpf_cnpj = $1`,
       [cpf_destinatario]
     );
-
     if (destinatarioCheck.rows.length === 0) {
       await client.query("ROLLBACK");
       return res.status(400).json({ erro: "Destinatário não encontrado" });
     }
-
     const para_usuario_id = destinatarioCheck.rows[0].id;
 
-    // 3️⃣ Valida valor da transferência
-    if (valor && parseFloat(valor) > valorIngresso) {
+    // 5️⃣ Valida valor da transferência
+    const valorTransferencia = parseFloat(valor) || null;
+    const valorIngresso = parseFloat(ingressoCheck.rows[0].preco);
+
+    if (valorTransferencia && valorTransferencia > valorIngresso) {
       await client.query("ROLLBACK");
       return res.status(400).json({
         erro: `O valor não pode ser maior que o preço do ingresso (R$ ${valorIngresso.toFixed(
@@ -502,13 +514,13 @@ app.post("/api/ingressos/transferir", autenticarToken, async (req, res) => {
       });
     }
 
-    // 4️⃣ Cria registro de transferência
+    // 6️⃣ Cria registro de transferência
     const insertTransfer = await client.query(
       `INSERT INTO transferencia_ingresso 
         (ingresso_id, de_usuario_id, para_usuario_id, valor, status, data_criacao)
        VALUES ($1, $2, $3, $4, 'A', NOW())
        RETURNING *`,
-      [ingresso_id, usuarioLogadoId, para_usuario_id, valor || null]
+      [ingresso_id, usuarioLogadoId, para_usuario_id, valorTransferencia]
     );
 
     await client.query("COMMIT");
@@ -537,20 +549,22 @@ app.get(
       const { rows: transferencias } = await pool.query(
         `
       SELECT 
-        t.id,
-        t.ingresso_id,
-        t.valor,
-        t.status,
-        t.data_criacao,
-        u1.nome AS nome_remetente,
-        u1.cpf_cnpj AS cpf_remetente,
-        u2.nome AS nome_destinatario,
-        u2.cpf_cnpj AS cpf_destinatario
-      FROM transferencia_ingresso t
-      JOIN usuarios u1 ON t.de_usuario_id = u1.id
-      JOIN usuarios u2 ON t.para_usuario_id = u2.id
-      WHERE t.para_usuario_id = $1
-      ORDER BY t.data_criacao DESC
+  t.id,
+  t.ingresso_id,
+  t.valor,
+  t.status,
+  t.data_criacao,
+  t.data_finalizacao,        -- <--- adicionado
+  u1.nome AS nome_remetente,
+  u1.cpf_cnpj AS cpf_remetente,
+  u2.nome AS nome_destinatario,
+  u2.cpf_cnpj AS cpf_destinatario
+FROM transferencia_ingresso t
+JOIN usuarios u1 ON t.de_usuario_id = u1.id
+JOIN usuarios u2 ON t.para_usuario_id = u2.id
+WHERE t.para_usuario_id = $1
+ORDER BY t.data_criacao DESC;
+
     `,
         [usuarioId]
       );
@@ -581,20 +595,22 @@ app.get(
       const { rows } = await pool.query(
         `
       SELECT 
-        t.id,
-        t.ingresso_id,
-        t.valor,
-        t.status,
-        t.data_criacao,
-        u1.nome AS nome_remetente,
-        u1.cpf_cnpj AS cpf_remetente,
-        u2.nome AS nome_destinatario,
-        u2.cpf_cnpj AS cpf_destinatario
-      FROM transferencia_ingresso t
-      JOIN usuarios u1 ON t.de_usuario_id = u1.id
-      JOIN usuarios u2 ON t.para_usuario_id = u2.id
-      WHERE t.de_usuario_id = $1
-      ORDER BY t.data_criacao DESC
+  t.id,
+  t.ingresso_id,
+  t.valor,
+  t.status,
+  t.data_criacao,
+  t.data_finalizacao,        -- <--- adicionado
+  u1.nome AS nome_remetente,
+  u1.cpf_cnpj AS cpf_remetente,
+  u2.nome AS nome_destinatario,
+  u2.cpf_cnpj AS cpf_destinatario
+FROM transferencia_ingresso t
+JOIN usuarios u1 ON t.de_usuario_id = u1.id
+JOIN usuarios u2 ON t.para_usuario_id = u2.id
+WHERE t.de_usuario_id = $1
+ORDER BY t.data_criacao DESC;
+
     `,
         [usuarioId]
       );

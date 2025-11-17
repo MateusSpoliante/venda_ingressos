@@ -28,9 +28,22 @@ export default function TransferirModal({ ingresso, onClose, onTransferido }) {
     setErro("");
 
     const valorNumerico = valor ? parseFloat(valor.replace(",", ".")) : null;
-
     if (valorNumerico && valorNumerico > precoMaximo) {
-      setErro(`O valor não pode ser maior que o preço do ingresso (R$ ${precoFormatado})`);
+      setErro(
+        `O valor não pode ser maior que o preço do ingresso (R$ ${precoFormatado})`
+      );
+      return;
+    }
+
+    // Normaliza CPF digitado
+    const cpfNormalizado = cpf.replace(/\D/g, "");
+
+    // Pega CPF do usuário logado do localStorage
+    const cpfUsuarioLogado = localStorage.getItem("cpfCnpj")?.replace(/\D/g, "");
+
+    // Validação: não pode transferir para o próprio usuário
+    if (cpfNormalizado === cpfUsuarioLogado) {
+      setErro("Não é possível transferir ingresso para você mesmo");
       return;
     }
 
@@ -43,7 +56,7 @@ export default function TransferirModal({ ingresso, onClose, onTransferido }) {
         `${import.meta.env.VITE_API_URL}/api/ingressos/transferir`,
         {
           ingresso_id: ingresso.id || ingresso.ingresso_id,
-          cpf_destinatario: cpf,
+          cpf_destinatario: cpfNormalizado,
           valor: valorNumerico,
         },
         {
