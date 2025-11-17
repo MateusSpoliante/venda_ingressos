@@ -19,7 +19,10 @@ const supabase = createClient(
 const app = express();
 app.use(
   cors({
-    origin: "https://openticket-rust.vercel.app/", // domínio real do frontend
+    origin: [
+      "https://openticket-rust.vercel.app",
+      "http://localhost:5173", // porta padrão do Vite
+    ],
     credentials: true,
   })
 );
